@@ -1,10 +1,10 @@
 ##################################################
-## stript to evaluate mobility on TN over ever
+## stript to evaluate mobility on SDTN over ever
 ## change data rates
 ##################################################
-## Author: Paulo H. L. Rettore
+## Author: Paulo H. L. Rettore and Merlin
 ## Status: open
-## Date: 01/07/2020
+## Date: 05/01/2021
 ##################################################
 import os
 import signal
@@ -199,7 +199,7 @@ def topology(traceFile,expRound):
     #info("\n*** Starting data flow after 20s\n")
     sleep(5)
     #makeTerm(sta1, title = 'Client', cmd="ITGSend -T UDP -a 10.0.0.2 -c 1264 -s 0.123456 -U .5 10 -z 100 -t 10000000")
-    makeTerm(sta1, title = 'Client', cmd="ITGSend -Sda 192.168.0.2 -Sdp 9090 -T UDP -a 10.0.0.2 -c 1264 -s 0.123456 -z 100 -t 6000000")# -l sender.log -x receiver.log")
+    makeTerm(sta1, title = 'Client', cmd="ITGSend -Sda 192.168.0.2 -Sdp 9090 -T UDP -a 10.0.0.2 -c 1264 -s 0.123456 -z 50 -t 6000000")# -l sender.log -x receiver.log")
     #makeTerm(sta1, title = 'Client', cmd="iperf -u -c 10.0.0.2 -n 0.01 -i 1 -t 10 -p 8999")#> iperf_result.txt")
     #makeTerm(sta1, title = 'Ping', cmd="ping 10.0.0.2")
 
