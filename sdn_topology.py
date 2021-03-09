@@ -5,6 +5,7 @@ import pandas as pd
 
 from mininet.term import makeTerm
 from mininet.log import setLogLevel, info
+from mininet.node import RemoteController
 from mininet.node import Controller, OVSKernelSwitch
 from mn_wifi.node import OVSKernelAP
 from mn_wifi.link import wmediumd, mesh
@@ -19,15 +20,15 @@ def topology(scenario):
     net = Mininet_wifi(topo=None, build=False, link=wmediumd, wmediumd_mode=interference, ipBase='10.0.0.0/8')
 
     info('*** Adding controller\n')
-    c0 = net.addController(name='c0', controller=Controller, protocol='tcp', port=6633)
+    c0 = net.addController(name='c0', controller=RemoteController, ip='127.0.0.1', port=6633)
 
     info('*** Adding switches/APs\n')
-    ap1 = net.addAccessPoint('ap1', cls=OVSKernelAP, ssid='ap1-ssid', mode='g', channel='1', position='30,50,0')
+    ap1 = net.addAccessPoint('ap1', ip='10.0.0.10', mac='00:00:00:00:01:00', listenPort=6634, dpid='0000000000000010', ssid='ap1-ssid', mode='g', channel='1', position='30,50,0')
 
     info("*** Creating nodes\n")
-    sta1 = net.addStation('sta1', ip='10.0.0.1', position='30,10,0')
-    sta2 = net.addStation('sta2', ip='10.0.0.2', position='10,40,0')
-    sta3 = net.addStation('sta3', ip='10.0.0.3', position='50,40,0')
+    sta1 = net.addStation('sta1', mac='00:00:00:00:00:01', ip='10.0.0.1', position='30,10,0')
+    sta2 = net.addStation('sta2', mac='00:00:00:00:00:02', ip='10.0.0.2', position='10,40,0')
+    sta3 = net.addStation('sta3', mac='00:00:00:00:00:03', ip='10.0.0.3', position='50,40,0')
 
     info("*** Configuring propagation model\n")
     net.setPropagationModel(model="logDistance", exp=4.5)
@@ -35,18 +36,28 @@ def topology(scenario):
     info("*** Configuring wifi nodes\n")
     net.configureWifiNodes()
 
-    info("*** Creating wired links\n")
-    net.addLink(sta1, ap1)
-    net.addLink(sta2, ap1)
-    net.addLink(sta3, ap1)
+    # nodes = net.stations
+    # net.telemetry(nodes=nodes, single=True, data_type='rssi')
 
-    if scenario == 2:
+    #info("*** Creating wired links\n")
+    #net.addLink(sta1, ap1)
+    #net.addLink(sta2, ap1)
+    #net.addLink(sta3, ap1)
+
+    if scenario > 1:
         info("*** Configuring moblity\n")
-        trace_file = 'Scenario_2.csv'
-        smooth_motion = False
-        path = os.path.dirname(os.path.abspath(__file__)) + '/data/'
-        get_trace([sta1, sta2, sta3], path+trace_file, smooth_motion)
-        net.isReplaying = True
+        if scenario == 2:
+            trace_file = 'Scenario_2.csv'
+            smooth_motion = False
+            path = os.path.dirname(os.path.abspath(__file__)) + '/data/'
+            get_trace([sta1, sta2, sta3], path + trace_file, smooth_motion)
+            net.isReplaying = True
+        if scenario == 3:
+            trace_file = 'Scenario_3.csv'
+            smooth_motion = False
+            path = os.path.dirname(os.path.abspath(__file__)) + '/data/'
+            get_trace([sta1, sta2, sta3], path + trace_file, smooth_motion)
+            net.isReplaying = True
 
     info("*** Creating plot\n")
     net.plotGraph(max_x=100, max_y=100)
@@ -56,12 +67,12 @@ def topology(scenario):
     c0.start()
     net.get('ap1').start([c0])
     sleep(2)
-    if scenario == 2:
+    if scenario > 1:
         info("\n*** Replaying Mobility\n")
         ReplayingMobility(net)
-
-    makeTerm(sta1, title='Ping_sta2', cmd="ping sta2")
-    makeTerm(sta1, title='Ping_sta3', cmd="ping sta3")
+    path = os.path.dirname(os.path.abspath(__file__))
+    makeTerm(sta1, title='signal_sta1', cmd="python3 " + path + "/monitor_signal.py -i sta1-wlan0")
+    makeTerm(sta3, title='signal_sta3', cmd="python3 " + path + "/monitor_signal.py -i sta3-wlan0")
     info("*** Running CLI\n")
     CLI(net)
     net.stop()
