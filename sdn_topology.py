@@ -58,6 +58,12 @@ def topology(scenario):
             path = os.path.dirname(os.path.abspath(__file__)) + '/data/'
             get_trace([sta1, sta2, sta3], path + trace_file, smooth_motion)
             net.isReplaying = True
+        if scenario == 4:
+            trace_file = 'Scenario_4.csv'
+            smooth_motion = False
+            path = os.path.dirname(os.path.abspath(__file__)) + '/data/'
+            get_trace([sta1, sta2, sta3], path + trace_file, smooth_motion)
+            net.isReplaying = True
 
     info("*** Creating plot\n")
     net.plotGraph(max_x=100, max_y=100)
@@ -71,8 +77,8 @@ def topology(scenario):
         info("\n*** Replaying Mobility\n")
         ReplayingMobility(net)
     path = os.path.dirname(os.path.abspath(__file__))
-    makeTerm(sta1, title='signal_sta1', cmd="python3 " + path + "/monitor_signal.py -i sta1-wlan0")
-    makeTerm(sta3, title='signal_sta3', cmd="python3 " + path + "/monitor_signal.py -i sta3-wlan0")
+    makeTerm(sta1, title='signal_sta1', cmd="python3 " + path + "/monitor_signal.py -i sta1-wlan0 -p 10.0.0.3")
+    makeTerm(sta3, title='signal_sta3', cmd="python3 " + path + "/monitor_signal.py -i sta3-wlan0 -p 10.0.0.1")
     info("*** Running CLI\n")
     CLI(net)
     net.stop()
