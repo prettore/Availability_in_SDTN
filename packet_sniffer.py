@@ -81,7 +81,7 @@ def capture_live_packets(interface,file,round,filter):
     print("***Starting packet sniffer!")
 
     cap = pyshark.LiveCapture(interface=interface, bpf_filter=filter,
-                                  only_summaries=False, use_json=True, include_raw=True)
+                              only_summaries=False, use_json=True, include_raw=True)
     #cap = pyshark.LiveCapture(interface=interface, only_summaries=False,
     #                          use_json=True, include_raw=True)
     cap.set_debug()
@@ -142,8 +142,9 @@ if __name__ == '__main__':
     if args.interface and args.outputFile:
         if args.ptable:
             capture_live_packets_iptables(str(args.interface), path + '/data/statistics/' + str(args.outputFile),
-                                          str(args.expRound),str(args.filter))
+                                          str(args.expRound), str(args.filter))
         else:
+            print(path + '/data/statistics/')
             capture_live_packets(str(args.interface), path + '/data/statistics/' + str(args.outputFile),
                                  str(args.expRound), str(args.filter))
     else:

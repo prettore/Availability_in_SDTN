@@ -1,8 +1,9 @@
 import os
 import argparse
 import subprocess
-from time import sleep
 import pandas as pd
+from time import sleep
+from datetime import datetime
 
 from mininet.term import makeTerm
 from mininet.log import setLogLevel, info
@@ -16,7 +17,7 @@ from mn_wifi.wmediumdConnector import interference
 from mn_wifi.replaying import ReplayingMobility
 
 
-def topology(scenario):
+def topology(scenario, scan_interval, disconnect_threshold, reconnect_threshold):
     """Build a custom topology and start it"""
     net = Mininet_wifi(topo=None, build=False, link=wmediumd, wmediumd_mode=interference, noise_th=-91, fading_cof=3)
 
@@ -73,10 +74,29 @@ def topology(scenario):
     if scenario > 1:
         info("\n*** Replaying Mobility\n")
         ReplayingMobility(net)
-    path = os.path.dirname(os.path.abspath(__file__))
     info("*** Starting flexible SDN script\n")
-    makeTerm(sta1, title='signal_sta1', cmd="python3 " + path + "/flexible_sdn.py -i sta1-wlan0 ; sleep 10")
-    makeTerm(sta3, title='signal_sta3', cmd="python3 " + path + "/flexible_sdn.py -i sta3-wlan0 ; sleep 10")
+    path = os.path.dirname(os.path.abspath(__file__))
+    start_time = datetime.now()
+    stat_dir = start_time.strftime('%Y-%m-%d_%H-%M-%S') + "_scen-{}_scan-{}_discon{}_recon{}/".format(scenario, scan_interval,
+                                                                                                        disconnect_threshold,
+                                                                                                        reconnect_threshold)
+    statistics_dir = path + '/data/statistics/' + stat_dir
+    if not os.path.isdir(statistics_dir):
+        os.makedirs(statistics_dir)
+    cmd = "python3 {}/flexible_sdn.py -i sta1-wlan0 -s {} -d {} -r {} -o {} ; sleep 10".format(path, scan_interval,
+                                                                                               disconnect_threshold,
+                                                                                               reconnect_threshold,
+                                                                                               stat_dir)
+    makeTerm(sta1, title='signal_sta1', cmd=cmd)
+    cmd = "python3 {}/flexible_sdn.py -i sta3-wlan0 -s {} -d {} -r {} -o {} ; sleep 10".format(path, scan_interval,
+                                                                                               disconnect_threshold,
+                                                                                               reconnect_threshold,
+                                                                                               stat_dir)
+    makeTerm(sta3, title='signal_sta3', cmd=cmd)
+    cmd = "python3 {}/packet_sniffer.py -i sta1-wlan0 -o {}send_packets.csv -f 'icmp[icmptype] = icmp-echo' ; sleep 10".format(path, stat_dir)
+    makeTerm(sta1, title='Packet Sniffer sta1', cmd=cmd)
+    cmd = "python3 {}/packet_sniffer.py -i sta3-wlan0 -o {}recv_packets.csv -f 'icmp[icmptype] = icmp-echo' ; sleep 10".format(path, stat_dir)
+    makeTerm(sta3, title='Packet Sniffer sta3', cmd=cmd)
     sleep(1)
     info("*** Starting ping: sta1 (10.0.0.1) -> sta3 (10.0.0.3)\n")
     makeTerm(sta1, title='ping', cmd="ping 10.0.0.3")
@@ -115,7 +135,15 @@ def get_trace(sta_list, file_, smooth):
 if __name__ == '__main__':
     setLogLevel('info')
     parser = argparse.ArgumentParser(description="Tactical network experiment!")
-    parser.add_argument("-s", "--scenario", help="Select a scenario", type=int, required=True)
+    parser.add_argument("-m", "--mobilityscenario", help="Select a mobility scenario", type=int, required=True)
+    parser.add_argument("-s", "--scaninterval", help="Time interval in seconds (float) for scanning if the wifi access "
+                                                     "point is in range while being in adhoc mode (default: 10.0)",
+                        type=float, default=10.0)
+    parser.add_argument("-d", "--disconnectthreshold", help="Signal strength (float) below which station dissconnects "
+                                                            "from AP and activates OLSR (default: -88.0 dBm)",
+                        type=float, default=-88.0)
+    parser.add_argument("-r", "--reconnectthreshold", help="Minimal signal strength (float) of AP required for trying "
+                                                           "reconnect (default: -85.0 dBm)", type=float, default=-85.0)
     args = parser.parse_args()
-    scenario = args.scenario
-    topology(scenario)
+    scenario = args.mobilityscenario
+    topology(scenario, args.scaninterval, args.disconnectthreshold, args.reconnectthreshold)

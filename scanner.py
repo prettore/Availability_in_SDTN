@@ -1,7 +1,10 @@
+import logging
 import multiprocessing
 
 from time import sleep
 from cmd_utils import cmd_iw_dev
+
+log = logging.getLogger('logger')
 
 
 class Scanner(multiprocessing.Process):
@@ -12,10 +15,10 @@ class Scanner(multiprocessing.Process):
         self.ssid = ssid
 
     def run(self):
-        sleep(2)
         while True:
+            sleep(self.interval)
+            log.info("*** {}: Scanning for {}".format(self.interface, self.ssid))
             if self.ssid:
                 stdout, stderr = cmd_iw_dev(self.interface, "scan", "ssid", self.ssid)
             else:
                 stdout, stderr = cmd_iw_dev(self.interface, "scan")
-            sleep(self.interval)
