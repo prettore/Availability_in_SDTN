@@ -36,33 +36,38 @@ def main():
                         type=float, default=-88.0)
     parser.add_argument("-r", "--reconnectthreshold", help="Minimal signal strength (float) of AP required for trying "
                                                            "reconnect (default: -85.0 dBm)", type=float, default=-85.0)
-    parser.add_argument("-S", "--apssid", help="SSID of the access point (default: ap1-ssid)", type=str,
+    parser.add_argument("-A", "--apssid", help="SSID of the access point (default: ap1-ssid)", type=str,
                         default="ap1-ssid")
     parser.add_argument("-B", "--apbssid", help="BSSID of the access point (default: 00:00:00:00:01:00)", type=str,
                         default="00:00:00:00:01:00")
     parser.add_argument("-I", "--apip", help="IP address of the access point", type=str, default="10.0.0.10")
     parser.add_argument("-o", "--outputpath", help="Path to save statistics in", type=str, required=True)
+    parser.add_argument("-S", "--scaninterface", help="Interface to use for active scans for reconnection to AP", type=str)
     args = parser.parse_args()
 
+    if args.scaninterface:
+        scaninterface = args.scaninterface
+    else:
+        scaninterface = args.interface
     path = os.path.dirname(os.path.abspath(__file__))
     statistics_dir = path + '/data/statistics/' + args.outputpath + '/'
     if not os.path.isdir(statistics_dir):
         os.makedirs(statistics_dir)
-    flexible_sdn_olsr(args.interface, args.scaninterval, args.reconnectthreshold, args.disconnectthreshold, args.pingto,
+    flexible_sdn_olsr(args.interface, scaninterface, args.scaninterval, args.reconnectthreshold, args.disconnectthreshold, args.pingto,
                       statistics_dir, args.apssid, args.apbssid, args.apip)
 
 
-def flexible_sdn_olsr(interface: str, scan_interval: float, reconnect_threshold: float, disconnect_threshold: float,
+def flexible_sdn_olsr(interface: str, scaninterface: str, scan_interval: float, reconnect_threshold: float, disconnect_threshold: float,
                       pingto: str, out_path: str, ap_ssid: str, ap_bssid: str, ap_ip: str):
     """
     This function monitors the wifi signal strength as long there is a connection to the AP.
     When the connection is lost it starts the OLSR and continuously scans for the AP to reappear.
     When the AP reappears OLSR is deactivated and a connection to the AP will be established.
     """
-    scanner = Scanner(interface, scan_interval, ap_ssid)
+    log.info("*** {}: Interface: {}, Scan-interface: {}".format(interface.split('-')[0], interface, scaninterface))
+    scanner = Scanner(scaninterface, scan_interval, ap_ssid)
     olsrd_pid = 0
     csv_columns = ['time', 'ssid', 'signal', 'signal_avg', 'rx_bitrate', 'tx_bitrate', 'expected_throughput']
-    start_time = datetime.now()
     file = out_path + interface + '_signal.csv'
     stdout, stderr = cmd_iw_dev(interface, "link")
     while b'Not connected.' in stdout and b'Connected to ' + ap_bssid.encode() not in stdout:
@@ -108,7 +113,7 @@ def flexible_sdn_olsr(interface: str, scan_interval: float, reconnect_threshold:
                 if scanner.is_alive():
                     print("*** Stopping background scan")
                     scanner.terminate()
-                    scanner = Scanner(interface, scan_interval, ap_ssid)
+                    scanner = Scanner(scaninterface, scan_interval, ap_ssid)
                 time.sleep(2)
                 print("*** Reconnected to AP.")
                 print("*** OLSRd PID: ", olsrd_pid)
