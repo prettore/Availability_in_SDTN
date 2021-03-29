@@ -8,6 +8,7 @@ import logging
 import re
 import threading
 
+from collections import deque
 from subprocess import Popen, PIPE
 from datetime import datetime
 
@@ -67,7 +68,8 @@ def flexible_sdn_olsr(interface: str, scaninterface: str, scan_interval: float, 
     log.info("*** {}: Interface: {}, Scan-interface: {}".format(interface.split('-')[0], interface, scaninterface))
     scanner = Scanner(scaninterface, scan_interval, ap_ssid)
     olsrd_pid = 0
-    csv_columns = ['time', 'ssid', 'signal', 'signal_avg', 'rx_bitrate', 'tx_bitrate', 'expected_throughput']
+    signal_deque = deque(maxlen=3)
+    csv_columns = ['time', 'SSID', 'signal', 'rx_bitrate', 'tx_bitrate']
     file = out_path + interface + '_signal.csv'
     stdout, stderr = cmd_iw_dev(interface, "link")
     while b'Not connected.' in stdout and b'Connected to ' + ap_bssid.encode() not in stdout:
@@ -80,44 +82,45 @@ def flexible_sdn_olsr(interface: str, scaninterface: str, scan_interval: float, 
         time.sleep(1)
         stdout, stderr = cmd_iw_dev(interface, "link")
         stdout = stdout.decode()
-        signal = signal_strength_from_link_info(stdout, ap_bssid, ap_ssid)
-        if 'Connected to ' + ap_bssid in stdout and signal and signal >= disconnect_threshold:
-            data = get_signal_quality(interface, ap_bssid, ap_ssid)
-            if data:
-                data.update({'time': datetime.now().timestamp()})
-                print("{}, {}, {}".format(data['ssid'], data['time'], data['signal']))
+        signal_data = get_signal_quality(interface, ap_bssid, ap_ssid)
+        # signal = signal_strength_from_link_info(stdout, ap_bssid, ap_ssid)
+        if signal_data:
+            signal_deque.append(float(signal_data['signal'].rstrip(' dBm')))
+            signal = sum(signal_deque) / len(signal_deque)
+            if signal >= disconnect_threshold:
+                print("{}, {}, {}".format(signal_data['SSID'], signal_data['time'], signal_data['signal']))
                 if os.path.isfile(file):
                     with open(file, 'a') as csvfile:
                         writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
-                        writer.writerow(data)
+                        writer.writerow(signal_data)
                 else:
                     with open(file, 'w') as csvfile:
                         writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
                         writer.writeheader()
-                        writer.writerow(data)
-        else:
-            print("*** AP signal too weak or connection lost (signal: {} / {})".format(signal, disconnect_threshold))
-            if not scanner.is_alive():
-                print("*** Starting background scan")
-                scanner.start()
-            reconnected, olsrd_pid = try_reconnect(interface, olsrd_pid, ssid=ap_ssid, bssid=ap_bssid,
-                                                   threshold=reconnect_threshold)
-            if not reconnected and olsrd_pid == 0:
-                print("*** Starting OLSRd")
-                olsrd_pid = start_olsrd(interface)
-                if pingto:
-                    spthread = threading.Thread(target=sleep_and_ping, kwargs={'sleep_interval': 1.0, 'ip': pingto},
-                                                daemon=True)
-                    spthread.start()
-            if reconnected:
-                if scanner.is_alive():
-                    print("*** Stopping background scan")
-                    scanner.terminate()
-                    scanner = Scanner(scaninterface, scan_interval, ap_ssid)
-                time.sleep(2)
-                print("*** Reconnected to AP.")
-                print("*** OLSRd PID: ", olsrd_pid)
-                stdout, stderr = Popen(["ping", "-c1", ap_ip], stdout=PIPE, stderr=PIPE).communicate()
+                        writer.writerow(signal_data)
+                continue
+        print("*** AP signal too weak or connection lost (signal: {} / {})".format(signal, disconnect_threshold))
+        if not scanner.is_alive():
+            print("*** Starting background scan")
+            scanner.start()
+        reconnected, olsrd_pid = try_reconnect(interface, scaninterface, olsrd_pid, ssid=ap_ssid, bssid=ap_bssid,
+                                               threshold=reconnect_threshold)
+        if not reconnected and olsrd_pid == 0:
+            print("*** Starting OLSRd")
+            olsrd_pid = start_olsrd(interface)
+            if pingto:
+                spthread = threading.Thread(target=sleep_and_ping, kwargs={'sleep_interval': 1.0, 'ip': pingto},
+                                            daemon=True)
+                spthread.start()
+        if reconnected:
+            if scanner.is_alive():
+                print("*** Stopping background scan")
+                scanner.terminate()
+                scanner = Scanner(scaninterface, scan_interval, ap_ssid)
+            time.sleep(2)
+            print("*** Reconnected to AP.")
+            print("*** OLSRd PID: ", olsrd_pid)
+            stdout, stderr = Popen(["ping", "-c1", ap_ip], stdout=PIPE, stderr=PIPE).communicate()
 
 
 def get_signal_quality(interface: str, bssid: str, ssid: str):
@@ -127,16 +130,15 @@ def get_signal_quality(interface: str, bssid: str, ssid: str):
     Returns the signal data if the connection is present.
     Returns None if the AP is not connected.
     """
-    stdout, stderr = cmd_iw_dev(interface, "station", "dump")
+    stdout, stderr = cmd_iw_dev(interface, "link")
     data = stdout.decode()
-    if 'Station ' + bssid in data:
-        data = list(filter(None, data.split('\n\t')[1:]))
+    if 'Connected to ' + bssid in data:
+        data = [x for x in list(filter(None, data.split('\n\t')[1:])) if x.strip()]
         data = dict(map(lambda s: s.split(':'), data))
-        signal_data = {k.replace(' ', '_'): (data[k].strip() if k in data else 'NaN') for k in ['signal', 'signal avg',
+        signal_data = {k.replace(' ', '_'): (data[k].strip() if k in data else 'NaN') for k in ['SSID', 'signal',
                                                                                                 'rx bitrate',
-                                                                                                'tx bitrate',
-                                                                                                'expected throughput']}
-        signal_data.update({'ssid': ssid})
+                                                                                                'tx bitrate']}
+        signal_data.update({'time': datetime.now().timestamp()})
         return signal_data
     return None
 
@@ -172,21 +174,21 @@ def start_olsrd(interface: str):
     return 1
 
 
-def try_reconnect(interface: str, olsrd_pid: int, ssid: str, bssid: str, threshold: float):
+def try_reconnect(interface: str, scanif: str, olsrd_pid: int, ssid: str, bssid: str, threshold: float):
     """
     Scans for the APs SSID and connects to the AP if the SSID is in range.
     Returns True if AP is in range and has been connected.
     Returns False if the AP is not in range.
     """
-    log.info("*** {}: Collecting scan dump for {}".format(interface, ssid))
-    stdout, stderr = cmd_iw_dev(interface, "scan", "dump")
+    log.info("*** {}: Collecting scan dump for {}".format(scanif, ssid))
+    stdout, stderr = cmd_iw_dev(scanif, "scan", "dump")
     data = stdout.decode()
     if "BSS " + bssid in data and "SSID: " + ssid in data:
         signal = signal_strength_from_scan_dump(data, bssid, ssid)
-        print("*** {}: Scan detected {} in range (signal: {} / {})".format(interface, ssid, signal, threshold))
-        log.info("*** {}: Scan detected {} in range (signal: {} / {})".format(interface, ssid, signal, threshold))
+        print("*** {}: Scan detected {} in range (signal: {} / {})".format(scanif, ssid, signal, threshold))
+        log.info("*** {}: Scan detected {} in range (signal: {} / {})".format(scanif, ssid, signal, threshold))
         if signal and signal >= threshold:
-            log.info("*** {}: Scan result: {} in range with signal {}".format(interface, ssid, signal))
+            log.info("*** {}: Scan result: {} in range with signal {}".format(scanif, ssid, signal))
             if olsrd_pid > 0:
                 log.info("*** {}: OLSR runnning: Killing olsrd process (PID: {})".format(interface, olsrd_pid))
                 olsrd_pid = stop_olsrd(interface, olsrd_pid)
