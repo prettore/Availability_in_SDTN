@@ -41,7 +41,7 @@ def topology(scenario, scan_interval, disconnect_threshold, reconnect_threshold,
         sta3 = net.addStation('sta3', mac='00:00:00:00:00:03', ip='10.0.0.3', position='50,40,0')
 
     info("*** Configuring propagation model\n")
-    net.setPropagationModel(model="logDistance", exp=4.5)
+    net.setPropagationModel(model="logDistance", exp=4.4)
 
     info("*** Configuring wifi nodes\n")
     net.configureWifiNodes()
@@ -105,13 +105,18 @@ def topology(scenario, scan_interval, disconnect_threshold, reconnect_threshold,
     if scan_iface:
         cmd += " -S sta3-wlan1"
     makeTerm(sta3, title='Station 3', cmd=cmd + " ; sleep 10")
-    cmd = "python3 {}/packet_sniffer.py -i sta1-wlan0 -o {}send_packets.csv -f 'icmp[icmptype] = icmp-echo'".format(path, stat_dir)
+    # cmd = "python3 {}/packet_sniffer.py -i sta1-wlan0 -o {}send_packets.csv -f 'icmp[icmptype] = icmp-echo'".format(path, stat_dir)
+    cmd = "python3 {}/packet_sniffer.py -i sta1-wlan0 -o {}send_packets.csv -f 'udp port 8999'".format(path, stat_dir)
     makeTerm(sta1, title='Packet Sniffer sta1', cmd=cmd + " ; sleep 10")
-    cmd = "python3 {}/packet_sniffer.py -i sta3-wlan0 -o {}recv_packets.csv -f 'icmp[icmptype] = icmp-echo'".format(path, stat_dir)
+    # cmd = "python3 {}/packet_sniffer.py -i sta3-wlan0 -o {}recv_packets.csv -f 'icmp[icmptype] = icmp-echo'".format(path, stat_dir)
+    cmd = "python3 {}/packet_sniffer.py -i sta3-wlan0 -o {}recv_packets.csv -f 'udp dst port 8999'".format(path, stat_dir)
     makeTerm(sta3, title='Packet Sniffer sta3', cmd=cmd + " ; sleep 10")
     sleep(1)
-    info("*** Starting ping: sta1 (10.0.0.1) -> sta3 (10.0.0.3)\n")
-    makeTerm(sta1, title='ping', cmd="ping 10.0.0.3")
+    # info("*** Starting ping: sta1 (10.0.0.1) -> sta3 (10.0.0.3)\n")
+    # makeTerm(sta1, title='ping', cmd="ping 10.0.0.3")
+    info("*** Start sending generated packets: sta1 (10.0.0.1) -> sta3 (10.0.0.3)\n")
+    makeTerm(sta3, title='Recv', cmd="ITGRecv -a 10.0.0.3 -i sta3-wlan0")
+    makeTerm(sta1, title='Send', cmd="ITGSend -T UDP -C 100 -a 10.0.0.3 -c 1264 -s 0.123456 -t 6000000")
     info("\n*** Running CLI\n")
     CLI(net)
     net.stop()
@@ -150,7 +155,7 @@ if __name__ == '__main__':
     parser.add_argument("-m", "--mobilityscenario", help="Select a mobility scenario", type=int, required=True)
     parser.add_argument("-s", "--scaninterval", help="Time interval in seconds (float) for scanning if the wifi access "
                                                      "point is in range while being in adhoc mode (default: 10.0)",
-                        type=float, default=10.0)
+                        type=float, default=5.0)
     parser.add_argument("-d", "--disconnectthreshold", help="Signal strength (float) below which station dissconnects "
                                                             "from AP and activates OLSR (default: -88.0 dBm)",
                         type=float, default=-88.0)
