@@ -17,7 +17,8 @@ from mn_wifi.wmediumdConnector import interference
 from mn_wifi.replaying import ReplayingMobility
 
 
-def topology(scenario, scan_interval, disconnect_threshold, reconnect_threshold, scan_iface: bool = False):
+def topology(scenario: int, signal_window: int, scan_interval: float, disconnect_threshold: float,
+             reconnect_threshold: float, scan_iface: bool = False):
     """Build a custom topology and start it"""
     net = Mininet_wifi(topo=None, build=False, link=wmediumd, wmediumd_mode=interference, noise_th=-91, fading_cof=3)
 
@@ -91,32 +92,34 @@ def topology(scenario, scan_interval, disconnect_threshold, reconnect_threshold,
     statistics_dir = path + '/data/statistics/' + stat_dir
     if not os.path.isdir(statistics_dir):
         os.makedirs(statistics_dir)
-    cmd = "python3 {}/flexible_sdn.py -i sta1-wlan0 -s {} -d {} -r {} -o {}".format(path, scan_interval,
+    cmd = "python3 {}/flexible_sdn.py -i sta1-wlan0 -s {} -d {} -r {} -o {} -w {}".format(path, scan_interval,
                                                                                     disconnect_threshold,
                                                                                     reconnect_threshold,
-                                                                                    stat_dir)
+                                                                                    stat_dir, signal_window)
     if scan_iface:
         cmd += " -S sta1-wlan1"
     makeTerm(sta1, title='Station 1', cmd=cmd + " ; sleep 10")
-    cmd = "python3 {}/flexible_sdn.py -i sta3-wlan0 -s {} -d {} -r {} -o {}".format(path, scan_interval,
+    cmd = "python3 {}/flexible_sdn.py -i sta3-wlan0 -s {} -d {} -r {} -o {} -w {}".format(path, scan_interval,
                                                                                     disconnect_threshold,
                                                                                     reconnect_threshold,
-                                                                                    stat_dir)
+                                                                                    stat_dir, signal_window)
     if scan_iface:
         cmd += " -S sta3-wlan1"
     makeTerm(sta3, title='Station 3', cmd=cmd + " ; sleep 10")
     # cmd = "python3 {}/packet_sniffer.py -i sta1-wlan0 -o {}send_packets.csv -f 'icmp[icmptype] = icmp-echo'".format(path, stat_dir)
-    cmd = "python3 {}/packet_sniffer.py -i sta1-wlan0 -o {}send_packets.csv -f 'udp port 8999'".format(path, stat_dir)
+    # cmd = "python3 {}/packet_sniffer.py -i sta1-wlan0 -o {}send_packets.csv -f 'udp port 8999'".format(path, stat_dir)
+    cmd = "python3 {}/packet_sniffer.py -i sta1-wlan0 -o {}send_packets.csv -f '-p udp -m udp --dport 8999' -T True".format(path, stat_dir)
     makeTerm(sta1, title='Packet Sniffer sta1', cmd=cmd + " ; sleep 10")
     # cmd = "python3 {}/packet_sniffer.py -i sta3-wlan0 -o {}recv_packets.csv -f 'icmp[icmptype] = icmp-echo'".format(path, stat_dir)
     cmd = "python3 {}/packet_sniffer.py -i sta3-wlan0 -o {}recv_packets.csv -f 'udp dst port 8999'".format(path, stat_dir)
+    # cmd = "python3 {}/packet_sniffer.py -i sta3-wlan0 -o {}recv_packets.csv -f '-p udp -m udp --dport 8999' -T True".format(path, stat_dir)
     makeTerm(sta3, title='Packet Sniffer sta3', cmd=cmd + " ; sleep 10")
     sleep(1)
     # info("*** Starting ping: sta1 (10.0.0.1) -> sta3 (10.0.0.3)\n")
     # makeTerm(sta1, title='ping', cmd="ping 10.0.0.3")
     info("*** Start sending generated packets: sta1 (10.0.0.1) -> sta3 (10.0.0.3)\n")
     makeTerm(sta3, title='Recv', cmd="ITGRecv -a 10.0.0.3 -i sta3-wlan0")
-    makeTerm(sta1, title='Send', cmd="ITGSend -T UDP -C 100 -a 10.0.0.3 -c 1264 -s 0.123456 -t 6000000")
+    makeTerm(sta1, title='Send', cmd="ITGSend -T UDP -C 100 -a 10.0.0.3 -c 1264 -s 0.123456 -t 160000 -l sender.log -x receiver.log")
     info("\n*** Running CLI\n")
     CLI(net)
     net.stop()
@@ -161,7 +164,11 @@ if __name__ == '__main__':
                         type=float, default=-88.0)
     parser.add_argument("-r", "--reconnectthreshold", help="Minimal signal strength (float) of AP required for trying "
                                                            "reconnect (default: -85.0 dBm)", type=float, default=-85.0)
-    parser.add_argument("-S", "--scaninterface", help="Use a second interface for scanning", action="store_true", default=False)
+    parser.add_argument("-S", "--scaninterface", help="Use a second interface for scanning", action="store_true",
+                        default=False)
+    parser.add_argument("-w", "--signalwindow", help="Window for the moving average calculation of the signal strength",
+                        type=int, default=3)
     args = parser.parse_args()
     scenario = args.mobilityscenario
-    topology(scenario, args.scaninterval, args.disconnectthreshold, args.reconnectthreshold, args.scaninterface)
+    topology(scenario, args.signalwindow, args.scaninterval, args.disconnectthreshold, args.reconnectthreshold,
+             args.scaninterface)
