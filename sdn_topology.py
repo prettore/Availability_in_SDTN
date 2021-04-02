@@ -85,47 +85,61 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
     if scenario > 1:
         info("\n*** Replaying Mobility\n")
         ReplayingMobility(net)
-    info("*** Starting flexible SDN script\n")
-    path = os.path.dirname(os.path.abspath(__file__))
     start_time = datetime.now()
+    info("*** Starting flexible SDN script (time: {})\n".format(start_time.timestamp()))
+    path = os.path.dirname(os.path.abspath(__file__))
     stat_dir = start_time.strftime('%Y-%m-%d_%H-%M-%S') + "_scen-{}_scan-{}_discon{}_recon{}_scanif-{}/".format(scenario, scan_interval, disconnect_threshold, reconnect_threshold, scanif)
     statistics_dir = path + '/data/statistics/' + stat_dir
     if not os.path.isdir(statistics_dir):
         os.makedirs(statistics_dir)
-    cmd = "python3 {}/flexible_sdn.py -i sta1-wlan0 -s {} -d {} -r {} -o {} -w {}".format(path, scan_interval,
-                                                                                    disconnect_threshold,
-                                                                                    reconnect_threshold,
-                                                                                    stat_dir, signal_window)
+    cmd = "python3"
+    cmd += " {}/flexible_sdn.py".format(path)
+    cmd += " -i sta1-wlan0"
+    cmd += " -s {}".format(scan_interval)
+    cmd += " -d {}".format(disconnect_threshold)
+    cmd += " -r {}".format(reconnect_threshold)
+    cmd += " -o {}".format(stat_dir)
+    cmd += " -w {}".format(signal_window)
+    cmd += " -t {}".format(start_time.timestamp())
     if scan_iface:
         cmd += " -S sta1-wlan1"
     makeTerm(sta1, title='Station 1', cmd=cmd + " ; sleep 10")
-    cmd = "python3 {}/flexible_sdn.py -i sta3-wlan0 -s {} -d {} -r {} -o {} -w {}".format(path, scan_interval,
-                                                                                    disconnect_threshold,
-                                                                                    reconnect_threshold,
-                                                                                    stat_dir, signal_window)
+    cmd = "python3"
+    cmd += " {}/flexible_sdn.py".format(path)
+    cmd += " -i sta3-wlan0"
+    cmd += " -s {}".format(scan_interval)
+    cmd += " -d {}".format(disconnect_threshold)
+    cmd += " -r {}".format(reconnect_threshold)
+    cmd += " -o {}".format(stat_dir)
+    cmd += " -w {}".format(signal_window)
+    cmd += " -t {}".format(start_time.timestamp())
     if scan_iface:
         cmd += " -S sta3-wlan1"
     makeTerm(sta3, title='Station 3', cmd=cmd + " ; sleep 10")
     # cmd = "python3 {}/packet_sniffer.py -i sta1-wlan0 -o {}send_packets.csv -f 'icmp[icmptype] = icmp-echo'".format(path, stat_dir)
     # cmd = "python3 {}/packet_sniffer.py -i sta1-wlan0 -o {}send_packets.csv -f 'udp port 8999'".format(path, stat_dir)
-    cmd = "python3 {}/packet_sniffer.py -i sta1-wlan0 -o {}send_packets.csv -f '-p udp -m udp --dport 8999' -T True".format(path, stat_dir)
-    makeTerm(sta1, title='Packet Sniffer sta1', cmd=cmd + " ; sleep 10")
+    # cmd = "python3 {}/packet_sniffer.py -i sta1-wlan0 -o {}send_packets.csv -f '-p udp -m udp --dport 8999' -T True".format(path, stat_dir)
+    # makeTerm(sta1, title='Packet Sniffer sta1', cmd=cmd + " ; sleep 10")
     # cmd = "python3 {}/packet_sniffer.py -i sta3-wlan0 -o {}recv_packets.csv -f 'icmp[icmptype] = icmp-echo'".format(path, stat_dir)
-    cmd = "python3 {}/packet_sniffer.py -i sta3-wlan0 -o {}recv_packets.csv -f 'udp dst port 8999'".format(path, stat_dir)
+    # cmd = "python3 {}/packet_sniffer.py -i sta3-wlan0 -o {}recv_packets.csv -f 'udp dst port 8999'".format(path, stat_dir)
     # cmd = "python3 {}/packet_sniffer.py -i sta3-wlan0 -o {}recv_packets.csv -f '-p udp -m udp --dport 8999' -T True".format(path, stat_dir)
-    makeTerm(sta3, title='Packet Sniffer sta3', cmd=cmd + " ; sleep 10")
+    # makeTerm(sta3, title='Packet Sniffer sta3', cmd=cmd + " ; sleep 10")
     sleep(1)
     # info("*** Starting ping: sta1 (10.0.0.1) -> sta3 (10.0.0.3)\n")
     # makeTerm(sta1, title='ping', cmd="ping 10.0.0.3")
     info("*** Start sending generated packets: sta1 (10.0.0.1) -> sta3 (10.0.0.3)\n")
-    makeTerm(sta3, title='Recv', cmd="ITGRecv -a 10.0.0.3 -i sta3-wlan0")
-    makeTerm(sta1, title='Send', cmd="ITGSend -T UDP -C 100 -a 10.0.0.3 -c 1264 -s 0.123456 -t 160000 -l sender.log -x receiver.log")
+    makeTerm(sta3, title='Recv', cmd="ITGRecv -a 10.0.0.3 -i sta3-wlan0 -l {}/receiver.log".format(statistics_dir))
+    makeTerm(sta1, title='Send', cmd="ITGSend -T UDP -C 100 -a 10.0.0.3 -c 1264 -s 0.123456 -t 160000 -l {}/sender.log ".format(statistics_dir))
     info("\n*** Running CLI\n")
     CLI(net)
     net.stop()
+    os.system('sudo pkill xterm')
     out, err = subprocess.Popen(['pgrep', 'olsrd'], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
     if out:
         subprocess.Popen(['killall', 'olsrd'])
+    subprocess.Popen(["python3", "{}/eval_ditg.py".format(path), "-d", statistics_dir, "-t", str(start_time.timestamp())]).communicate()
+    subprocess.Popen(["python3", "{}/plot_statistics.py".format(path), "-d", statistics_dir]).communicate()
+    os.system("chown -R wifi {}".format(path + '/data/statistics/'))
 
 
 def get_trace(sta_list, file_, smooth):

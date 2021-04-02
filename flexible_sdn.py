@@ -35,11 +35,11 @@ def main(args):
         os.makedirs(statistics_dir)
     # set_qdisc_initial_rules(args.interface, 9600, 2000)
     flexible_sdn_olsr(args.interface, scaninterface, args.scaninterval, args.reconnectthreshold, args.disconnectthreshold, args.pingto,
-                      statistics_dir, args.apssid, args.apbssid, args.apip, args.signalwindow)
+                      statistics_dir, args.apssid, args.apbssid, args.apip, args.signalwindow, args.starttime)
 
 
 def flexible_sdn_olsr(interface: str, scaninterface: str, scan_interval: float, reconnect_threshold: float, disconnect_threshold: float,
-                      pingto: str, out_path: str, ap_ssid: str, ap_bssid: str, ap_ip: str, signal_window: int):
+                      pingto: str, out_path: str, ap_ssid: str, ap_bssid: str, ap_ip: str, signal_window: int, start_time: float):
     """
     This function monitors the wifi signal strength as long there is a connection to the AP.
     When the connection is lost it starts the OLSR and continuously scans for the AP to reappear.
@@ -57,13 +57,14 @@ def flexible_sdn_olsr(interface: str, scaninterface: str, scan_interval: float, 
     stdout, stderr = Popen(["ping", "-c1", ap_ip], stdout=PIPE, stderr=PIPE).communicate()
     if pingto:
         Popen(["ping", "-c1", pingto]).communicate()
-    print("ssid, time, signal, signal_avg")
+    print("ssid, time (s), signal (dBm), signal_avg (dBm)")
     while True:
         time.sleep(1)
-        signal_data = get_signal_quality(interface, ap_bssid, ap_ssid)
+        signal_data = get_signal_quality(interface, ap_bssid, ap_ssid, start_time)
         if signal_data:
-            signal_deque.append(float(signal_data['signal'].rstrip(' dBm')))
-            signal_data.update({'signal_avg': sum(signal_deque) / len(signal_deque)})
+            signal = float(signal_data['signal'].rstrip(' dBm'))
+            signal_deque.append(signal)
+            signal_data.update({'signal': signal, 'signal_avg': sum(signal_deque) / len(signal_deque)})
             if signal_data['signal_avg'] >= disconnect_threshold:
                 print("{}, {}, {}, {:.2f}".format(signal_data['SSID'], signal_data['time'], signal_data['signal'], signal_data['signal_avg']))
                 if os.path.isfile(file):
@@ -105,7 +106,7 @@ def flexible_sdn_olsr(interface: str, scaninterface: str, scan_interval: float, 
                 spthread.start()
 
 
-def get_signal_quality(interface: str, bssid: str, ssid: str):
+def get_signal_quality(interface: str, bssid: str, ssid: str, start_time: float):
     """
     Monitor the signal strength on a given wifi interface as long as it is connected to an AP with the hard coded MAC
     address.
@@ -120,7 +121,7 @@ def get_signal_quality(interface: str, bssid: str, ssid: str):
         signal_data = {k.replace(' ', '_'): (data[k].strip() if k in data else 'NaN') for k in ['SSID', 'signal',
                                                                                                 'rx bitrate',
                                                                                                 'tx bitrate']}
-        signal_data.update({'time': datetime.now().timestamp()})
+        signal_data.update({'time': datetime.now().timestamp() - start_time})
         return signal_data
     return None
 
@@ -253,6 +254,7 @@ if __name__ == '__main__':
     parser.add_argument("-S", "--scaninterface", help="Interface to use for active scans for reconnection to AP",
                         type=str)
     parser.add_argument("-w", "--signalwindow", help="Window for the moving average calculation of the signal strength", type=int, default=3)
+    parser.add_argument("-t", "--starttime", help="Timestamp of the start of the experiment as synchronizing reference for measurements", type=float, required=True)
     args = parser.parse_args()
 
     log_format = logging.Formatter(fmt='%(levelname)-8s [%(asctime)s]: %(message)s')
