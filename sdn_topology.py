@@ -18,7 +18,7 @@ from mn_wifi.replaying import ReplayingMobility
 
 
 def topology(scenario: int, signal_window: int, scan_interval: float, disconnect_threshold: float,
-             reconnect_threshold: float, scan_iface: bool = False):
+             reconnect_threshold: float, scan_iface: bool = False, no_olsr: bool = False, qdisc: bool = False):
     """Build a custom topology and start it"""
     net = Mininet_wifi(topo=None, build=False, link=wmediumd, wmediumd_mode=interference, noise_th=-91, fading_cof=3)
 
@@ -103,6 +103,10 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
     cmd += " -t {}".format(start_time.timestamp())
     if scan_iface:
         cmd += " -S sta1-wlan1"
+    if no_olsr:
+        cmd += " -O"
+    if qdisc:
+        cmd += " -q"
     makeTerm(sta1, title='Station 1', cmd=cmd + " ; sleep 10")
     cmd = "python3"
     cmd += " {}/flexible_sdn.py".format(path)
@@ -115,6 +119,10 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
     cmd += " -t {}".format(start_time.timestamp())
     if scan_iface:
         cmd += " -S sta3-wlan1"
+    if no_olsr:
+        cmd += " -O"
+    if qdisc:
+        cmd += " -q"
     makeTerm(sta3, title='Station 3', cmd=cmd + " ; sleep 10")
     # cmd = "python3 {}/packet_sniffer.py -i sta1-wlan0 -o {}send_packets.csv -f 'icmp[icmptype] = icmp-echo'".format(path, stat_dir)
     # cmd = "python3 {}/packet_sniffer.py -i sta1-wlan0 -o {}send_packets.csv -f 'udp port 8999'".format(path, stat_dir)
@@ -182,7 +190,9 @@ if __name__ == '__main__':
                         default=False)
     parser.add_argument("-w", "--signalwindow", help="Window for the moving average calculation of the signal strength",
                         type=int, default=3)
+    parser.add_argument("-O", "--noolsr", help="Do not use olsr when connection to AP is lost (default: False)", action='store_true', default=False)
+    parser.add_argument("-q", "--qdisc", help="Use qdisc to improve performance", action="store_true", default=False)
     args = parser.parse_args()
     scenario = args.mobilityscenario
     topology(scenario, args.signalwindow, args.scaninterval, args.disconnectthreshold, args.reconnectthreshold,
-             args.scaninterface)
+             args.scaninterface, args.noolsr, args.qdisc)

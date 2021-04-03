@@ -7,6 +7,7 @@ import csv
 import logging
 import re
 import threading
+import json
 
 from collections import deque
 from subprocess import Popen, PIPE
@@ -33,13 +34,33 @@ def main(args):
     statistics_dir = path + '/data/statistics/' + args.outputpath + '/'
     if not os.path.isdir(statistics_dir):
         os.makedirs(statistics_dir)
-    # set_qdisc_initial_rules(args.interface, 9600, 2000)
+    if args.qdisc:
+        rate, unit = 1, 'mbit'
+        print("*** Setting up qdisc with HTB rate {} {}".format(rate, unit))
+        init_qdisc(args.interface, rate, unit)
+        log.info("*** {}: Qdisc set up with HTB rate {} {}".format(args.interface, rate, unit))
+        print(subprocess.Popen("tc -g -s class show dev " + args.interface, stdout=PIPE, stderr=PIPE, shell=True).communicate())
+        qdisc = 'on'
+    else:
+        qdisc = 'off'
+    if args.noolsr:
+        olsr = 'off'
+    else:
+        olsr = 'on'
+    parameters = {'start_time': args.starttime, 'OLSR': olsr, 'qdisc': qdisc, 'interface': args.interface,
+                  'AP': {'ssid': args.apssid, 'bssid': args.apbssid, 'ip': args.apip},
+                  'scan': {'interface': scaninterface, 'interval': args.scaninterval,
+                           'moving_avg_window': args.signalwindow,
+                           'reconnect_threshold': args.reconnectthreshold,
+                           'disconnect_threshold': args.disconnectthreshold}}
+    with open(statistics_dir + 'start_params.json', 'w') as file:
+        json.dump(parameters, file)
     flexible_sdn_olsr(args.interface, scaninterface, args.scaninterval, args.reconnectthreshold, args.disconnectthreshold, args.pingto,
-                      statistics_dir, args.apssid, args.apbssid, args.apip, args.signalwindow, args.starttime)
+                      statistics_dir, args.apssid, args.apbssid, args.apip, args.signalwindow, args.starttime, args.qdisc, args.noolsr)
 
 
 def flexible_sdn_olsr(interface: str, scaninterface: str, scan_interval: float, reconnect_threshold: float, disconnect_threshold: float,
-                      pingto: str, out_path: str, ap_ssid: str, ap_bssid: str, ap_ip: str, signal_window: int, start_time: float):
+                      pingto: str, out_path: str, ap_ssid: str, ap_bssid: str, ap_ip: str, signal_window: int, start_time: float, qdisc: bool, no_olsr: bool = False):
     """
     This function monitors the wifi signal strength as long there is a connection to the AP.
     When the connection is lost it starts the OLSR and continuously scans for the AP to reappear.
@@ -87,7 +108,18 @@ def flexible_sdn_olsr(interface: str, scaninterface: str, scan_interval: float, 
                                                                                reconnect_threshold))
             log.info("*** {}: Scan detected {} in range (signal: {} / {})".format(scaninterface, ap_ssid, scan_signal,
                                                                                   reconnect_threshold))
+            if qdisc:
+                # FIXME 1 bit not working (Output: "rate" is required) maybe higher rate?
+                rate, unit = 1, 'bit'
+                print("*** Updating qdisc with HTB rate {} {}".format(rate, unit))
+                update_qdisc(interface, rate, unit)
+                log.info("*** {}: Qdisc updated with HTB rate {} {}".format(args.interface, rate, unit))
             olsrd_pid = reconnect(interface, scaninterface, olsrd_pid, ssid=ap_ssid)
+            if qdisc:
+                rate, unit = 1, 'mbit'
+                print("*** Updating qdisc with HTB rate {} {}".format(rate, unit))
+                update_qdisc(interface, rate, unit)
+                log.info("*** {}: Qdisc updated with HTB rate {} {}".format(args.interface, rate, unit))
             if scanner.is_alive():
                 print("*** Stopping background scan")
                 scanner.terminate()
@@ -97,9 +129,20 @@ def flexible_sdn_olsr(interface: str, scaninterface: str, scan_interval: float, 
             print("*** OLSRd PID: ", olsrd_pid)
             stdout, stderr = Popen(["ping", "-c1", ap_ip], stdout=PIPE, stderr=PIPE).communicate()
             continue
-        if olsrd_pid == 0:
+        if olsrd_pid == 0 and not no_olsr:
             print("*** Starting OLSRd")
+            if qdisc:
+                # FIXME 1 bit not working (Output: "rate" is required) maybe higher rate?
+                rate, unit = 1, 'bit'
+                print("*** Updating qdisc with HTB rate {} {}".format(rate, unit))
+                update_qdisc(interface, rate, unit)
+                log.info("*** {}: Qdisc updated with HTB rate {} {}".format(args.interface, rate, unit))
             olsrd_pid = start_olsrd(interface)
+            if qdisc:
+                rate, unit = 1, 'mbit'
+                print("*** Updating qdisc with HTB rate {} {}".format(rate, unit))
+                update_qdisc(interface, rate, unit)
+                log.info("*** {}: Qdisc updated with HTB rate {} {}".format(args.interface, rate, unit))
             if pingto:
                 spthread = threading.Thread(target=sleep_and_ping, kwargs={'sleep_interval': 1.0, 'ip': pingto},
                                             daemon=True)
@@ -219,17 +262,22 @@ def sleep_and_ping(sleep_interval: float, ip: str):
 
 
 # function to create the qdisc
-def set_qdisc_initial_rules(interface_arg, rate_arg, latency_arg):
+def init_qdisc(interface: str, rate: float, rate_unit: str, latency: float = 2.0, latency_unit: str = 's'):
     # deleting rules
-    subprocess.call('tc qdisc del dev ' + interface_arg + ' root', shell=True)
+    subprocess.call('tc qdisc del dev ' + interface + ' root', shell=True)
     # increasing the queue len - Root qdisc and default queue length:
-    subprocess.call('ip link set dev ' + interface_arg + ' txqueuelen 10000', shell=True)
-    subprocess.call('tc qdisc add dev ' + interface_arg + ' root handle 1: htb default 1', shell=True)
-    subprocess.call('tc class add dev ' + interface_arg + ' parent 1: classid 1:1 htb rate 9600bit', shell=True)  # ceil 9600bit
-    subprocess.call('tc class add dev ' + interface_arg + ' parent 1:1 classid 1:2 htb rate ' + str(rate_arg) + 'bit',
-                    shell=True)  # ceil 9600bit
-    subprocess.call('tc qdisc add dev ' + interface_arg + ' parent 1:2 handle 2: netem delay ' + str(latency_arg) + 'ms ',
+    subprocess.call('ip link set dev ' + interface + ' txqueuelen 10000', shell=True)
+    subprocess.call('tc qdisc add dev ' + interface + ' root handle 1: htb default 1', shell=True)
+    subprocess.call('tc class add dev ' + interface + ' parent 1: classid 1:1 htb rate 1mbit', shell=True)  # ceil 1mbit
+    subprocess.call('tc class add dev ' + interface + ' parent 1:1 classid 1:2 htb rate ' + str(rate) + rate_unit,
                     shell=True)
+    # subprocess.call('tc qdisc add dev ' + interface + ' parent 1:2 handle 2: netem delay ' + str(latency) + latency_unit,
+    #                 shell=True)
+
+
+def update_qdisc(interface: str, rate: float, rate_unit: str):
+    subprocess.call('tc class replace dev ' + interface + ' parent 1:10 classid 1:2 htb rate ' +
+                    str(rate) + rate_unit, shell=True)
 
 
 if __name__ == '__main__':
@@ -255,6 +303,8 @@ if __name__ == '__main__':
                         type=str)
     parser.add_argument("-w", "--signalwindow", help="Window for the moving average calculation of the signal strength", type=int, default=3)
     parser.add_argument("-t", "--starttime", help="Timestamp of the start of the experiment as synchronizing reference for measurements", type=float, required=True)
+    parser.add_argument("-O", "--noolsr", help="Do not use olsr when connection to AP is lost (default: False)", action='store_true', default=False)
+    parser.add_argument("-q", "--qdisc", help="Use qdisc to improve performance", action="store_true", default=False)
     args = parser.parse_args()
 
     log_format = logging.Formatter(fmt='%(levelname)-8s [%(asctime)s]: %(message)s')
