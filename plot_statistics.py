@@ -49,12 +49,12 @@ def main(data_path, show):
     # signal_receiver = [float(s.rstrip(' dBm')) for s in signal_data_receiver["signal"][:len(t_axis_signal_receiver)]]
     # signal_avg_receiver = [s for s in signal_data_receiver["signal_avg"][:len(t_axis_signal_receiver)]]
 
-    fig, ax = plt.subplots(3, 1, figsize=(10, 10))
+    fig, ax = plt.subplots(3, 1, figsize=(12, 8))
 
     line1 = ax[0].plot(df_signal_send['time'], df_signal_send['signal'], label='Signal strength sender', marker='v',
                        color='tab:blue', linewidth=0)
-    line11 = ax[0].plot(df_signal_send['time'], df_signal_send['signal_avg'], label='Signal strength sender moving avg.', marker=',',
-                        color='tab:blue')
+    line11 = ax[0].plot(df_signal_send['time'], df_signal_send['signal_avg'], label='Signal strength sender moving avg.',
+                        marker=',', color='tab:blue')
     ax[0].set_xlabel("Time (seconds)")
     ax[0].set_ylabel("Signal AP (dBm)")
     ax[0].legend()
@@ -62,15 +62,15 @@ def main(data_path, show):
     line2 = ax[0].plot(df_signal_recv['time'], df_signal_recv['signal'], label='Signal strength receiver', marker='x',
                        color='tab:orange', linewidth=0)
     line22 = ax[0].plot(df_signal_recv['time'], df_signal_recv['signal_avg'], label='Signal strength receiver moving avg.',
-                        marker=',', color='tab:orange')
+                        marker=',', color='tab:orange', linestyle='dashed')
     ax[0].set_xlabel("Time (seconds)")
     ax[0].set_ylabel("Signal AP (dBm)")
+    ax[0].yaxis.set_minor_locator(MultipleLocator(5))
     ax[0].legend()
     ax[0].grid()
 
     # line0 = ax[1].plot(t_axis_packets, packet_loss, label='Packet loss', marker='2', linewidth=0)
-    line0 = ax[1].plot(df_time_series['time'], df_time_series['packet_loss'], label='Packet loss')  #,
-                       # marker='2', linewidth=2)
+    line0 = ax[1].plot(df_time_series['time'], df_time_series['packet_loss'], label='Packet loss')
     ax[1].set_xlabel("Time (seconds)")
     ax[1].set_ylabel("Packet loss")
     # ax[1].set_yticks([0.0, 1.0])
@@ -79,17 +79,22 @@ def main(data_path, show):
     ax[1].grid()
 
     # line3 = ax[2].plot(t_axis_packets, delay, label='Delay', marker='')
-    line3 = ax[2].plot(df_time_series['time'], df_time_series['latency'], label='Latency') #, marker='')
+    line3 = ax[2].plot(df_time_series['time'], df_time_series['latency'], label='Latency')
+    lat_max = ax[2].plot(df_time_series['time'], np.zeros(len(df_time_series['time'])) + df_summary.loc[0, 'max_latency_s'],
+                         label='Max. latency', linestyle='dashed')
+    lat_avg = ax[2].plot(df_time_series['time'], np.zeros(len(df_time_series['time'])) + df_summary.loc[0, 'avg_latency_s'],
+                         label='Avg. latency', linestyle='dotted')
     ax[2].set_xlabel("Time (seconds)")
     ax[2].set_ylabel("End-to-end Latency (seconds)")
+    ax[2].yaxis.set_minor_locator(MultipleLocator(0.1))
     ax[2].legend()
     ax[2].grid()
 
     for x in ax:
-        x.set_xlim(-5, 165)
-        x.xaxis.set_major_locator(MultipleLocator(20))
+        x.set_xlim(0, 165)
+        x.xaxis.set_major_locator(MultipleLocator(10))
         x.xaxis.set_major_formatter(FormatStrFormatter('%d'))
-        x.xaxis.set_minor_locator(MultipleLocator(2.5))
+        x.xaxis.set_minor_locator(MultipleLocator(2.0))
 
     plt.tight_layout()
     if show:
