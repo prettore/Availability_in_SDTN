@@ -45,7 +45,7 @@ def main(data_path: str, start_time: float):
     # df_summary.loc[0, 'total_time_s'] = np.nanmax(df_packets_merged['time_rx_recv']) - start_time
     df_summary.loc[0, 'total_time_s'] = np.nanmax(df_packets_merged['time_rx_recv']) - np.nanmin(df_packets_merged['time_tx_send'])
     # df_time_series['time'] = np.array(df_packets_merged['time_rx_recv']) - start_time
-    df_time_series['time'] = np.array(df_packets_merged['time_rx_recv']) - np.nanmin(df_packets_merged['time_tx_send'])
+    df_time_series['time'] = np.array(df_packets_merged['time_rx_recv']) - start_time
 
     print("*** Eval: Compute latency")
     # end to end latency and latency summary
@@ -119,11 +119,11 @@ def time_columns_to_timestamp(df: pd.DataFrame, today: datetime = None):
     df_new['packet_length'] = df['packet_length']
     df_new['time_tx'] = df.apply(
         lambda r: today.replace(
-            hour=0, minute=0, second=0, microsecond=0).timestamp() + (r['hour_tx'] * 3600 + r['min_tx'] * 60 + r['sec_tx']),
+            hour=2, minute=0, second=0, microsecond=0).timestamp() + (r['hour_tx'] * 3600 + r['min_tx'] * 60 + r['sec_tx']),
         axis='columns')
     df_new['time_rx'] = df.apply(
         lambda r: today.replace(
-            hour=0, minute=0, second=0, microsecond=0).timestamp() + (r['hour_rx'] * 3600 + r['min_rx'] * 60 + r['sec_rx']),
+            hour=2, minute=0, second=0, microsecond=0).timestamp() + (r['hour_rx'] * 3600 + r['min_rx'] * 60 + r['sec_rx']),
         axis='columns')
     return df_new
 
