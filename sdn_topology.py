@@ -8,8 +8,6 @@ from datetime import datetime
 from mininet.term import makeTerm
 from mininet.log import setLogLevel, info
 from mininet.node import RemoteController
-from mininet.node import Controller, OVSKernelSwitch
-from mn_wifi.node import OVSKernelAP
 from mn_wifi.link import wmediumd, mesh
 from mn_wifi.cli import CLI
 from mn_wifi.net import Mininet_wifi
@@ -47,9 +45,6 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
     info("*** Configuring wifi nodes\n")
     net.configureWifiNodes()
 
-    # nodes = net.stations
-    # net.telemetry(nodes=nodes, single=True, data_type='rssi')
-
     if scenario > 1:
         info("*** Configuring moblity\n")
         if scenario == 2:
@@ -78,9 +73,6 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
     net.build()
     c0.start()
     net.get('ap1').start([c0])
-    # sta1.setAssociation(ap1, intf='sta1-wlan0')
-    # sta2.setAssociation(ap1, intf='sta2-wlan0')
-    # sta3.setAssociation(ap1, intf='sta3-wlan0')
     sleep(2)
     if scenario > 1:
         info("\n*** Replaying Mobility\n")
@@ -105,8 +97,8 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
         cmd += " -S sta1-wlan1"
     if no_olsr:
         cmd += " -O"
-    if qdisc:
-        cmd += " -q"
+    if qdisc > 0:
+        cmd += " -q {}".format(qdisc)
     makeTerm(sta1, title='Station 1', cmd=cmd + " ; sleep 10")
     cmd = "python3"
     cmd += " {}/flexible_sdn.py".format(path)
@@ -121,16 +113,14 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
         cmd += " -S sta3-wlan1"
     if no_olsr:
         cmd += " -O"
-    if qdisc:
-        cmd += " -q"
+    if qdisc > 0:
+        cmd += " -q {}".format(qdisc)
     makeTerm(sta3, title='Station 3', cmd=cmd + " ; sleep 10")
     # cmd = "python3 {}/packet_sniffer.py -i sta1-wlan0 -o {}send_packets.csv -f 'icmp[icmptype] = icmp-echo'".format(path, stat_dir)
-    # cmd = "python3 {}/packet_sniffer.py -i sta1-wlan0 -o {}send_packets.csv -f 'udp port 8999'".format(path, stat_dir)
     # cmd = "python3 {}/packet_sniffer.py -i sta1-wlan0 -o {}send_packets.csv -f '-p udp -m udp --dport 8999' -T True".format(path, stat_dir)
     # makeTerm(sta1, title='Packet Sniffer sta1', cmd=cmd + " ; sleep 10")
     # cmd = "python3 {}/packet_sniffer.py -i sta3-wlan0 -o {}recv_packets.csv -f 'icmp[icmptype] = icmp-echo'".format(path, stat_dir)
     # cmd = "python3 {}/packet_sniffer.py -i sta3-wlan0 -o {}recv_packets.csv -f 'udp dst port 8999'".format(path, stat_dir)
-    # cmd = "python3 {}/packet_sniffer.py -i sta3-wlan0 -o {}recv_packets.csv -f '-p udp -m udp --dport 8999' -T True".format(path, stat_dir)
     # makeTerm(sta3, title='Packet Sniffer sta3', cmd=cmd + " ; sleep 10")
     sleep(1)
     # info("*** Starting ping: sta1 (10.0.0.1) -> sta3 (10.0.0.3)\n")
@@ -191,7 +181,7 @@ if __name__ == '__main__':
     parser.add_argument("-w", "--signalwindow", help="Window for the moving average calculation of the signal strength",
                         type=int, default=3)
     parser.add_argument("-O", "--noolsr", help="Do not use olsr when connection to AP is lost (default: False)", action='store_true', default=False)
-    parser.add_argument("-q", "--qdisc", help="Use qdisc to improve performance", action="store_true", default=False)
+    parser.add_argument("-q", "--qdisc", help="Bandwidth in bits/s to throttle qdisc to during handover. 0 means deactivate qdisc (default: 0)", type=int, default=0)
     args = parser.parse_args()
     scenario = args.mobilityscenario
     topology(scenario, args.signalwindow, args.scaninterval, args.disconnectthreshold, args.reconnectthreshold,

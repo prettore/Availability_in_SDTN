@@ -15,6 +15,7 @@ class Scanner(multiprocessing.Process):
         self.ssid = ssid
 
     def run(self):
+        log.info("*** {}: Scanner started. Searching for {} with interval {}".format(self.interface, self.ssid, self.interval))
         while True:
             sleep(self.interval)
             log.info("*** {}: Scanning for {}".format(self.interface, self.ssid))
