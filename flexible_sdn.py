@@ -57,7 +57,7 @@ def main(args):
                            'reconnect_threshold': args.reconnectthreshold,
                            'disconnect_threshold': args.disconnectthreshold}}
     with open(statistics_dir + 'start_params.json', 'w') as file:
-        json.dump(parameters, file)
+        json.dump(parameters, file, indent=4)
     flexible_sdn_olsr(args.interface, scaninterface, args.scaninterval, args.reconnectthreshold, args.disconnectthreshold, args.pingto,
                       statistics_dir, args.apssid, args.apbssid, args.apip, args.signalwindow, args.starttime, args.qdisc, args.noolsr)
 
@@ -70,10 +70,11 @@ def flexible_sdn_olsr(interface: str, scaninterface: str, scan_interval: float, 
     When the AP reappears OLSR is deactivated and a connection to the AP will be established.
     """
     log.info("*** {}: Interface: {}, Scan-interface: {}".format(interface.split('-')[0], interface, scaninterface))
-    scanner = Scanner(scaninterface, scan_interval, ap_ssid)
+    station = interface.split('-')[0]
+    scanner = Scanner(scaninterface, scan_interval, out_path, station, start_time, ap_ssid)
     olsrd_pid = 0
-    signal_deque = deque(maxlen=signal_window)
-    csv_columns = ['time', 'SSID', 'signal', 'signal_avg', 'rx_bitrate', 'tx_bitrate']
+    link_signal_deque = deque(maxlen=signal_window)
+    scan_signal_deque = deque(maxlen=signal_window)
     file = out_path + interface + '_signal.csv'
     stdout, stderr = cmd_iw_dev(interface, "link")
     while b'Not connected.' in stdout and b'Connected to ' + ap_bssid.encode() not in stdout:
@@ -87,63 +88,50 @@ def flexible_sdn_olsr(interface: str, scaninterface: str, scan_interval: float, 
         ap_link_signal = get_link_signal_quality(interface, ap_bssid, ap_ssid, start_time)
         if ap_link_signal:
             signal = float(ap_link_signal['signal'].rstrip(' dBm'))
-            signal_deque.append(signal)
-            ap_link_signal.update({'signal': signal, 'signal_avg': sum(signal_deque) / len(signal_deque)})
+            link_signal_deque.append(signal)
+            ap_link_signal.update({'signal': signal, 'signal_avg': sum(link_signal_deque) / len(link_signal_deque)})
             if ap_link_signal['signal_avg'] >= disconnect_threshold:
                 print("{}, {}, {}, {:.2f}".format(ap_link_signal['SSID'], ap_link_signal['time'], ap_link_signal['signal'], ap_link_signal['signal_avg']))
-                if os.path.isfile(file):
-                    with open(file, 'a') as csvfile:
-                        writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
-                        writer.writerow(ap_link_signal)
-                else:
-                    with open(file, 'w') as csvfile:
-                        writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
-                        writer.writeheader()
-                        writer.writerow(ap_link_signal)
+                write_signal_to_file(ap_link_signal, file)
                 continue
         if not scanner.is_alive():
-            print("*** AP signal too weak or connection lost (last signal: {} / {})".format(ap_link_signal['signal'], disconnect_threshold))
+            if ap_link_signal:
+                print("*** AP signal too weak (last signal: {} / {})".format(ap_link_signal['signal'], disconnect_threshold))
+            else:
+                print("*** AP connection lost")
             print("*** Starting background scan")
             scanner.start()
-        scan_signal = get_scan_dump_signal(scaninterface, ap_bssid, ap_ssid)
-        if scan_signal and scan_signal >= reconnect_threshold:
-            print("*** {}: Scan detected {} in range (signal: {} / {})".format(scaninterface, ap_ssid, scan_signal,
+            log_event('scanner_start', 1, start_time, out_path, station)
+        scan_signal = get_scan_dump_signal(scaninterface, ap_bssid, ap_ssid, start_time)
+        if scan_signal and 'signal' in scan_signal:
+            scan_signal_deque.append(scan_signal['signal'])
+            scan_signal.update({'signal_avg': sum(scan_signal_deque) / len(scan_signal_deque)})
+            print("*** {}: Scan detected {} in range (signal: {} / {})".format(scaninterface, ap_ssid, scan_signal['signal'],
                                                                                reconnect_threshold))
-            log.info("*** {}: Scan detected {} in range (signal: {} / {})".format(scaninterface, ap_ssid, scan_signal,
+            log.info("*** {}: Scan detected {} in range (signal: {} / {})".format(scaninterface, ap_ssid, scan_signal['signal'],
                                                                                   reconnect_threshold))
-            if qdisc > 0:
-                rate, unit = qdisc, 'bit'
-                print("*** Updating qdisc with HTB rate {} {}".format(rate, unit))
-                update_qdisc(interface, rate, unit)
-                log.info("*** {}: Qdisc updated with HTB rate {} {}".format(args.interface, rate, unit))
-            olsrd_pid = reconnect(interface, scaninterface, olsrd_pid, ssid=ap_ssid)
-            if qdisc > 0:
-                rate, unit = 1, 'mbit'
-                print("*** Updating qdisc with HTB rate {} {}".format(rate, unit))
-                update_qdisc(interface, rate, unit)
-                log.info("*** {}: Qdisc updated with HTB rate {} {}".format(args.interface, rate, unit))
-            if scanner.is_alive():
-                print("*** Stopping background scan")
-                scanner.terminate()
-                scanner = Scanner(scaninterface, scan_interval, ap_ssid)
-            time.sleep(2)
-            print("*** Reconnected to AP.")
-            print("*** OLSRd PID: ", olsrd_pid)
-            stdout, stderr = Popen(["ping", "-c1", ap_ip], stdout=PIPE, stderr=PIPE).communicate()
-            continue
+            write_signal_to_file(scan_signal, file)
+            print("{}, {}, {}, {:.2f}".format(scan_signal['SSID'], scan_signal['time'], scan_signal['signal'],
+                                              scan_signal['signal_avg']))
+            if scan_signal['signal'] >= reconnect_threshold:
+                log_event('reconnect', 1, start_time, out_path, station)
+                olsrd_pid = reconnect_to_access_point(interface, olsrd_pid, ssid=ap_ssid, qdisc_rate=qdisc, qdisc_unit='bit')
+                log_event('reconnect', 2, start_time, out_path, station)
+                if scanner.is_alive():
+                    print("*** Stopping background scan")
+                    scanner.terminate()
+                    log_event('scanner_stop', 1, start_time, out_path, station)
+                    scanner = Scanner(scaninterface, scan_interval, out_path, station, start_time, ap_ssid)
+                time.sleep(0.5)
+                print("*** Reconnected to AP.")
+                print("*** OLSRd PID: ", olsrd_pid)
+                stdout, stderr = Popen(["ping", "-c1", ap_ip], stdout=PIPE, stderr=PIPE).communicate()
+                continue
         if olsrd_pid == 0 and not no_olsr:
             print("*** Starting OLSRd")
-            if qdisc > 0:
-                rate, unit = qdisc, 'bit'
-                print("*** Updating qdisc with HTB rate {} {}".format(rate, unit))
-                update_qdisc(interface, rate, unit)
-                log.info("*** {}: Qdisc updated with HTB rate {} {}".format(args.interface, rate, unit))
-            olsrd_pid = start_olsrd(interface)
-            if qdisc > 0:
-                rate, unit = 1, 'mbit'
-                print("*** Updating qdisc with HTB rate {} {}".format(rate, unit))
-                update_qdisc(interface, rate, unit)
-                log.info("*** {}: Qdisc updated with HTB rate {} {}".format(args.interface, rate, unit))
+            log_event('disconnect', 1, start_time, out_path, station)
+            olsrd_pid = switch_to_olsr(interface, qdisc_rate=qdisc, qdisc_unit='bit')
+            log_event('disconnect', 2, start_time, out_path, station)
             if pingto:
                 spthread = threading.Thread(target=sleep_and_ping, kwargs={'sleep_interval': 1.0, 'ip': pingto},
                                             daemon=True)
@@ -152,8 +140,7 @@ def flexible_sdn_olsr(interface: str, scaninterface: str, scan_interval: float, 
 
 def get_link_signal_quality(interface: str, bssid: str, ssid: str, start_time: float):
     """
-    Monitor the signal strength on a given wifi interface as long as it is connected to an AP with the hard coded MAC
-    address.
+    Fetches the signal strength on a given wifi interface as long as it is connected to an AP with a matching ssid.
     Returns the signal data if the connection is present.
     Returns None if the AP is not connected.
     """
@@ -170,12 +157,14 @@ def get_link_signal_quality(interface: str, bssid: str, ssid: str, start_time: f
     return None
 
 
-def get_scan_dump_signal(interface: str, bssid: str, ssid: str):
+def get_scan_dump_signal(interface: str, bssid: str, ssid: str, start_time: float):
     stdout, stderr = cmd_iw_dev(interface, "scan", "dump")
     scan_data = stdout.decode()
     if "BSS " + bssid in scan_data and "SSID: " + ssid in scan_data:
         scan_signal = signal_strength_from_scan_dump(scan_data, bssid, ssid)
-        return scan_signal
+        scan_data = {'time': datetime.now().timestamp() - start_time, 'signal': scan_signal, 'SSID': ssid,
+                     'rx_bitrate': 0, 'tx_bitrate': 0}
+        return scan_data
     return None
 
 
@@ -198,15 +187,40 @@ def extract_signal_strength(data: str, bssid: str, ssid: str):
     return None
 
 
-def start_olsrd(interface: str):
+def switch_to_olsr(interface: str, qdisc_rate: int, qdisc_unit: str):
     """
-    Configures the given wifi interface for OLSR and activates OLSR.
-    The configuration for OLSR is defined in the ibss dict.
-    Returns the Popen object of the olsrd process after starting olsrd in the background.
-    The Popen object can be used to kill the process later.
+    Configures the given wifi interface for OLSR and starts OLSRd in the background.
+    Returns the PID of the OLSRd process.
     """
-    path = os.path.dirname(os.path.abspath(__file__))
-    configfile = path + '/' + interface + '-olsrd.conf'
+    if qdisc_rate > 0:
+        rate, unit = qdisc_rate, qdisc_unit
+        print("*** Updating qdisc with HTB rate {} {}".format(rate, unit))
+        update_qdisc(interface, rate, unit)
+        log.info("*** {}: Qdisc updated with HTB rate {} {}".format(args.interface, rate, unit))
+    prepare_olsrd(interface)
+    stdout = start_olsrd(interface)
+    if stdout:
+        olsrd_pid = int(stdout.split()[0])
+        log.info("*** {}: Started olsrd in the background (PID: )".format(interface, olsrd_pid))
+        print("*** OLSRd running (PID: {})".format(olsrd_pid))
+        if qdisc_rate > 0:
+            rate, unit = 1, 'mbit'
+            print("*** Updating qdisc with HTB rate {} {}".format(rate, unit))
+            update_qdisc(interface, rate, unit)
+            log.info("*** {}: Qdisc updated with HTB rate {} {}".format(args.interface, rate, unit))
+        return olsrd_pid
+    if qdisc_rate > 0:
+        rate, unit = 1, 'mbit'
+        print("*** Updating qdisc with HTB rate {} {}".format(rate, unit))
+        update_qdisc(interface, rate, unit)
+        log.info("*** {}: Qdisc updated with HTB rate {} {}".format(args.interface, rate, unit))
+    return 1
+
+
+def prepare_olsrd(interface: str):
+    """
+    Configures the given interface for ad-hoc mode and joins IBSS.
+    """
     ibss = {'ssid': 'adhocNet', 'freq': '2432', 'ht_cap': 'HT40+', 'bssid': '02:CA:FF:EE:BA:01'}
     stdout, stderr = cmd_iw_dev(interface, "set", "type", "ibss")
     log.info("*** {}: Set type to ibss".format(interface))
@@ -214,6 +228,15 @@ def start_olsrd(interface: str):
     log.info("*** {}: Set ip link up".format(interface))
     stdout, stderr = cmd_iw_dev(interface, "ibss", "join", ibss['ssid'], ibss['freq'], ibss['ht_cap'], ibss['bssid'])
     log.info("*** {}: Join ibss adhocNet".format(interface))
+
+
+def start_olsrd(interface: str):
+    """
+    Starts OLSRd on given interface.
+    Returns the process info of the started OLSRd process.
+    """
+    path = os.path.dirname(os.path.abspath(__file__))
+    configfile = path + '/' + interface + '-olsrd.conf'
     # Wait for the interface to be in UP or DORMANT state
     stdout, stderr = cmd_ip_link_show(interface)
     while b'state DOWN' in stdout:
@@ -221,25 +244,29 @@ def start_olsrd(interface: str):
     log.info("*** {}: Starting OLSR".format(interface))
     stdout, stderr = Popen(["olsrd", "-f", configfile, "-d", "0"], stdout=PIPE, stderr=PIPE).communicate()
     stdout, stderr = Popen("pgrep -a olsrd | grep " + interface, shell=True, stdout=PIPE, stderr=PIPE).communicate()
-    if stdout:
-        olsrd_pid = int(stdout.split()[0])
-        log.info("*** {}: Started olsrd in the background (PID: )".format(interface, olsrd_pid))
-        print("*** OLSRd running (PID: {})".format(olsrd_pid))
-        return olsrd_pid
-    return 1
+    return stdout
 
 
-def reconnect(interface: str, scanif: str, olsrd_pid: int, ssid: str):
+def reconnect_to_access_point(interface: str, olsrd_pid: int, ssid: str, qdisc_rate: int, qdisc_unit: str):
     """
-    Scans for the APs SSID and connects to the AP if the SSID is in range.
-    Returns True if AP is in range and has been connected.
-    Returns False if the AP is not in range.
+    Connects to the AP if the SSID is in range.
+    Returns 0 after successful reconnect.
     """
+    if qdisc_rate > 0:
+        rate, unit = qdisc_rate, qdisc_unit
+        print("*** Updating qdisc with HTB rate {} {}".format(rate, unit))
+        update_qdisc(interface, rate, unit)
+        log.info("*** {}: Qdisc updated with HTB rate {} {}".format(args.interface, rate, unit))
     if olsrd_pid > 0:
         log.info("*** {}: OLSR runnning: Killing olsrd process (PID: {})".format(interface, olsrd_pid))
         olsrd_pid = stop_olsrd(interface, olsrd_pid)
     stdout, stderr = cmd_iw_dev(interface, "connect", ssid)
     log.info("*** {}: Connected interface to {}".format(interface, ssid))
+    if qdisc_rate > 0:
+        rate, unit = 1, 'mbit'
+        print("*** Updating qdisc with HTB rate {} {}".format(rate, unit))
+        update_qdisc(interface, rate, unit)
+        log.info("*** {}: Qdisc updated with HTB rate {} {}".format(args.interface, rate, unit))
     return olsrd_pid
 
 
@@ -256,9 +283,29 @@ def stop_olsrd(interface: str, pid: int):
     return 0
 
 
-def sleep_and_ping(sleep_interval: float, ip: str):
-    time.sleep(sleep_interval)
-    subprocess.Popen(["ping", "-c1", ip]).communicate()
+def write_signal_to_file(signal_data: dict, file: str):
+    csv_columns = ['time', 'SSID', 'signal', 'signal_avg', 'rx_bitrate', 'tx_bitrate']
+    write_or_append_csv_to_file(signal_data, csv_columns, file)
+
+
+def log_event(event: str, value: int, start_time: float, path: str, station: str):
+    csv_columns = ['time', 'disconnect', 'reconnect', 'scanner_start', 'scanner_stop', 'scan_trigger']
+    data = {k: 0 for k in csv_columns}
+    data.update({'time': datetime.now().timestamp() - start_time, event: value})
+    file = path + station + '_events.csv'
+    write_or_append_csv_to_file(data, csv_columns, file)
+
+
+def write_or_append_csv_to_file(data: dict, csv_columns: list, file: str):
+    if os.path.isfile(file):
+        with open(file, 'a') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
+            writer.writerow(data)
+    else:
+        with open(file, 'w') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
+            writer.writeheader()
+            writer.writerow(data)
 
 
 # function to create the qdisc
@@ -279,6 +326,11 @@ def update_qdisc(interface: str, rate: float, rate_unit: str):
     """Updates the HTB rate of the qdisc (Minimum: 8 bit)"""
     subprocess.call('tc class replace dev ' + interface + ' parent 1: classid 1:1 htb rate ' +
                     str(rate) + rate_unit, shell=True)
+
+
+def sleep_and_ping(sleep_interval: float, ip: str):
+    time.sleep(sleep_interval)
+    subprocess.Popen(["ping", "-c1", ip]).communicate()
 
 
 if __name__ == '__main__':

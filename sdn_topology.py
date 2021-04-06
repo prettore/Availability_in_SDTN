@@ -127,7 +127,7 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
     # makeTerm(sta1, title='ping', cmd="ping 10.0.0.3")
     info("*** Start sending generated packets: sta1 (10.0.0.1) -> sta3 (10.0.0.3)\n")
     makeTerm(sta3, title='Recv', cmd="ITGRecv -a 10.0.0.3 -i sta3-wlan0 -l {}/receiver.log".format(statistics_dir))
-    makeTerm(sta1, title='Send', cmd="ITGSend -T UDP -C 100 -a 10.0.0.3 -c 1264 -s 0.123456 -t 160000 -l {}/sender.log ".format(statistics_dir))
+    makeTerm(sta1, title='Send', cmd="ITGSend -T UDP -C 10 -a 10.0.0.3 -c 1264 -s 0.123456 -t 160000 -l {}/sender.log ".format(statistics_dir))
     info("\n*** Running CLI\n")
     CLI(net)
     net.stop()
