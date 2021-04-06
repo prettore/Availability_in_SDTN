@@ -24,30 +24,53 @@ def main(data_path, show):
     df_time_series = df_time_series[time_series_columns]
 
     send_signal_file = data_path + 'sta1-wlan0_signal.csv'
+    send_events_file = data_path + 'sta1_events.csv'
     recv_signal_file = data_path + 'sta3-wlan0_signal.csv'
+    recv_events_file = data_path + 'sta3_events.csv'
     signal_columns = ["time", "SSID", "signal", "signal_avg", "rx_bitrate", "tx_bitrate"]
+    events_columns = ['time', 'disconnect', 'reconnect', 'scanner_start', 'scanner_stop', 'scan_trigger']
 
     df_signal_send = pd.read_csv(send_signal_file, sep=',')
+    df_events_send = pd.read_csv(send_events_file, sep=',')
     df_signal_recv = pd.read_csv(recv_signal_file, sep=',')
+    df_events_recv = pd.read_csv(recv_events_file, sep=',')
 
     df_signal_send = df_signal_send[signal_columns]
+    df_events_send = df_events_send[events_columns]
     df_signal_recv = df_signal_recv[signal_columns]
+    df_events_recv = df_events_recv[events_columns]
 
-    # signal_data_sender = np.genfromtxt(send_signal, delimiter=",", dtype=None, autostrip=True, names=names,
-    #                                    skip_header=1, encoding='UTF-8')
-    # signal_data_receiver = np.genfromtxt(recv_signal, delimiter=",", dtype=None, autostrip=True, names=names,
-    #                                      skip_header=1, encoding='UTF-8')
-    #
-    # starttime = np.nanmin(df_time_series['time']) - df_summary.loc[0, 'avg_latency_s']
-    # endtime = np.nanmax(df_time_series['time'])
-    #
-    # t_axis_signal_sender = [float(t) - starttime for t in signal_data_sender["time"] if float(t) - starttime <= 160]
-    # signal_sender = [float(s.rstrip(' dBm')) for s in signal_data_sender["signal"][:len(t_axis_signal_sender)]]
-    # signal_avg_sender = [s for s in signal_data_sender["signal_avg"][:len(t_axis_signal_sender)]]
-    #
-    # t_axis_signal_receiver = [float(t) - starttime for t in signal_data_receiver["time"] if float(t) - starttime <= 160]
-    # signal_receiver = [float(s.rstrip(' dBm')) for s in signal_data_receiver["signal"][:len(t_axis_signal_receiver)]]
-    # signal_avg_receiver = [s for s in signal_data_receiver["signal_avg"][:len(t_axis_signal_receiver)]]
+    send_disconnect_start = []
+    send_disconnect_stop = []
+    send_reconnect_start = []
+    send_reconnect_stop = []
+    for i, row in df_events_send.iterrows():
+        if df_events_send.loc[i, 'disconnect'] == 1:
+            send_disconnect_start.append(df_events_send.loc[i, 'time'])
+        if df_events_send.loc[i, 'disconnect'] == 2:
+            send_disconnect_stop.append(df_events_send.loc[i, 'time'])
+        if df_events_send.loc[i, 'reconnect'] == 1:
+            send_reconnect_start.append(df_events_send.loc[i, 'time'])
+        if df_events_send.loc[i, 'reconnect'] == 2:
+            send_reconnect_stop.append(df_events_send.loc[i, 'time'])
+    send_disconnect = list(zip(send_disconnect_start, send_disconnect_stop))
+    send_reconnect = list(zip(send_reconnect_start, send_reconnect_stop))
+
+    recv_disconnect_start = []
+    recv_disconnect_stop = []
+    recv_reconnect_start = []
+    recv_reconnect_stop = []
+    for i, row in df_events_recv.iterrows():
+        if df_events_recv.loc[i, 'disconnect'] == 1:
+            recv_disconnect_start.append(df_events_recv.loc[i, 'time'])
+        if df_events_recv.loc[i, 'disconnect'] == 2:
+            recv_disconnect_stop.append(df_events_recv.loc[i, 'time'])
+        if df_events_recv.loc[i, 'reconnect'] == 1:
+            recv_reconnect_start.append(df_events_recv.loc[i, 'time'])
+        if df_events_recv.loc[i, 'reconnect'] == 2:
+            recv_reconnect_stop.append(df_events_recv.loc[i, 'time'])
+    recv_disconnect = list(zip(recv_disconnect_start, recv_disconnect_stop))
+    recv_reconnect = list(zip(recv_reconnect_start, recv_reconnect_stop))
 
     fig, ax = plt.subplots(3, 1, figsize=(12, 8))
 
@@ -55,14 +78,30 @@ def main(data_path, show):
                        color='tab:blue', linewidth=0)
     line11 = ax[0].plot(df_signal_send['time'], df_signal_send['signal_avg'], label='Signal strength sender moving avg.',
                         marker=',', color='tab:blue')
-    ax[0].set_xlabel("Time (seconds)")
-    ax[0].set_ylabel("Signal AP (dBm)")
-    ax[0].legend()
-
+    for i, j in send_disconnect:
+        print("*** Send disconnect: {}, {}".format(i, j))
+        ax[0].axvspan(i, j, ymin=0, ymax=0.5, color='#b8e1ff')
+        ax[0].axvline(x=i, ymax=0.5, color='tab:blue', linestyle=(0, (3, 5, 1, 5)))
+        ax[0].axvline(x=j, ymax=0.5, color='tab:blue', linestyle=(0, (3, 5, 1, 5)))
+    for i, j in send_reconnect:
+        print("*** Send reconnect: {}, {}".format(i, j))
+        ax[0].axvspan(i, j, ymin=0, ymax=0.5, color='#b8e1ff')
+        ax[0].axvline(x=i, ymax=0.5, color='tab:blue', linestyle=(0, (3, 5, 1, 5)))
+        ax[0].axvline(x=j, ymax=0.5, color='tab:blue', linestyle=(0, (3, 5, 1, 5)))
     line2 = ax[0].plot(df_signal_recv['time'], df_signal_recv['signal'], label='Signal strength receiver', marker='x',
                        color='tab:orange', linewidth=0)
     line22 = ax[0].plot(df_signal_recv['time'], df_signal_recv['signal_avg'], label='Signal strength receiver moving avg.',
                         marker=',', color='tab:orange', linestyle='dashed')
+    for i, j in recv_disconnect:
+        print("*** Recv disconnect: {}, {}".format(i, j))
+        ax[0].axvspan(i, j, ymin=0.5, ymax=1, color='#ffcfa6')
+        ax[0].axvline(x=i, color='tab:orange', linestyle=(0, (3, 5, 1, 5, 1, 5)))
+        ax[0].axvline(x=j, color='tab:orange', linestyle=(0, (3, 5, 1, 5, 1, 5)))
+    for i, j in recv_reconnect:
+        print("*** Recv reconnect: {}, {}".format(i, j))
+        ax[0].axvspan(i, j, ymin=0.5, ymax=1, color='#ffcfa6')
+        ax[0].axvline(x=i, color='tab:orange', linestyle=(0, (3, 5, 1, 5, 1, 5)))
+        ax[0].axvline(x=j, color='tab:orange', linestyle=(0, (3, 5, 1, 5, 1, 5)))
     ax[0].set_xlabel("Time (seconds)")
     ax[0].set_ylabel("Signal AP (dBm)")
     ax[0].yaxis.set_minor_locator(MultipleLocator(5))
@@ -73,8 +112,6 @@ def main(data_path, show):
     line0 = ax[1].plot(df_time_series['time'], df_time_series['packet_loss'], label='Packet loss')
     ax[1].set_xlabel("Time (seconds)")
     ax[1].set_ylabel("Packet loss")
-    # ax[1].set_yticks([0.0, 1.0])
-    # ax[1].set_ylim(-1, 3)
     ax[1].legend()
     ax[1].grid()
 
