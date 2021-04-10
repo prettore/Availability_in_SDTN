@@ -79,43 +79,48 @@ def main(data_path, show):
     line11 = ax[0].plot(df_signal_send['time'], df_signal_send['signal_avg'], label='Signal strength sender moving avg.',
                         marker=',', color='tab:blue')
     for i, j in send_disconnect:
-        print("*** Send disconnect: {}, {}".format(i, j))
+        print("*** Send disconnect time: {}, {}".format(i, j))
         ax[0].axvspan(i, j, ymin=0, ymax=0.5, color='#b8e1ff')
         ax[0].axvline(x=i, ymax=0.5, color='tab:blue', linestyle=(0, (3, 5, 1, 5)))
         ax[0].axvline(x=j, ymax=0.5, color='tab:blue', linestyle=(0, (3, 5, 1, 5)))
+        ymin, ymax = ax[0].get_ylim()
+        draw_brace_bottom(ax[0], (i, j), "Sender:\nAP" r"$\rightarrow$" "OLSR", '#006ab5')
     for i, j in send_reconnect:
-        print("*** Send reconnect: {}, {}".format(i, j))
+        print("*** Send reconnect time: {}, {}".format(i, j))
         ax[0].axvspan(i, j, ymin=0, ymax=0.5, color='#b8e1ff')
         ax[0].axvline(x=i, ymax=0.5, color='tab:blue', linestyle=(0, (3, 5, 1, 5)))
         ax[0].axvline(x=j, ymax=0.5, color='tab:blue', linestyle=(0, (3, 5, 1, 5)))
+        draw_brace_bottom(ax[0], (i, j), "Sender:\nOLSR" r"$\rightarrow$" "AP", '#006ab5')
     line2 = ax[0].plot(df_signal_recv['time'], df_signal_recv['signal'], label='Signal strength receiver', marker='x',
                        color='tab:orange', linewidth=0)
     line22 = ax[0].plot(df_signal_recv['time'], df_signal_recv['signal_avg'], label='Signal strength receiver moving avg.',
                         marker=',', color='tab:orange', linestyle='dashed')
     for i, j in recv_disconnect:
-        print("*** Recv disconnect: {}, {}".format(i, j))
+        print("*** Recv disconnect time: {}, {}".format(i, j))
         ax[0].axvspan(i, j, ymin=0.5, ymax=1, color='#ffcfa6')
-        ax[0].axvline(x=i, color='tab:orange', linestyle=(0, (3, 5, 1, 5, 1, 5)))
-        ax[0].axvline(x=j, color='tab:orange', linestyle=(0, (3, 5, 1, 5, 1, 5)))
+        ax[0].axvline(x=i, ymin=0.5, color='tab:orange', linestyle=(0, (3, 5, 1, 5, 1, 5)))
+        ax[0].axvline(x=j, ymin=0.5, color='tab:orange', linestyle=(0, (3, 5, 1, 5, 1, 5)))
+        ymin, ymax = ax[0].get_ylim()
+        draw_brace_top(ax[0], (i, j), "Receiver:\nAP" r"$\rightarrow$" "OLSR", '#ff7700')
     for i, j in recv_reconnect:
-        print("*** Recv reconnect: {}, {}".format(i, j))
+        print("*** Recv reconnect time: {}, {}".format(i, j))
         ax[0].axvspan(i, j, ymin=0.5, ymax=1, color='#ffcfa6')
-        ax[0].axvline(x=i, color='tab:orange', linestyle=(0, (3, 5, 1, 5, 1, 5)))
-        ax[0].axvline(x=j, color='tab:orange', linestyle=(0, (3, 5, 1, 5, 1, 5)))
+        ax[0].axvline(x=i, ymin=0.5, color='tab:orange', linestyle=(0, (3, 5, 1, 5, 1, 5)))
+        ax[0].axvline(x=j, ymin=0.5, color='tab:orange', linestyle=(0, (3, 5, 1, 5, 1, 5)))
+        draw_brace_top(ax[0], (i, j), "Receiver:\nOLSR" r"$\rightarrow$" "AP", '#ff7700')
     ax[0].set_xlabel("Time (seconds)")
     ax[0].set_ylabel("Signal AP (dBm)")
     ax[0].yaxis.set_minor_locator(MultipleLocator(5))
+    ax_top = ax[0].twiny()
     ax[0].legend()
     ax[0].grid()
 
-    # line0 = ax[1].plot(t_axis_packets, packet_loss, label='Packet loss', marker='2', linewidth=0)
     line0 = ax[1].plot(df_time_series['time'], df_time_series['packet_loss'], label='Packet loss')
     ax[1].set_xlabel("Time (seconds)")
     ax[1].set_ylabel("Packet loss")
     ax[1].legend()
     ax[1].grid()
 
-    # line3 = ax[2].plot(t_axis_packets, delay, label='Delay', marker='')
     line3 = ax[2].plot(df_time_series['time'], df_time_series['latency'], label='Latency')
     lat_max = ax[2].plot(df_time_series['time'], np.zeros(len(df_time_series['time'])) + df_summary.loc[0, 'max_latency_s'],
                          label='Max. latency', linestyle='dashed')
@@ -128,16 +133,76 @@ def main(data_path, show):
     ax[2].grid()
 
     for x in ax:
-        x.set_xlim(0, 165)
+        x.set_xlim(0, 175)
         x.xaxis.set_major_locator(MultipleLocator(10))
         x.xaxis.set_major_formatter(FormatStrFormatter('%d'))
         x.xaxis.set_minor_locator(MultipleLocator(2.0))
+    ax_top.set_xlim(0, 175)
+    ax_top.xaxis.set_major_locator(MultipleLocator(10))
+    ax_top.xaxis.set_major_formatter(FormatStrFormatter('%d'))
+    ax_top.xaxis.set_minor_locator(MultipleLocator(2.0))
 
     plt.tight_layout()
     if show:
         plt.show()
     else:
         plt.savefig(path + 'plot.pdf')
+
+
+def draw_brace_top(ax, xspan, text, color):
+    """Draws an annotated brace above the diagram."""
+    xmin, xmax = xspan
+    xspan = xmax - xmin
+    ymin, ymax = ax.get_ylim()
+    yspan = ymax - ymin
+    if xspan < 3:
+        x = np.full(2, xmin + (xspan / 2))
+        y = np.array([ymax - .01 * yspan, ymax + .23 * yspan])
+        ax.plot(x, y, color=color, lw=1, clip_on=False)
+    else:
+        ax_xmin, ax_xmax = ax.get_xlim()
+        xax_span = ax_xmax - ax_xmin
+        resolution = int(xspan/xax_span*100)*2+1  # guaranteed uneven
+        beta = 800./xax_span  # the higher this is, the smaller the radius
+
+        x = np.linspace(xmin, xmax, resolution)
+        x_half = x[:resolution//2+1]
+        y_half_brace = (1/(1.+np.exp(-beta*(x_half-x_half[0])))
+                        + 1/(1.+np.exp(-beta*(x_half-x_half[-1]))))
+        y = np.concatenate((y_half_brace, y_half_brace[-2::-1]))
+        y = ymax + (.05 * y + .15) * yspan  # adjust vertical position
+
+        ax.autoscale(False)
+        ax.plot(x, y, color=color, lw=1, clip_on=False)
+    ax.text((xmax + xmin) / 2., ymax + .25 * yspan, text, color=color, ha='center', va='bottom')
+
+
+def draw_brace_bottom(ax, xspan, text, color):
+    """Draws an annotated brace below the diagram."""
+    xmin, xmax = xspan
+    xspan = xmax - xmin
+    ymin, ymax = ax.get_ylim()
+    yspan = ymax - ymin
+    if xspan < 3:
+        x = np.full(2, xmin + (xspan / 2))
+        y = np.array([ymin - .23 * yspan, ymin + .01 * yspan])
+        ax.plot(x, y, color=color, lw=1, clip_on=False)
+    else:
+        ax_xmin, ax_xmax = ax.get_xlim()
+        xax_span = ax_xmax - ax_xmin
+        resolution = int(xspan / xax_span * 100) * 2 + 1  # guaranteed uneven
+        beta = 800. / xax_span  # the higher this is, the smaller the radius
+
+        x = np.linspace(xmin, xmax, resolution)
+        x_half = x[:resolution // 2 + 1]
+        y_half_brace = (1 / (1. + np.exp(-beta * (x_half - x_half[0])))
+                        + 1 / (1. + np.exp(-beta * (x_half - x_half[-1]))))
+        y = np.concatenate((y_half_brace, y_half_brace[-2::-1]))
+        y = ymin - (.05 * y + .15) * yspan  # adjust vertical position
+
+        ax.autoscale(False)
+        ax.plot(x, y, color=color, lw=1, clip_on=False)
+    ax.text((xmax + xmin) / 2., ymin - .25 * yspan, text, color=color, ha='center', va='top')
 
 
 if __name__ == '__main__':
