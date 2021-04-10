@@ -26,6 +26,7 @@ def main(args):
     While OLSR is activated the program continuously scans for the APs SSID to reappear in range.
     When the APs SSID is again in range the program deactivates OLSR and reconnects to the AP.
     """
+    cmd_iw_dev(args.interface, "connect", args.apssid)
     if args.scaninterface:
         scaninterface = args.scaninterface
     else:
@@ -62,6 +63,32 @@ def main(args):
                       statistics_dir, args.apssid, args.apbssid, args.apip, args.signalwindow, args.starttime, args.qdisc, args.noolsr)
 
 
+class FlexibleSdnOlsrController:
+    def __init__(self, interface: str, scaninterface: str, scan_interval: float, reconnect_threshold: float,
+                 disconnect_threshold: float, pingto: str, out_path: str, ap_ssid: str, ap_bssid: str, ap_ip: str,
+                 signal_window: int, start_time: float, qdisc: int, no_olsr: bool = False):
+        self.interface = interface
+        self.station = interface.split('-')[0]
+        self.scaninterface = scaninterface
+        self.scan_interval = scan_interval
+        self.reconnect_threshold = reconnect_threshold
+        self.disconnect_threshold = disconnect_threshold
+        self.pinto = pingto
+        self.out_path = out_path
+        self.signal_file = out_path + interface + '_signal.csv'
+        self.ap_ssid = ap_ssid
+        self.ap_bssid = ap_bssid
+        self.ap_ip = ap_ip
+        self.signal_window = signal_window
+        self.start_time = start_time
+        self.qdisc = qdisc
+        self.no_olsr = no_olsr
+        self.olsrd_pid = 0
+        self.link_signal_deque = deque(maxlen=signal_window)
+        self.scan_signal_deque = deque(maxlen=signal_window)
+        self.scanner = Scanner(scaninterface, scan_interval, out_path, self.station, start_time, ap_ssid)
+
+
 def flexible_sdn_olsr(interface: str, scaninterface: str, scan_interval: float, reconnect_threshold: float, disconnect_threshold: float,
                       pingto: str, out_path: str, ap_ssid: str, ap_bssid: str, ap_ip: str, signal_window: int, start_time: float, qdisc: int, no_olsr: bool = False):
     """
@@ -77,7 +104,7 @@ def flexible_sdn_olsr(interface: str, scaninterface: str, scan_interval: float, 
     scan_signal_deque = deque(maxlen=signal_window)
     file = out_path + interface + '_signal.csv'
     stdout, stderr = cmd_iw_dev(interface, "link")
-    while b'Not connected.' in stdout and b'Connected to ' + ap_bssid.encode() not in stdout:
+    while b'Connected to ' + ap_bssid.encode() not in stdout:
         stdout, stderr = cmd_iw_dev(interface, "link")
     stdout, stderr = Popen(["ping", "-c1", ap_ip], stdout=PIPE, stderr=PIPE).communicate()
     if pingto:
@@ -106,8 +133,8 @@ def flexible_sdn_olsr(interface: str, scaninterface: str, scan_interval: float, 
         if scan_signal and 'signal' in scan_signal:
             scan_signal_deque.append(scan_signal['signal'])
             scan_signal.update({'signal_avg': sum(scan_signal_deque) / len(scan_signal_deque)})
-            print("*** {}: Scan detected {} in range (signal: {} / {})".format(scaninterface, ap_ssid, scan_signal['signal'],
-                                                                               reconnect_threshold))
+            # print("*** {}: Scan detected {} in range (signal: {} / {})".format(scaninterface, ap_ssid, scan_signal['signal'],
+            #                                                                    reconnect_threshold))
             log.info("*** {}: Scan detected {} in range (signal: {} / {})".format(scaninterface, ap_ssid, scan_signal['signal'],
                                                                                   reconnect_threshold))
             write_signal_to_file(scan_signal, file)
