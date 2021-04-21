@@ -16,7 +16,8 @@ from mn_wifi.replaying import ReplayingMobility
 
 
 def topology(scenario: int, signal_window: int, scan_interval: float, disconnect_threshold: float,
-             reconnect_threshold: float, scan_iface: bool = False, no_olsr: bool = False, qdisc: bool = False):
+             reconnect_threshold: float, scan_iface: bool = False, no_olsr: bool = False,
+             qdisc_rates: dict = {'disconnect': 0, 'reconnect': 0}):
     """Build a custom topology and start it"""
     net = Mininet_wifi(topo=None, build=False, link=wmediumd, wmediumd_mode=interference, noise_th=-91, fading_cof=3,
                        autoAssociation=False, allAutoAssociation=False)
@@ -74,7 +75,7 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
     net.build()
     c0.start()
     net.get('ap1').start([c0])
-    sleep(2)
+    sleep(1)
     if scenario > 1:
         info("\n*** Replaying Mobility\n")
         ReplayingMobility(net)
@@ -98,8 +99,8 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
         cmd += " -S sta1-wlan1"
     if no_olsr:
         cmd += " -O"
-    if qdisc > 0:
-        cmd += " -q {}".format(qdisc)
+    if qdisc_rates['disconnect'] > 0 and qdisc_rates['reconnect'] > 0:
+        cmd += " -qr {} -qd {}".format(qdisc_rates['reconnect'], qdisc_rates['disconnect'])
     makeTerm(sta1, title='Station 1', cmd=cmd + " ; sleep 10")
     cmd = "python3"
     cmd += " {}/flexible_sdn.py".format(path)
@@ -114,8 +115,8 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
         cmd += " -S sta3-wlan1"
     if no_olsr:
         cmd += " -O"
-    if qdisc > 0:
-        cmd += " -q {}".format(qdisc)
+    if qdisc_rates['disconnect'] > 0 and qdisc_rates['reconnect'] > 0:
+        cmd += " -qr {} -qd {}".format(qdisc_rates['reconnect'], qdisc_rates['disconnect'])
     makeTerm(sta3, title='Station 3', cmd=cmd + " ; sleep 10")
     # cmd = "python3 {}/packet_sniffer.py -i sta1-wlan0 -o {}send_packets.csv -f 'icmp[icmptype] = icmp-echo'".format(path, stat_dir)
     # cmd = "python3 {}/packet_sniffer.py -i sta1-wlan0 -o {}send_packets.csv -f '-p udp -m udp --dport 8999' -T True".format(path, stat_dir)
@@ -123,7 +124,7 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
     # cmd = "python3 {}/packet_sniffer.py -i sta3-wlan0 -o {}recv_packets.csv -f 'icmp[icmptype] = icmp-echo'".format(path, stat_dir)
     # cmd = "python3 {}/packet_sniffer.py -i sta3-wlan0 -o {}recv_packets.csv -f 'udp dst port 8999'".format(path, stat_dir)
     # makeTerm(sta3, title='Packet Sniffer sta3', cmd=cmd + " ; sleep 10")
-    sleep(1)
+    sleep(2)
     # info("*** Starting ping: sta1 (10.0.0.1) -> sta3 (10.0.0.3)\n")
     # makeTerm(sta1, title='ping', cmd="ping 10.0.0.3")
     info("*** Start sending generated packets: sta1 (10.0.0.1) -> sta3 (10.0.0.3)\n")
@@ -182,8 +183,10 @@ if __name__ == '__main__':
     parser.add_argument("-w", "--signalwindow", help="Window for the moving average calculation of the signal strength",
                         type=int, default=3)
     parser.add_argument("-O", "--noolsr", help="Do not use olsr when connection to AP is lost (default: False)", action='store_true', default=False)
-    parser.add_argument("-q", "--qdisc", help="Bandwidth in bits/s to throttle qdisc to during handover. 0 means deactivate qdisc (default: 0)", type=int, default=0)
+    parser.add_argument("-qd", "--qdiscdisconnect", help="Bandwidth in bits/s to throttle qdisc to during handover AP to OLSR. 0 means deactivate qdisc (default: 0)", type=int, default=0)
+    parser.add_argument("-qr", "--qdiscreconnect", help="Bandwidth in bits/s to throttle qdisc to during handover AP to OLSR. 0 means deactivate (default: 0)", type=int, default=0)
     args = parser.parse_args()
     scenario = args.mobilityscenario
+    qdisc_rates = {'disconnect': args.qdiscdisconnect, 'reconnect': args.qdiscreconnect}
     topology(scenario, args.signalwindow, args.scaninterval, args.disconnectthreshold, args.reconnectthreshold,
-             args.scaninterface, args.noolsr, args.qdisc)
+             args.scaninterface, args.noolsr, qdisc_rates)
