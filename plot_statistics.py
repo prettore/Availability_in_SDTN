@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 
 
-def main(data_path, show):
+def main(data_path, show, noolsr):
     summary_file = data_path + 'summary.csv'
     time_series_file = data_path + 'metrics_time_series.csv'
 
@@ -78,19 +78,27 @@ def main(data_path, show):
                        color='tab:blue', linewidth=0)
     line11 = ax[0].plot(df_signal_send['time'], df_signal_send['signal_avg'], label='Signal strength sender moving avg.',
                         marker=',', color='tab:blue')
+    ax[0].yaxis.set_minor_locator(MultipleLocator(5))
+    ax[0].set_ylim(-100, -30)
     for i, j in send_disconnect:
         print("*** Send disconnect time: {}, {}".format(i, j))
         ax[0].axvspan(i, j, ymin=0, ymax=0.5, color='#b8e1ff')
         ax[0].axvline(x=i, ymax=0.5, color='tab:blue', linestyle=(0, (3, 5, 1, 5)))
         ax[0].axvline(x=j, ymax=0.5, color='tab:blue', linestyle=(0, (3, 5, 1, 5)))
         ymin, ymax = ax[0].get_ylim()
-        draw_brace_bottom(ax[0], (i, j), "Sender:\nAP" r"$\rightarrow$" "OLSR", '#006ab5')
+        if not noolsr:
+            draw_brace_bottom(ax[0], (i, j), "Sender:\nAP" r"$\rightarrow$" "OLSR", '#006ab5')
+        else:
+            draw_brace_bottom(ax[0], (i, j), "Sender:\nAP disconnect", '#006ab5')
     for i, j in send_reconnect:
         print("*** Send reconnect time: {}, {}".format(i, j))
         ax[0].axvspan(i, j, ymin=0, ymax=0.5, color='#b8e1ff')
         ax[0].axvline(x=i, ymax=0.5, color='tab:blue', linestyle=(0, (3, 5, 1, 5)))
         ax[0].axvline(x=j, ymax=0.5, color='tab:blue', linestyle=(0, (3, 5, 1, 5)))
-        draw_brace_bottom(ax[0], (i, j), "Sender:\nOLSR" r"$\rightarrow$" "AP", '#006ab5')
+        if not noolsr:
+            draw_brace_bottom(ax[0], (i, j), "Sender:\nOLSR" r"$\rightarrow$" "AP", '#006ab5')
+        else:
+            draw_brace_bottom(ax[0], (i, j), "Sender:\nAP reconnect", '#006ab5')
     line2 = ax[0].plot(df_signal_recv['time'], df_signal_recv['signal'], label='Signal strength receiver', marker='x',
                        color='tab:orange', linewidth=0)
     line22 = ax[0].plot(df_signal_recv['time'], df_signal_recv['signal_avg'], label='Signal strength receiver moving avg.',
@@ -101,23 +109,31 @@ def main(data_path, show):
         ax[0].axvline(x=i, ymin=0.5, color='tab:orange', linestyle=(0, (3, 5, 1, 5, 1, 5)))
         ax[0].axvline(x=j, ymin=0.5, color='tab:orange', linestyle=(0, (3, 5, 1, 5, 1, 5)))
         ymin, ymax = ax[0].get_ylim()
-        draw_brace_top(ax[0], (i, j), "Receiver:\nAP" r"$\rightarrow$" "OLSR", '#ff7700')
+        if not noolsr:
+            draw_brace_top(ax[0], (i, j), "Receiver:\nAP" r"$\rightarrow$" "OLSR", '#ff7700')
+        else:
+            draw_brace_top(ax[0], (i, j), "Receiver:\nAP disconnect", '#ff7700')
     for i, j in recv_reconnect:
         print("*** Recv reconnect time: {}, {}".format(i, j))
         ax[0].axvspan(i, j, ymin=0.5, ymax=1, color='#ffcfa6')
         ax[0].axvline(x=i, ymin=0.5, color='tab:orange', linestyle=(0, (3, 5, 1, 5, 1, 5)))
         ax[0].axvline(x=j, ymin=0.5, color='tab:orange', linestyle=(0, (3, 5, 1, 5, 1, 5)))
-        draw_brace_top(ax[0], (i, j), "Receiver:\nOLSR" r"$\rightarrow$" "AP", '#ff7700')
+        if not noolsr:
+            draw_brace_top(ax[0], (i, j), "Receiver:\nOLSR" r"$\rightarrow$" "AP", '#ff7700')
+        else:
+            draw_brace_top(ax[0], (i, j), "Receiver:\nAP reconnect", '#ff7700')
     ax[0].set_xlabel("Time (seconds)")
     ax[0].set_ylabel("Signal AP (dBm)")
-    ax[0].yaxis.set_minor_locator(MultipleLocator(5))
     ax_top = ax[0].twiny()
-    ax[0].legend()
+    ax[0].legend(loc='upper center')
     ax[0].grid()
 
     line0 = ax[1].plot(df_time_series['time'], df_time_series['packet_loss'], label='Packet loss')
     ax[1].set_xlabel("Time (seconds)")
     ax[1].set_ylabel("Packet loss")
+    # ax[1].set_ylim(-5, 130)
+    ax[1].yaxis.set_minor_locator(MultipleLocator(25))
+    ax[1].set_ylim(-20, 600)
     ax[1].legend()
     ax[1].grid()
 
@@ -129,6 +145,7 @@ def main(data_path, show):
     ax[2].set_xlabel("Time (seconds)")
     ax[2].set_ylabel("End-to-end Latency (seconds)")
     ax[2].yaxis.set_minor_locator(MultipleLocator(0.1))
+    ax[2].set_ylim(-0.1, 2.5)
     ax[2].legend()
     ax[2].grid()
 
@@ -209,6 +226,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Tactical network experiment!")
     parser.add_argument("-d", "--directory", help="Directory of log files", type=str, required=True)
     parser.add_argument("-s", "--show", help="Show the plot instead of saving to file", action="store_true", default=False)
+    parser.add_argument("-O", "--noolsr", help="No olsr when connection to AP is lost (default: False)", action='store_true', default=False)
     args = parser.parse_args()
     path = args.directory
-    main(path, args.show)
+    main(path, args.show, args.noolsr)

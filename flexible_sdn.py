@@ -58,7 +58,7 @@ def main(args):
                            'moving_avg_window': args.signalwindow,
                            'reconnect_threshold': args.reconnectthreshold,
                            'disconnect_threshold': args.disconnectthreshold}}
-    with open(statistics_dir + 'start_params.json', 'w') as file:
+    with open(statistics_dir + args.interface.split('-')[0] + '_start-params.json', 'w') as file:
         json.dump(parameters, file, indent=4)
     controller = FlexibleSdnOlsrController(args.interface, scaninterface, args.scaninterval, args.reconnectthreshold,
                                            args.disconnectthreshold, args.pingto, statistics_dir, args.apssid,
@@ -77,6 +77,7 @@ class FlexibleSdnOlsrController:
         self.scan_interval = scan_interval
         self.reconnect_threshold = reconnect_threshold
         self.disconnect_threshold = disconnect_threshold
+        self.connected_to_ap = True
         self.pingto = pingto
         self.out_path = out_path
         self.signal_file = out_path + interface + '_signal.csv'
@@ -145,6 +146,7 @@ class FlexibleSdnOlsrController:
                 if scan_signal['signal'] >= self.reconnect_threshold:
                     self.log_event('reconnect', 1)
                     self.reconnect_to_access_point()
+                    self.connected_to_ap = True
                     self.log_event('reconnect', 2)
                     if self.scanner.is_alive():
                         print("*** Stopping background scan")
@@ -161,15 +163,17 @@ class FlexibleSdnOlsrController:
                 print("*** Starting OLSRd")
                 self.log_event('disconnect', 1)
                 self.switch_to_olsr()
+                self.connected_to_ap = False
                 self.log_event('disconnect', 2)
                 if self.pingto:
                     spthread = threading.Thread(target=sleep_and_ping,
                                                 kwargs={'sleep_interval': 1.0, 'ip': self.pingto},
                                                 daemon=True)
                     spthread.start()
-            elif self.no_olsr:
+            elif self.no_olsr and self.connected_to_ap:
                 self.log_event('disconnect', 1)
                 cmd_iw_dev(self.interface, 'disconnect')
+                self.connected_to_ap = False
                 self.log_event('disconnect', 2)
 
     def get_link_signal_quality(self):

@@ -138,7 +138,11 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
     if out:
         subprocess.Popen(['killall', 'olsrd'])
     subprocess.Popen(["python3", "{}/eval_ditg.py".format(path), "-d", statistics_dir, "-t", str(start_time.timestamp())]).communicate()
-    subprocess.Popen(["python3", "{}/plot_statistics.py".format(path), "-d", statistics_dir]).communicate()
+    if no_olsr:
+        plot_cmd = ["python3", "{}/plot_statistics.py".format(path), "-d", statistics_dir, '-O']
+    else:
+        plot_cmd = ["python3", "{}/plot_statistics.py".format(path), "-d", statistics_dir]
+    subprocess.Popen(plot_cmd).communicate()
     os.system("chown -R wifi {}".format(path + '/data/statistics/'))
 
 
