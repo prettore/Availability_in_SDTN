@@ -10,11 +10,11 @@ from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 
 
 class Animation(object):
-    def __init__(self, duration, ax0, ax1, ax2, df_signal_send, df_signal_recv, df_time_series, send_disconnect, send_reconnect,
+    def __init__(self, duration, ax0, ax1, df_signal_send, df_signal_recv, df_time_series, send_disconnect, send_reconnect,
                  recv_disconnect, recv_reconnect):
         self.ax0 = ax0
         self.ax1 = ax1
-        self.ax2 = ax2
+        # self.ax2 = ax2
         self.signal_send = df_signal_send
         self.signal_recv = df_signal_recv
         self.time_series = df_time_series
@@ -71,16 +71,15 @@ class Animation(object):
         self.ax1.legend()
 
         # init latency plot
-        self.line2 = Line2D([], [], label='Latency')
-        self.ax2.set_xlabel("Time (seconds)")
-        self.ax2.set_ylabel("End-to-end Latency (seconds)")
-        # self.ax2.yaxis.set_minor_locator(MultipleLocator(0.1))
-        self.ax2.set_xlim(0, duration)
-        self.ax2.set_xticks([x for x in range(duration + 1)], True)
-        self.ax2.set_ylim(-0.1, 2.5)
-        self.ax2.grid()
-        self.ax2.add_line(self.line2)
-        self.ax2.legend()
+        # self.line2 = Line2D([], [], label='Latency')
+        # self.ax2.set_xlabel("Time (seconds)")
+        # self.ax2.set_ylabel("End-to-end Latency (seconds)")
+        # self.ax2.set_xlim(0, duration)
+        # self.ax2.set_xticks([x for x in range(duration + 1)], True)
+        # self.ax2.set_ylim(-0.1, 2.5)
+        # self.ax2.grid()
+        # self.ax2.add_line(self.line2)
+        # self.ax2.legend()
 
     def __call__(self, i):
         if i == 0:
@@ -89,8 +88,8 @@ class Animation(object):
             self.line0_recv.set_data([], [])
             self.line0_recv_avg.set_data([], [])
             self.line1.set_data([], [])
-            self.line1.set_data([], [])
-            lines = [self.line0_send, self.line0_send_avg, self.line0_recv, self.line0_recv_avg, self.line1, self.line2]
+            # self.line2.set_data([], [])
+            lines = [self.line0_send, self.line0_send_avg, self.line0_recv, self.line0_recv_avg, self.line1]  # , self.line2]
             spans = self.send_dspans + self.send_rspans + self.recv_dspans + self.recv_rspans
             return lines + spans
         signal_send = self.signal_send[self.signal_send['time'] <= i]
@@ -101,7 +100,7 @@ class Animation(object):
         self.line0_recv.set_data(signal_recv['time'], signal_recv['signal'])
         self.line0_recv_avg.set_data(signal_recv['time'], signal_recv['signal_avg'])
         self.line1.set_data(time_series['time'], time_series['packet_loss'])
-        self.line2.set_data(time_series['time'], time_series['latency'])
+        # self.line2.set_data(time_series['time'], time_series['latency'])
         send_disconnect = [(n, m) for n, m in self.send_disconnect if n <= i]
         send_reconnect = [(n, m) for n, m in self.send_reconnect if n <= i]
         recv_disconnect = [(n, m) for n, m in self.recv_disconnect if n <= i]
@@ -130,23 +129,23 @@ class Animation(object):
                 self.recv_rspans[k].set_xy([[n, 0.5], [n, 1], [m, 1], [m, 0.5], [n, 0.5]])
             else:
                 self.recv_rspans[k].set_xy([[n, 0.5], [n, 1], [i, 1], [i, 0.5], [n, 0.5]])
-        lines = [self.line0_send, self.line0_send_avg, self.line0_recv, self.line0_recv_avg, self.line1, self.line2]
+        lines = [self.line0_send, self.line0_send_avg, self.line0_recv, self.line0_recv_avg, self.line1]  # , self.line2]
         spans = self.send_dspans + self.send_rspans + self.recv_dspans + self.recv_rspans
         return lines + spans
 
 
 def main(data_path, show, noolsr):
-    summary_file = data_path + 'summary.csv'
+    # summary_file = data_path + 'summary.csv'
     time_series_file = data_path + 'metrics_time_series.csv'
 
     # read the csv files
-    df_summary = pd.read_csv(summary_file, sep=',')
+    # df_summary = pd.read_csv(summary_file, sep=',')
     df_time_series = pd.read_csv(time_series_file, sep=',')
 
     summary_columns = ['total_time_s', 'packet_sent', 'packet_received', 'packet_dropped', 'packet_dropped_rate',
                        'min_latency_s', 'max_latency_s', 'avg_latency_s', 'sd_latency_s', 'avg_jitter_s',
                        'sd_jitter_s', 'avg_packetrate_pkts', 'round']
-    df_summary = df_summary[summary_columns]
+    # df_summary = df_summary[summary_columns]
 
     time_series_columns = ['time', 'latency', 'jitter', 'packet_loss']
     df_time_series = df_time_series[time_series_columns]
@@ -201,13 +200,13 @@ def main(data_path, show, noolsr):
     recv_reconnect = list(zip(recv_reconnect_start, recv_reconnect_stop))
 
     # initialize the plots for the visualization
-    fig = plt.figure(figsize=(12, 8))
-    ax0 = plt.subplot2grid((3, 1), (0, 0))
-    ax1 = plt.subplot2grid((3, 1), (1, 0))
-    ax2 = plt.subplot2grid((3, 1), (2, 0))
+    fig = plt.figure(figsize=(10, 5))
+    ax0 = plt.subplot2grid((2, 1), (0, 0))
+    ax1 = plt.subplot2grid((2, 1), (1, 0))
+    # ax2 = plt.subplot2grid((3, 1), (2, 0))
 
     duration = 175
-    plot_animated = Animation(duration, ax0, ax1, ax2, df_signal_send, df_signal_recv, df_time_series, send_disconnect,
+    plot_animated = Animation(duration, ax0, ax1, df_signal_send, df_signal_recv, df_time_series, send_disconnect,
                               send_reconnect, recv_disconnect, recv_reconnect)
     frames = [t/10 for t in range(duration * 10)]
     animation = ani.FuncAnimation(fig, plot_animated, frames=frames, interval=50, blit=True)

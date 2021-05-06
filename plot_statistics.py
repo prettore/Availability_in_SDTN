@@ -23,6 +23,11 @@ def main(data_path, show, noolsr):
     time_series_columns = ['time', 'latency', 'jitter', 'packet_loss']
     df_time_series = df_time_series[time_series_columns]
 
+    df_packet_loss_peaks = df_time_series[
+        (df_time_series.packet_loss > 0) & (df_time_series.packet_loss.shift(-1) == 0)].append(
+        df_time_series.tail(1)[df_time_series.tail(1).packet_loss > 0])
+    print("Packet loss peaks:\n", df_packet_loss_peaks)
+
     send_signal_file = data_path + 'sta1-wlan0_signal.csv'
     send_events_file = data_path + 'sta1_events.csv'
     recv_signal_file = data_path + 'sta3-wlan0_signal.csv'
@@ -72,20 +77,19 @@ def main(data_path, show, noolsr):
     recv_disconnect = list(zip(recv_disconnect_start, recv_disconnect_stop))
     recv_reconnect = list(zip(recv_reconnect_start, recv_reconnect_stop))
 
-    fig, ax = plt.subplots(3, 1, figsize=(12, 8))
+    fig, ax = plt.subplots(2, 1, figsize=(10, 6))
 
-    line1 = ax[0].plot(df_signal_send['time'], df_signal_send['signal'], label='Signal strength sender', marker='v',
+    line1 = ax[0].plot(df_signal_send['time'], df_signal_send['signal'], label='Measured by sender', marker='v',
                        color='tab:blue', linewidth=0)
-    line11 = ax[0].plot(df_signal_send['time'], df_signal_send['signal_avg'], label='Signal strength sender moving avg.',
+    line11 = ax[0].plot(df_signal_send['time'], df_signal_send['signal_avg'], label='Moving avg. sender',
                         marker=',', color='tab:blue')
     ax[0].yaxis.set_minor_locator(MultipleLocator(5))
-    ax[0].set_ylim(-100, -30)
+    ax[0].set_ylim(-95, -35)
     for i, j in send_disconnect:
         print("*** Send disconnect time: {}, {}".format(i, j))
         ax[0].axvspan(i, j, ymin=0, ymax=0.5, color='#b8e1ff')
         ax[0].axvline(x=i, ymax=0.5, color='tab:blue', linestyle=(0, (3, 5, 1, 5)))
         ax[0].axvline(x=j, ymax=0.5, color='tab:blue', linestyle=(0, (3, 5, 1, 5)))
-        ymin, ymax = ax[0].get_ylim()
         if not noolsr:
             draw_brace_bottom(ax[0], (i, j), "Sender:\nAP" r"$\rightarrow$" "OLSR", '#006ab5')
         else:
@@ -99,9 +103,9 @@ def main(data_path, show, noolsr):
             draw_brace_bottom(ax[0], (i, j), "Sender:\nOLSR" r"$\rightarrow$" "AP", '#006ab5')
         else:
             draw_brace_bottom(ax[0], (i, j), "Sender:\nAP reconnect", '#006ab5')
-    line2 = ax[0].plot(df_signal_recv['time'], df_signal_recv['signal'], label='Signal strength receiver', marker='x',
+    line2 = ax[0].plot(df_signal_recv['time'], df_signal_recv['signal'], label='Measured by receiver', marker='x',
                        color='tab:orange', linewidth=0)
-    line22 = ax[0].plot(df_signal_recv['time'], df_signal_recv['signal_avg'], label='Signal strength receiver moving avg.',
+    line22 = ax[0].plot(df_signal_recv['time'], df_signal_recv['signal_avg'], label='Moving avg. receiver',
                         marker=',', color='tab:orange', linestyle='dashed')
     for i, j in recv_disconnect:
         print("*** Recv disconnect time: {}, {}".format(i, j))
@@ -123,31 +127,38 @@ def main(data_path, show, noolsr):
         else:
             draw_brace_top(ax[0], (i, j), "Receiver:\nAP reconnect", '#ff7700')
     ax[0].set_xlabel("Time (seconds)")
-    ax[0].set_ylabel("Signal AP (dBm)")
+    ax[0].set_ylabel("RSSI of AP (dBm)")
     ax_top = ax[0].twiny()
     ax[0].legend(loc='upper center')
+    #ax[0].legend(loc='best', bbox_to_anchor=(0.4, 0.5, 0.2, 0.5))
     ax[0].grid()
 
     line0 = ax[1].plot(df_time_series['time'], df_time_series['packet_loss'], label='Packet loss')
     ax[1].set_xlabel("Time (seconds)")
     ax[1].set_ylabel("Packet loss")
-    # ax[1].set_ylim(-5, 130)
-    ax[1].yaxis.set_minor_locator(MultipleLocator(25))
+    # ax[1].yaxis.set_major_locator(MultipleLocator(50))
+    # ax[1].yaxis.set_minor_locator(MultipleLocator(10))
+    # ax[1].set_ylim(-5, 200)
+    # ax[1].yaxis.set_major_locator(MultipleLocator(25))
+    # ax[1].yaxis.set_minor_locator(MultipleLocator(10))
+    # ax[1].set_ylim(-5, 110)
+    ax[1].yaxis.set_major_locator(MultipleLocator(150))
+    ax[1].yaxis.set_minor_locator(MultipleLocator(50))
     ax[1].set_ylim(-20, 600)
-    ax[1].legend()
+    ax[1].legend(loc='upper center')
     ax[1].grid()
 
-    line3 = ax[2].plot(df_time_series['time'], df_time_series['latency'], label='Latency')
-    lat_max = ax[2].plot(df_time_series['time'], np.zeros(len(df_time_series['time'])) + df_summary.loc[0, 'max_latency_s'],
-                         label='Max. latency', linestyle='dashed')
-    lat_avg = ax[2].plot(df_time_series['time'], np.zeros(len(df_time_series['time'])) + df_summary.loc[0, 'avg_latency_s'],
-                         label='Avg. latency', linestyle='dotted')
-    ax[2].set_xlabel("Time (seconds)")
-    ax[2].set_ylabel("End-to-end Latency (seconds)")
-    ax[2].yaxis.set_minor_locator(MultipleLocator(0.1))
-    ax[2].set_ylim(-0.1, 2.5)
-    ax[2].legend()
-    ax[2].grid()
+    # line3 = ax[2].plot(df_time_series['time'], df_time_series['latency'], label='Latency')
+    # lat_max = ax[2].plot(df_time_series['time'], np.zeros(len(df_time_series['time'])) + df_summary.loc[0, 'max_latency_s'],
+    #                      label='Max. latency', linestyle='dashed')
+    # lat_avg = ax[2].plot(df_time_series['time'], np.zeros(len(df_time_series['time'])) + df_summary.loc[0, 'avg_latency_s'],
+    #                      label='Avg. latency', linestyle='dotted')
+    # ax[2].set_xlabel("Time (seconds)")
+    # ax[2].set_ylabel("End-to-end Latency (seconds)")
+    # ax[2].yaxis.set_minor_locator(MultipleLocator(0.1))
+    # ax[2].set_ylim(-0.1, 2.5)
+    # ax[2].legend()
+    # ax[2].grid()
 
     for x in ax:
         x.set_xlim(0, 175)
@@ -159,6 +170,7 @@ def main(data_path, show, noolsr):
     ax_top.xaxis.set_major_formatter(FormatStrFormatter('%d'))
     ax_top.xaxis.set_minor_locator(MultipleLocator(2.0))
 
+    # plt.rcParams.update({'font.size': 16})
     plt.tight_layout()
     if show:
         plt.show()
