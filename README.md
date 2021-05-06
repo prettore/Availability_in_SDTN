@@ -136,6 +136,13 @@ The directory will be named with the date and time of the start of the experimen
 The mobility patterns can be found in CSV files under `./data/`.
 The mobility patterns that can be used through the CLI of `sdn_topology.py` are in the files `Scenario_*.csv`
 
+The scripts `eval_ditg.py` and `eval_statistics.py` are used to evaluate the statistics after running the experiment.
+The output of those are needed to plot the results with `plot_statistics.py` or `plot_animated.py`.
+
+`scanner.py` contains the Multiprocessing class that is used inside the nodes to scan for the AP.
+`cmd_utils.py` contains some wrapper functions for the shell commands of `iw dev`.
+`sta1-wlan0-olsrd.conf` and `sta3-wlan0-olsrd.conf` contain the configurations needed to start OLSRd. 
+
 ### Design
 The approach that we implemented in `flexible_sdn.py` is designed as follows:
 
