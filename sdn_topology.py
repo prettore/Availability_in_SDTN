@@ -7,7 +7,7 @@ from datetime import datetime
 
 from mininet.term import makeTerm
 from mininet.log import setLogLevel, info
-from mininet.node import RemoteController
+from mininet.node import RemoteController, Controller
 from mn_wifi.link import wmediumd, mesh
 from mn_wifi.cli import CLI
 from mn_wifi.net import Mininet_wifi
@@ -18,16 +18,28 @@ from mn_wifi.replaying import ReplayingMobility
 def topology(scenario: int, signal_window: int, scan_interval: float, disconnect_threshold: float,
              reconnect_threshold: float, scan_iface: bool = False, no_olsr: bool = False,
              qdisc_rates: dict = {'disconnect': 0, 'reconnect': 0}):
-    """Build a custom topology and start it"""
+    """
+    Build a custom topology and start it.
+
+    Note: If you do not want to use a remote SDN controller but the controller class that is included in Mininet-Wifi you will have to change some
+    """
     net = Mininet_wifi(topo=None, build=False, link=wmediumd, wmediumd_mode=interference, noise_th=-91, fading_cof=3,
                        autoAssociation=False, allAutoAssociation=False)
 
     info('*** Adding controller\n')
+    # Use this if you have a remote controller (e.g. RYU controller) intalled and running in the background
     c0 = net.addController(name='c0', controller=RemoteController, ip='127.0.0.1', port=6633)
 
+    # Use this instead if you want to use the SDN controller provided by Mininet-Wifi
+    # c0 = net.addController(name='c0', controller=Controller)
+
     info('*** Adding switches/APs\n')
+    # Use this SDN switch configuration if you use the RYU controller as a remote controller
     ap1 = net.addAccessPoint('ap1', ip='10.0.0.10', mac='00:00:00:00:01:00', listenPort=6634, dpid='0000000000000010',
                              ssid='ap1-ssid', mode='g', channel='1', position='30,50,0')
+
+    # Use this if you are using the SDN controller provided by Mininet-Wifi
+    # ap1 = net.addAccessPoint('ap1', ip='10.0.0.10', mac='00:00:00:00:01:00', ssid='ap1-ssid', mode='g', channel='1', position='30,50,0')
 
     info("*** Creating nodes\n")
     if scan_iface:
@@ -62,7 +74,7 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
             get_trace([sta1, sta2, sta3], path + trace_file, smooth_motion)
             net.isReplaying = True
         if scenario == 4:
-            trace_file = 'Scenario_4.csv'
+            trace_file = 'Scenario_1.csv'
             smooth_motion = False
             path = os.path.dirname(os.path.abspath(__file__)) + '/data/'
             get_trace([sta1, sta2, sta3], path + trace_file, smooth_motion)
@@ -82,7 +94,7 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
     start_time = datetime.now()
     info("*** Starting flexible SDN script (time: {})\n".format(start_time.timestamp()))
     path = os.path.dirname(os.path.abspath(__file__))
-    stat_dir = start_time.strftime('%Y-%m-%d_%H-%M-%S') + "_scen-{}_scan-{}_discon{}_recon{}_scanif-{}/".format(scenario, scan_interval, disconnect_threshold, reconnect_threshold, scanif)
+    stat_dir = start_time.strftime('%Y-%m-%d_%H-%M-%S') + "/"
     statistics_dir = path + '/data/statistics/' + stat_dir
     if not os.path.isdir(statistics_dir):
         os.makedirs(statistics_dir)
@@ -173,22 +185,31 @@ def get_trace(sta_list, file_, smooth):
 if __name__ == '__main__':
     setLogLevel('info')
     parser = argparse.ArgumentParser(description="Tactical network experiment!")
-    parser.add_argument("-m", "--mobilityscenario", help="Select a mobility scenario", type=int, required=True)
+    parser.add_argument("-m", "--mobilityscenario", help="Select a mobility scenario (Integer: 1, 2 or 3) (default: 1)",
+                        type=int, required=True, default=1)
     parser.add_argument("-s", "--scaninterval", help="Time interval in seconds (float) for scanning if the wifi access "
                                                      "point is in range while being in adhoc mode (default: 10.0)",
                         type=float, default=5.0)
     parser.add_argument("-d", "--disconnectthreshold", help="Signal strength (float) below which station dissconnects "
-                                                            "from AP and activates OLSR (default: -88.0 dBm)",
-                        type=float, default=-88.0)
+                                                            "from AP and activates OLSR (default: -70.0 dBm)",
+                        type=float, default=-70.0)
     parser.add_argument("-r", "--reconnectthreshold", help="Minimal signal strength (float) of AP required for trying "
-                                                           "reconnect (default: -85.0 dBm)", type=float, default=-85.0)
-    parser.add_argument("-S", "--scaninterface", help="Use a second interface for scanning", action="store_true",
-                        default=False)
-    parser.add_argument("-w", "--signalwindow", help="Window for the moving average calculation of the signal strength",
+                                                           "reconnect (default: -65.0 dBm)", type=float, default=-65.0)
+    parser.add_argument("-S", "--scaninterface", help="Use a second interface for scanning to prevent blocking the "
+                                                      "primary interface and thus disrupting the data flow (default: True)",
+                        action="store_true",
+                        default=True)
+    parser.add_argument("-w", "--signalwindow", help="Window for the moving average calculation of the AP signal "
+                                                     "strength (default: 3)",
                         type=int, default=3)
-    parser.add_argument("-O", "--noolsr", help="Do not use olsr when connection to AP is lost (default: False)", action='store_true', default=False)
-    parser.add_argument("-qd", "--qdiscdisconnect", help="Bandwidth in bits/s to throttle qdisc to during handover AP to OLSR. 0 means deactivate qdisc (default: 0)", type=int, default=0)
-    parser.add_argument("-qr", "--qdiscreconnect", help="Bandwidth in bits/s to throttle qdisc to during handover AP to OLSR. 0 means deactivate (default: 0)", type=int, default=0)
+    parser.add_argument("-O", "--noolsr", help="Set to disable the usage of olsr when connection to AP is lost "
+                                               "(default: False)", action='store_true', default=False)
+    parser.add_argument("-qd", "--qdiscdisconnect", help="Bandwidth in bits/s to throttle qdisc to during handover AP "
+                                                         "to OLSR. If set to 0 qdisc feature is deactivated "
+                                                         "(default: 0)", type=int, default=0)
+    parser.add_argument("-qr", "--qdiscreconnect", help="Bandwidth in bits/s to throttle qdisc to during handover AP to"
+                                                        " OLSR. If set to 0 qdisc feature is deactivated (default: 0)",
+                        type=int, default=0)
     args = parser.parse_args()
     scenario = args.mobilityscenario
     qdisc_rates = {'disconnect': args.qdiscdisconnect, 'reconnect': args.qdiscreconnect}
