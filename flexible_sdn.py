@@ -244,6 +244,9 @@ class FlexibleSdnOlsrController:
             log.info("*** {}: OLSR runnning: Killing olsrd process (PID: {})".format(self.interface, self.olsrd_pid))
             self.stop_olsrd()
         stdout, stderr = cmd_iw_dev(self.interface, "connect", self.ap_ssid)
+        stdout, stderr = cmd_iw_dev(self.interface, "link")
+        while b'Connected to ' + self.ap_bssid.encode() not in stdout:
+            stdout, stderr = cmd_iw_dev(self.interface, "link")
         log.info("*** {}: Connected interface to {}".format(self.interface, self.ap_ssid))
         if self.qdisc['reconnect'] > 0:
             update_qdisc(self.interface, self.qdisc['standard'], self.qdisc['std_unit'])
