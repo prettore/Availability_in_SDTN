@@ -214,8 +214,8 @@ def processing_packets(path, sender,receiver,output):
         df_merged_sorted = df_merged.reset_index(drop=True)
 
         # convert string to timestamp to seconds
-        df_merged_sorted = timestamp_to_second(df_merged_sorted, 'packet_timestamp_x')
-        df_merged_sorted = timestamp_to_second(df_merged_sorted, 'packet_timestamp_y')
+        #df_merged_sorted = timestamp_to_second(df_merged_sorted, 'packet_timestamp_x')
+        #df_merged_sorted = timestamp_to_second(df_merged_sorted, 'packet_timestamp_y')
 
         # experiment duration
         df_summary.loc[exp-1, 'total_time_s'] = np.nanmax(df_merged_sorted['packet_timestamp_y']) - np.nanmin(df_merged_sorted['packet_timestamp_y'])#df_merged_sorted.iloc[-1]['packet_timestamp_x'] - df_merged_sorted.iloc[0]['packet_timestamp_x']

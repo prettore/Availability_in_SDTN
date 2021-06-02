@@ -3,7 +3,7 @@
 ##################################################
 ## Author: Paulo H. L. Rettore and Sharath
 ## Status: open
-## Date: 07/09/2020
+## Date: 07/05/2021
 ##################################################
 import csv
 import os
@@ -12,7 +12,11 @@ import argparse
 from collections import OrderedDict
 from datetime import datetime
 
-
+'''
+On the emulated platform the packet sniffer doesn't log the last packet
+error also noticed in https://github.com/KimiNewt/pyshark/issues/429
+It seems something about the JSON format
+'''
 def parse_string(string):
     """
     function to convert acquired data to string format
@@ -37,94 +41,109 @@ def capture_live_packets_iptables(interface,file,round,filter):
     #os.system('iptables-save > /temp/iptables-default')
     os.system('iptables -A OUTPUT '+filter+' -o '+interface+' -j NFLOG --nflog-group 1')
 
-    cap = pyshark.LiveCapture(interface='nflog:1', only_summaries=False, use_json=True, include_raw=True)
+    cap = pyshark.LiveCapture(interface='nflog:1', only_summaries=False, use_json=False, include_raw=False)
     cap.set_debug()
     while True:
         for packet in cap.sniff_continuously():
-            packet_data_columns = ['packet_id', 'packet_timestamp', 'source_ip', 'destination_ip', 'protocol', 'packet_length','round']#, 'payload_length', 'payload','round']
-            packet_data_dict = OrderedDict.fromkeys(packet_data_columns)
+            if 'ipv6' in packet:
+                pass
+            else:
+                try:
+                    packet_data_columns = ['packet_id', 'packet_timestamp', 'source_ip', 'destination_ip', 'protocol', 'packet_length','round']#, 'payload_length', 'payload','round']
+                    packet_data_dict = OrderedDict.fromkeys(packet_data_columns)
 
-            packet_data_dict['packet_id'] = int(packet.ip.id, 0)#packet.number
-            #packet_data_dict['frame_id'] = packet.frame_info.number
-            packet_data_dict['packet_timestamp'] = str(packet.sniff_timestamp)#packet_sniff_time
-            packet_data_dict['source_ip'] = parse_string(packet.ip.src_host)
-            packet_data_dict['destination_ip'] = parse_string(packet.ip.dst_host)
-            packet_data_dict['protocol'] = parse_string(packet.transport_layer)#parse_string(packet.highest_layer)
-            packet_data_dict['packet_length'] = packet.length
-            # payload = None
-            # if 'data_raw' in packet:
-            #    payload = packet.data_raw.value
-            # elif 'packetbb_raw' in packet:
-            #    payload = packet.packetbb_raw.value
-            # packet_data_dict['payload'] = payload
-            # payload_as_byte = bytearray.fromhex(payload)
-            # payload_length = len(payload_as_byte)
-            # packet_data_dict['payload_length'] = payload_length
-            packet_data_dict['round'] = round
+                    packet_data_dict['packet_id'] = int(packet.ip.id, 0)#packet.number
+                    #packet_data_dict['frame_id'] = packet.frame_info.number
+                    packet_data_dict['packet_timestamp'] = str(packet.sniff_timestamp)#packet_sniff_time
+                    packet_data_dict['source_ip'] = parse_string(packet.ip.src_host)
+                    packet_data_dict['destination_ip'] = parse_string(packet.ip.dst_host)
+                    packet_data_dict['protocol'] = parse_string(packet.transport_layer)#parse_string(packet.highest_layer)
+                    packet_data_dict['packet_length'] = packet.length
+                    # payload = None
+                    # if 'data_raw' in packet:
+                    #    payload = packet.data_raw.value
+                    # elif 'packetbb_raw' in packet:
+                    #    payload = packet.packetbb_raw.value
+                    # packet_data_dict['payload'] = payload
+                    # payload_as_byte = bytearray.fromhex(payload)
+                    # payload_length = len(payload_as_byte)
+                    # packet_data_dict['payload_length'] = payload_length
+                    packet_data_dict['round'] = round
 
-            print("Packet number: " + str(packet.number) + " packet id: " + str(int(packet.ip.id, 0)))
-            try:
-                if os.path.isfile(file):
-                    with open(file, 'a') as csvfile:
-                        writer = csv.DictWriter(csvfile, fieldnames=packet_data_columns)
-                        writer.writerow(packet_data_dict)
-                else:
-                    with open(file, 'w') as csvfile:
-                        writer = csv.DictWriter(csvfile, fieldnames=packet_data_columns)
-                        writer.writeheader()
-                        writer.writerow(packet_data_dict)
-            except IOError:
-                print("I/O error")
+                    print("Packet number: " + str(packet.number) + " packet id: " + str(int(packet.ip.id, 0)))
+                    try:
+                        if os.path.isfile(file):
+                            with open(file, 'a') as csvfile:
+                                writer = csv.DictWriter(csvfile, fieldnames=packet_data_columns)
+                                writer.writerow(packet_data_dict)
+                        else:
+                            with open(file, 'w') as csvfile:
+                                writer = csv.DictWriter(csvfile, fieldnames=packet_data_columns)
+                                writer.writeheader()
+                                writer.writerow(packet_data_dict)
+                    except IOError:
+                        print("I/O error")
+                except Exception as exception:
+                    print("I/O error", exception)
+                    pass
 
 def capture_live_packets(interface,file,round,filter):
 
     print("***Starting packet sniffer!")
 
     cap = pyshark.LiveCapture(interface=interface, bpf_filter=filter,
-                              only_summaries=False, use_json=True, include_raw=True)
+                                  only_summaries=False, use_json=False, include_raw=False)
     #cap = pyshark.LiveCapture(interface=interface, only_summaries=False,
     #                          use_json=True, include_raw=True)
     cap.set_debug()
     while True:
         for packet in cap.sniff_continuously():
-            packet_data_columns = ['packet_id', 'packet_timestamp', 'source_ip', 'destination_ip', 'protocol', 'packet_length','round']#, 'payload_length', 'payload','round']
-            packet_data_dict = OrderedDict.fromkeys(packet_data_columns)
+            if 'ipv6' in packet:
+                pass
+            else:
+                try:
+                    packet_data_columns = ['packet_id', 'packet_timestamp', 'source_ip', 'destination_ip', 'protocol', 'packet_length','round']#, 'payload_length', 'payload','round']
+                    packet_data_dict = OrderedDict.fromkeys(packet_data_columns)
 
-            packet_data_dict['packet_id'] = int(packet.ip.id, 0)#packet.number
-            #packet_data_dict['frame_id'] = packet.frame_info.number
-            #packet_sniff_time = datetime.strptime((str(packet.sniff_timestamp).replace('000 CEST','')),'%b %d, %Y %H:%M:%S.%f')
-            #packet_sniff_time = parse_datetime_prefix(datetime_string=packet.sniff_timestamp,
-            #                                          date_time_format='%b %d, %Y %H:%M:%S.%f')[:-2]
-            #packet_data_dict['packet_timestamp'] = packet_sniff_time
-            packet_data_dict['packet_timestamp'] = str(packet.sniff_timestamp)
-            packet_data_dict['source_ip'] = parse_string(packet.ip.src_host)
-            packet_data_dict['destination_ip'] = parse_string(packet.ip.dst_host)
-            packet_data_dict['protocol'] = parse_string(packet.transport_layer)#parse_string(packet.highest_layer)
-            packet_data_dict['packet_length'] = packet.length
-            # payload = None
-            # if 'data_raw' in packet:
-            #    payload = packet.data_raw.value
-            # elif 'packetbb_raw' in packet:
-            #    payload = packet.packetbb_raw.value
-            # packet_data_dict['payload'] = payload
-            # payload_as_byte = bytearray.fromhex(payload)
-            # payload_length = len(payload_as_byte)
-            # packet_data_dict['payload_length'] = payload_length
-            packet_data_dict['round'] = round
+                    packet_data_dict['packet_id'] = int(packet.ip.id, 0)#packet.number
+                    #packet_data_dict['frame_id'] = packet.frame_info.number
+                    #packet_sniff_time = datetime.strptime((str(packet.sniff_timestamp).replace('000 CEST','')),'%b %d, %Y %H:%M:%S.%f')
+                    #packet_sniff_time = parse_datetime_prefix(datetime_string=packet.sniff_timestamp,
+                    #                                          date_time_format='%b %d, %Y %H:%M:%S.%f')[:-2]
+                    #packet_data_dict['packet_timestamp'] = packet_sniff_time
+                    packet_data_dict['packet_timestamp'] = str(packet.sniff_timestamp)
+                    packet_data_dict['source_ip'] = parse_string(packet.ip.src_host)
+                    packet_data_dict['destination_ip'] = parse_string(packet.ip.dst_host)
+                    packet_data_dict['protocol'] = parse_string(packet.transport_layer)#parse_string(packet.highest_layer)
+                    packet_data_dict['packet_length'] = packet.length
+                    # payload = None
+                    # if 'data_raw' in packet:
+                    #    payload = packet.data_raw.value
+                    # elif 'packetbb_raw' in packet:
+                    #    payload = packet.packetbb_raw.value
+                    # packet_data_dict['payload'] = payload
+                    # payload_as_byte = bytearray.fromhex(payload)
+                    # payload_length = len(payload_as_byte)
+                    # packet_data_dict['payload_length'] = payload_length
+                    packet_data_dict['round'] = round
 
-            print("Packet number: " + str(packet.number) + " packet id: " + str(int(packet.ip.id, 0)))
-            try:
-                if os.path.isfile(file):
-                    with open(file, 'a') as csvfile:
-                        writer = csv.DictWriter(csvfile, fieldnames=packet_data_columns)
-                        writer.writerow(packet_data_dict)
-                else:
-                    with open(file, 'w') as csvfile:
-                        writer = csv.DictWriter(csvfile, fieldnames=packet_data_columns)
-                        writer.writeheader()
-                        writer.writerow(packet_data_dict)
-            except IOError:
-                print("I/O error")
+                    print("Packet number: " + str(packet.number) + " packet id: " + str(int(packet.ip.id, 0)))
+                    try:
+                        if os.path.isfile(file):
+                            with open(file, 'a') as csvfile:
+                                writer = csv.DictWriter(csvfile, fieldnames=packet_data_columns)
+                                writer.writerow(packet_data_dict)
+                        else:
+                            with open(file, 'w') as csvfile:
+                                writer = csv.DictWriter(csvfile, fieldnames=packet_data_columns)
+                                writer.writeheader()
+                                writer.writerow(packet_data_dict)
+                    except IOError:
+                        print("I/O error")
+                except Exception as exception:
+                    print("I/O error", exception)
+                    pass
+
 
 if __name__ == '__main__':
 
@@ -142,9 +161,8 @@ if __name__ == '__main__':
     if args.interface and args.outputFile:
         if args.ptable:
             capture_live_packets_iptables(str(args.interface), path + '/data/statistics/' + str(args.outputFile),
-                                          str(args.expRound), str(args.filter))
+                                          str(args.expRound),str(args.filter))
         else:
-            print(path + '/data/statistics/')
             capture_live_packets(str(args.interface), path + '/data/statistics/' + str(args.outputFile),
                                  str(args.expRound), str(args.filter))
     else:

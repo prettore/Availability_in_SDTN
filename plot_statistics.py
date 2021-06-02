@@ -175,7 +175,7 @@ def main(data_path, show, noolsr):
     if show:
         plt.show()
     else:
-        plt.savefig(path + 'plot.pdf')
+        plt.savefig(path + 'pendulum_olsr_no-qdisc_disconnect-88_reconnect-75_scaninterval-3.pdf')
 
 
 def draw_brace_top(ax, xspan, text, color):

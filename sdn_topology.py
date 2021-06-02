@@ -62,19 +62,19 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
     if scenario > 1:
         info("*** Configuring moblity\n")
         if scenario == 2:
-            trace_file = 'Scenario_2.csv'
+            trace_file = 'Trace_Scenario_2.csv'
             smooth_motion = False
             path = os.path.dirname(os.path.abspath(__file__)) + '/data/'
             get_trace([sta1, sta2, sta3], path + trace_file, smooth_motion)
             net.isReplaying = True
         if scenario == 3:
-            trace_file = 'Scenario_3.csv'
+            trace_file = 'Trace_Scenario_3.csv'
             smooth_motion = False
             path = os.path.dirname(os.path.abspath(__file__)) + '/data/'
             get_trace([sta1, sta2, sta3], path + trace_file, smooth_motion)
             net.isReplaying = True
         if scenario == 4:
-            trace_file = 'Scenario_1.csv'
+            trace_file = 'Trace_Scenario_1.csv'
             smooth_motion = False
             path = os.path.dirname(os.path.abspath(__file__)) + '/data/'
             get_trace([sta1, sta2, sta3], path + trace_file, smooth_motion)
@@ -131,17 +131,27 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
         cmd += " -qr {} -qd {}".format(qdisc_rates['reconnect'], qdisc_rates['disconnect'])
     makeTerm(sta3, title='Station 3', cmd=cmd + " ; sleep 10")
     # cmd = "python3 {}/packet_sniffer.py -i sta1-wlan0 -o {}send_packets.csv -f 'icmp[icmptype] = icmp-echo'".format(path, stat_dir)
-    # cmd = "python3 {}/packet_sniffer.py -i sta1-wlan0 -o {}send_packets.csv -f '-p udp -m udp --dport 8999' -T True".format(path, stat_dir)
-    # makeTerm(sta1, title='Packet Sniffer sta1', cmd=cmd + " ; sleep 10")
+    #cmd = "python3 {}/packet_sniffer.py -i sta1-wlan0 -o {}send_packets.csv -f '-p udp -m udp --dport 8999' -T True".format(path, stat_dir)
+    #makeTerm(sta1, title='Packet Sniffer sta1', cmd=cmd + " ; sleep 10")
     # cmd = "python3 {}/packet_sniffer.py -i sta3-wlan0 -o {}recv_packets.csv -f 'icmp[icmptype] = icmp-echo'".format(path, stat_dir)
-    # cmd = "python3 {}/packet_sniffer.py -i sta3-wlan0 -o {}recv_packets.csv -f 'udp dst port 8999'".format(path, stat_dir)
-    # makeTerm(sta3, title='Packet Sniffer sta3', cmd=cmd + " ; sleep 10")
+    #cmd = "python3 {}/packet_sniffer.py -i sta3-wlan0 -o {}recv_packets.csv -f 'udp dst port 8999'".format(path, stat_dir)
+    #makeTerm(sta3, title='Packet Sniffer sta3', cmd=cmd + " ; sleep 10")
     sleep(2)
+
+    info("*** Starting packet sniffer\n")
+    # Starting the packet sniffer
+    #packet_sniffer(sta1, sta3, 0)
+
+    #sleep(2)
+
     # info("*** Starting ping: sta1 (10.0.0.1) -> sta3 (10.0.0.3)\n")
     # makeTerm(sta1, title='ping', cmd="ping 10.0.0.3")
     info("*** Start sending generated packets: sta1 (10.0.0.1) -> sta3 (10.0.0.3)\n")
-    makeTerm(sta3, title='Recv', cmd="ITGRecv -a 10.0.0.3 -i sta3-wlan0 -l {}/receiver.log".format(statistics_dir))
-    makeTerm(sta1, title='Send', cmd="ITGSend -T UDP -C 10 -a 10.0.0.3 -c 1264 -s 0.123456 -t 170000 -l {}/sender.log ; sleep 10".format(statistics_dir))
+    #makeTerm(sta3, title='Recv', cmd="ITGRecv -a 10.0.0.3 -i sta3-wlan0 -l {}/receiver.log".format(statistics_dir))
+    #makeTerm(sta1, title='Send', cmd="ITGSend -T UDP -C 10 -a 10.0.0.3 -c 1264 -s 0.123456 -t 170000 -l {}/sender.log -c 1000 ; sleep 10".format(statistics_dir))
+    # creating user data flows
+    user_data_flow(sta1, sta3,statistics_dir)
+
     info("\n*** Running CLI\n")
     CLI(net)
     net.stop()
@@ -151,9 +161,9 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
         subprocess.Popen(['killall', 'olsrd'])
     subprocess.Popen(["python3", "{}/eval_ditg.py".format(path), "-d", statistics_dir, "-t", str(start_time.timestamp())]).communicate()
     if no_olsr:
-        plot_cmd = ["python3", "{}/plot_statistics.py".format(path), "-d", statistics_dir, '-O']
+        plot_cmd = ["python3", "{}/plot_statistics_new.py".format(path), "-d", statistics_dir, '-O']
     else:
-        plot_cmd = ["python3", "{}/plot_statistics.py".format(path), "-d", statistics_dir]
+        plot_cmd = ["python3", "{}/plot_statistics_new.py".format(path), "-d", statistics_dir]
     subprocess.Popen(plot_cmd).communicate()
     os.system("chown -R wifi {}".format(path + '/data/statistics/'))
 
@@ -182,11 +192,34 @@ def get_trace(sta_list, file_, smooth):
             sta_list[n].time.append(t)
 
 
+# creating packet sniffer
+def packet_sniffer(station1, station2, exp_round):
+    command = "sudo python packet_sniffer.py -i sta3-wlan0 -o recv_packets.csv -r " + exp_round + " -f 'udp and port 8999'"
+    makeTerm(station2, title='Monitoring IP packets at Receiver', cmd=command)
+
+    command = "sudo python packet_sniffer.py -i sta1-wlan0 -o send_packets.csv -r " + exp_round + " -f '-p udp -m udp --dport 8999' -T True"
+    makeTerm(station1, title='Monitoring IP packets at Sender', cmd=command)
+
+# creating user data flows
+def user_data_flow(station1, station2,statistics_dir):
+
+    # Receiver
+    # reference: http://traffic.comics.unina.it/software/ITG/manual/index.html
+    makeTerm(station2, title='Server', cmd="ITGRecv -a 10.0.0.3 -i sta3-wlan0 -l {}/receiver.log".format(statistics_dir))
+
+    # Sender
+    # makeTerm(sta1, title = 'Client', cmd="ITGSend -T UDP -a 10.0.0.2 -c 1264 -s 0.123456 -U .5 10 -z 100 -t 10000000")
+    makeTerm(station1, title='Client',
+             cmd="ITGSend -T UDP -C 10 -a 10.0.0.3 -c 1264 -s 0.123456 -t 170000 -l {}/sender.log -c 1000 ; sleep 10".format(
+                 statistics_dir))  # -l sender.log -x receiver.log")
+
+
+
 if __name__ == '__main__':
     setLogLevel('info')
     parser = argparse.ArgumentParser(description="Tactical network experiment!")
     parser.add_argument("-m", "--mobilityscenario", help="Select a mobility scenario (Integer: 1, 2 or 3) (default: 1)",
-                        type=int, required=True, default=1)
+                        type=int, required=False, default=1)
     parser.add_argument("-s", "--scaninterval", help="Time interval in seconds (float) for scanning if the wifi access "
                                                      "point is in range while being in adhoc mode (default: 10.0)",
                         type=float, default=5.0)

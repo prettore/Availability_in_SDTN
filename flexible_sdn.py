@@ -130,6 +130,8 @@ class FlexibleSdnOlsrController:
                                                                                  self.disconnect_threshold))
                 else:
                     print("*** AP connection lost")
+                # Rettore
+                #if not self.no_olsr:
                 print("*** Starting background scan")
                 self.scanner.start()
                 self.log_event('scanner_start', 1)
@@ -156,6 +158,8 @@ class FlexibleSdnOlsrController:
                                                self.start_time, self.ap_ssid)
                     time.sleep(0.5)
                     print("*** Reconnected to AP.")
+                    #Rettore
+                    #if not self.no_olsr:
                     print("*** OLSRd PID: ", self.olsrd_pid)
                     stdout, stderr = Popen(["ping", "-c1", self.ap_ip], stdout=PIPE, stderr=PIPE).communicate()
                     continue
@@ -240,7 +244,8 @@ class FlexibleSdnOlsrController:
         if self.qdisc['reconnect'] > 0:
             update_qdisc(self.interface, self.qdisc['reconnect'], self.qdisc['throttle_unit'])
             self.qdisc.update({'throttled': True})
-        if self.olsrd_pid > 0:
+        # Rettore
+        if self.olsrd_pid > 0:# and not self.no_olsr:
             log.info("*** {}: OLSR runnning: Killing olsrd process (PID: {})".format(self.interface, self.olsrd_pid))
             self.stop_olsrd()
         stdout, stderr = cmd_iw_dev(self.interface, "connect", self.ap_ssid)
@@ -359,13 +364,13 @@ if __name__ == '__main__':
     parser.add_argument("-p", "--pingto", help="Define an address to ping after activating OLSR to test", type=str,
                         default=None)
     parser.add_argument("-s", "--scaninterval", help="Time interval in seconds (float) for scanning if the wifi access "
-                                                     "point is in range while being in adhoc mode (default: 10.0)",
+                                                     "point is in range while being in adhoc mode (default: 5.0)",
                         type=float, default=5.0)
-    parser.add_argument("-d", "--disconnectthreshold", help="Signal strength (float) below which station dissconnects "
-                                                            "from AP and activates OLSR (default: -88.0 dBm)",
-                        type=float, default=-70.0)
+    parser.add_argument("-d", "--disconnectthreshold", help="Signal strength (float) below which station disconnects "
+                                                            "from AP and activates OLSR (default: -80.0 dBm)",
+                        type=float, default=-80.0)
     parser.add_argument("-r", "--reconnectthreshold", help="Minimal signal strength (float) of AP required for trying "
-                                                           "reconnect (default: -85.0 dBm)", type=float, default=-65.0)
+                                                           "reconnect (default: -85.0 dBm)", type=float, default=-85.0)
     parser.add_argument("-A", "--apssid", help="SSID of the access point (default: ap1-ssid)", type=str,
                         default="ap1-ssid")
     parser.add_argument("-B", "--apbssid", help="BSSID of the access point (default: 00:00:00:00:01:00)", type=str,
@@ -389,6 +394,8 @@ if __name__ == '__main__':
     ch = logging.StreamHandler()
     starttime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     path = os.path.dirname(os.path.abspath(__file__))
+    if not os.path.isdir(path + '/data/logs/'):
+        os.makedirs(path + '/data/logs/')
     log.setLevel(logging.DEBUG)
     log_fh = logging.FileHandler(path + '/data/logs/' + starttime + '_debug.log')
     log_fh.setLevel(logging.DEBUG)
