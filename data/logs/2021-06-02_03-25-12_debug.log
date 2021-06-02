@@ -1,0 +1,21 @@
+INFO     [2021-06-02 03:25:12,087]: *** sta1-wlan0: Started flexible_sdn.py
+INFO     [2021-06-02 03:25:12,093]: *** sta1: Interface: sta1-wlan0, Scan-interface: sta1-wlan1
+INFO     [2021-06-02 03:25:12,138]: *** sta3-wlan0: Started flexible_sdn.py
+INFO     [2021-06-02 03:25:12,140]: *** sta3: Interface: sta3-wlan0, Scan-interface: sta3-wlan1
+INFO     [2021-06-02 03:25:39,213]: *** sta3-wlan1: Scanner started. Searching for ap1-ssid with interval 1.0
+INFO     [2021-06-02 03:25:39,230]: *** sta3-wlan0: Set type to ibss
+INFO     [2021-06-02 03:25:39,236]: *** sta3-wlan0: Set ip link up
+INFO     [2021-06-02 03:25:39,240]: *** sta3-wlan0: Join ibss adhocNet
+INFO     [2021-06-02 03:25:39,244]: *** sta3-wlan0: Starting OLSR
+INFO     [2021-06-02 03:25:39,552]: *** sta1-wlan1: Scanner started. Searching for ap1-ssid with interval 1.0
+INFO     [2021-06-02 03:25:39,568]: *** sta1-wlan0: Set type to ibss
+INFO     [2021-06-02 03:25:39,573]: *** sta1-wlan0: Set ip link up
+INFO     [2021-06-02 03:25:39,578]: *** sta1-wlan0: Join ibss adhocNet
+INFO     [2021-06-02 03:25:39,582]: *** sta1-wlan0: Starting OLSR
+INFO     [2021-06-02 03:25:40,215]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:25:40,553]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:25:41,573]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:25:42,594]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:25:43,602]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:25:44,614]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:25:44,629]: *** sta1-wlan0: Started olsrd in the background (PID: )

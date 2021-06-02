@@ -58,9 +58,12 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
 
     info("*** Configuring propagation model\n")
     #net.setPropagationModel(model="logDistance", exp=4.4)
-    net.setPropagationModel(model="logDistance", exp=3.8)  # around 100meters range wifi
-    #net.setPropagationModel(model="logDistance", exp=2.257)  # around 2000meters range uhf
+    if scenario == 4:
+        net.setPropagationModel(model="logDistance", exp=2.257)  # around 2000meters range uhf
+    else:
+        net.setPropagationModel(model="logDistance", exp=3.8)  # around 100meters range wifi
 
+        
     info("*** Configuring wifi nodes\n")
     net.configureWifiNodes()
 
@@ -81,16 +84,26 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
             path = os.path.dirname(os.path.abspath(__file__)) + '/data/'
             get_trace([sta1, sta3, ap1], path + trace_file, smooth_motion)
             net.isReplaying = True
+            info("*** Creating plot\n")
+            net.plotGraph(max_x=250, max_y=350)
         if scenario == 3:
-            trace_file = 'Trace_GaussMarkov.csv'
+            trace_file = 'Trace_GaussMarkov_WIFI.csv'
             smooth_motion = False
             path = os.path.dirname(os.path.abspath(__file__)) + '/data/'
             get_trace([sta1, sta3, ap1], path + trace_file, smooth_motion)
             net.isReplaying = True
+            info("*** Creating plot\n")
+            net.plotGraph(max_x=250, max_y=350)
+        if scenario == 4:
+            trace_file = 'Trace_Pendulum_Filled_Shortest(UHF).csv'
+            smooth_motion = False
+            path = os.path.dirname(os.path.abspath(__file__)) + '/data/'
+            get_trace([sta1, sta3, ap1], path + trace_file, smooth_motion)
+            net.isReplaying = True
+            info("*** Creating plot\n")
+            net.plotGraph(max_x=5000, max_y=6000)
 
-    info("*** Creating plot\n")
-    #net.plotGraph(max_x=5000, max_y=5000)
-    net.plotGraph(max_x=250, max_y=350)
+
 
     info("*** Starting network\n")
     net.build()
@@ -306,7 +319,7 @@ if __name__ == '__main__':
                                                             "from AP and activates OLSR (default: -87.0 dBm)",
                         type=float, default=-88.0)
     parser.add_argument("-r", "--reconnectthreshold", help="Minimal signal strength (float) of AP required for trying "
-                                                           "reconnect (default: -75.0 dBm)", type=float, default=-75.0)
+                                                           "reconnect (default: -75.0 dBm)", type=float, default=-72.0)
     parser.add_argument("-S", "--scaninterface", help="Use a second interface for scanning to prevent blocking the "
                                                       "primary interface and thus disrupting the data flow (default: True)",
                         action="store_true", default=True)

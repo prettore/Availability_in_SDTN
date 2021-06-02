@@ -1,0 +1,64 @@
+INFO     [2021-05-31 03:40:44,944]: *** sta1-wlan0: Started flexible_sdn.py
+INFO     [2021-05-31 03:40:44,947]: *** sta1: Interface: sta1-wlan0, Scan-interface: sta1-wlan1
+INFO     [2021-05-31 03:40:44,965]: *** sta3-wlan0: Started flexible_sdn.py
+INFO     [2021-05-31 03:40:44,967]: *** sta3: Interface: sta3-wlan0, Scan-interface: sta3-wlan1
+INFO     [2021-05-31 03:42:09,511]: *** sta1-wlan1: Scanner started. Searching for ap1-ssid with interval 3.0
+INFO     [2021-05-31 03:42:09,519]: *** sta1-wlan0: Set type to ibss
+INFO     [2021-05-31 03:42:09,522]: *** sta1-wlan0: Set ip link up
+INFO     [2021-05-31 03:42:09,524]: *** sta1-wlan0: Join ibss adhocNet
+INFO     [2021-05-31 03:42:12,514]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 03:42:18,578]: *** sta1-wlan0: Starting OLSR
+INFO     [2021-05-31 03:42:18,589]: *** sta1-wlan0: Started olsrd in the background (PID: )
+INFO     [2021-05-31 03:42:19,326]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 03:42:19,544]: *** sta3-wlan1: Scanner started. Searching for ap1-ssid with interval 3.0
+INFO     [2021-05-31 03:42:19,547]: *** sta3-wlan0: Set type to ibss
+INFO     [2021-05-31 03:42:19,549]: *** sta3-wlan0: Set ip link up
+INFO     [2021-05-31 03:42:19,550]: *** sta3-wlan0: Join ibss adhocNet
+INFO     [2021-05-31 03:42:19,553]: *** sta3-wlan0: Starting OLSR
+INFO     [2021-05-31 03:42:19,608]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -84.0 / -80.0)
+INFO     [2021-05-31 03:42:20,614]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -84.0 / -80.0)
+INFO     [2021-05-31 03:42:21,621]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -84.0 / -80.0)
+INFO     [2021-05-31 03:42:22,562]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 03:42:22,626]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -84.0 / -80.0)
+INFO     [2021-05-31 03:42:23,632]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -84.0 / -80.0)
+INFO     [2021-05-31 03:42:24,567]: *** sta3-wlan0: Started olsrd in the background (PID: )
+INFO     [2021-05-31 03:42:24,641]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -84.0 / -80.0)
+INFO     [2021-05-31 03:42:25,574]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -80.0)
+INFO     [2021-05-31 03:42:25,647]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -84.0 / -80.0)
+INFO     [2021-05-31 03:42:26,125]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 03:42:26,579]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -80.0 / -80.0)
+INFO     [2021-05-31 03:42:26,579]: *** sta3-wlan0: OLSR runnning: Killing olsrd process (PID: 76494)
+INFO     [2021-05-31 03:42:26,579]: *** sta3-wlan0: Killed given olsrd process (PID: 76494)
+INFO     [2021-05-31 03:42:26,598]: *** sta3-wlan0: IBSS leave completed
+INFO     [2021-05-31 03:42:26,600]: *** sta3-wlan0: Set type to managed
+INFO     [2021-05-31 03:42:26,612]: *** sta3-wlan0: Connected interface to ap1-ssid
+INFO     [2021-05-31 03:42:26,652]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -80.0 / -80.0)
+INFO     [2021-05-31 03:42:26,652]: *** sta1-wlan0: OLSR runnning: Killing olsrd process (PID: 76469)
+INFO     [2021-05-31 03:42:26,652]: *** sta1-wlan0: Killed given olsrd process (PID: 76469)
+INFO     [2021-05-31 03:42:26,671]: *** sta1-wlan0: IBSS leave completed
+INFO     [2021-05-31 03:42:26,678]: *** sta1-wlan0: Set type to managed
+INFO     [2021-05-31 03:42:26,699]: *** sta1-wlan0: Connected interface to ap1-ssid
+INFO     [2021-05-31 03:42:31,179]: *** sta3-wlan1: Scanner started. Searching for ap1-ssid with interval 3.0
+INFO     [2021-05-31 03:42:31,182]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -80.0 / -80.0)
+INFO     [2021-05-31 03:42:31,187]: *** sta3-wlan0: Connected interface to ap1-ssid
+INFO     [2021-05-31 03:42:31,290]: *** sta1-wlan1: Scanner started. Searching for ap1-ssid with interval 3.0
+INFO     [2021-05-31 03:42:31,293]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -80.0 / -80.0)
+INFO     [2021-05-31 03:42:31,298]: *** sta1-wlan0: Connected interface to ap1-ssid
+INFO     [2021-05-31 03:42:35,751]: *** sta3-wlan1: Scanner started. Searching for ap1-ssid with interval 3.0
+INFO     [2021-05-31 03:42:35,752]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -80.0 / -80.0)
+INFO     [2021-05-31 03:42:35,756]: *** sta3-wlan0: Connected interface to ap1-ssid
+INFO     [2021-05-31 03:42:35,879]: *** sta1-wlan1: Scanner started. Searching for ap1-ssid with interval 3.0
+INFO     [2021-05-31 03:42:35,881]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -80.0 / -80.0)
+INFO     [2021-05-31 03:42:35,886]: *** sta1-wlan0: Connected interface to ap1-ssid
+INFO     [2021-05-31 03:42:40,327]: *** sta3-wlan1: Scanner started. Searching for ap1-ssid with interval 3.0
+INFO     [2021-05-31 03:42:40,328]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -80.0 / -80.0)
+INFO     [2021-05-31 03:42:40,333]: *** sta3-wlan0: Connected interface to ap1-ssid
+INFO     [2021-05-31 03:42:40,468]: *** sta1-wlan1: Scanner started. Searching for ap1-ssid with interval 3.0
+INFO     [2021-05-31 03:42:40,470]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -80.0 / -80.0)
+INFO     [2021-05-31 03:42:40,475]: *** sta1-wlan0: Connected interface to ap1-ssid
+INFO     [2021-05-31 03:42:44,913]: *** sta3-wlan1: Scanner started. Searching for ap1-ssid with interval 3.0
+INFO     [2021-05-31 03:42:44,919]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -80.0 / -80.0)
+INFO     [2021-05-31 03:42:44,934]: *** sta3-wlan0: Connected interface to ap1-ssid
+INFO     [2021-05-31 03:42:45,046]: *** sta1-wlan1: Scanner started. Searching for ap1-ssid with interval 3.0
+INFO     [2021-05-31 03:42:45,057]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -80.0 / -80.0)
+INFO     [2021-05-31 03:42:45,076]: *** sta1-wlan0: Connected interface to ap1-ssid

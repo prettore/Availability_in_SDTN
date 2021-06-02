@@ -1,0 +1,851 @@
+INFO     [2021-05-31 10:15:18,484]: *** sta3-wlan0: Started flexible_sdn.py
+INFO     [2021-05-31 10:15:18,486]: *** sta3: Interface: sta3-wlan0, Scan-interface: sta3-wlan1
+INFO     [2021-05-31 10:15:18,490]: *** sta1-wlan0: Started flexible_sdn.py
+INFO     [2021-05-31 10:15:18,493]: *** sta1: Interface: sta1-wlan0, Scan-interface: sta1-wlan1
+INFO     [2021-05-31 10:17:27,488]: *** sta3-wlan1: Scanner started. Searching for ap1-ssid with interval 3.0
+INFO     [2021-05-31 10:17:30,491]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:17:31,527]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -84.0 / -80.0)
+INFO     [2021-05-31 10:17:31,736]: *** sta1-wlan1: Scanner started. Searching for ap1-ssid with interval 3.0
+INFO     [2021-05-31 10:17:32,531]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -84.0 / -80.0)
+INFO     [2021-05-31 10:17:33,536]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -84.0 / -80.0)
+INFO     [2021-05-31 10:17:34,542]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -84.0 / -80.0)
+INFO     [2021-05-31 10:17:34,738]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:17:35,556]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -84.0 / -80.0)
+INFO     [2021-05-31 10:17:36,567]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -84.0 / -80.0)
+INFO     [2021-05-31 10:17:37,413]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:17:37,571]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:17:38,576]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:17:39,597]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:17:40,602]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:17:41,705]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:17:41,844]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:17:41,932]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:17:42,720]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:17:42,937]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:17:43,729]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:17:43,941]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:17:44,205]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:17:44,733]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:17:44,947]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:17:45,747]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:17:45,959]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:17:46,761]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:17:46,968]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:17:47,781]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:17:47,976]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:17:48,728]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:17:48,787]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:17:48,998]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:17:49,793]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:17:50,011]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:17:50,796]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:17:51,016]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:17:51,026]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:17:51,807]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:17:52,019]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:17:52,813]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:17:53,029]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:17:53,840]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:17:54,040]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:17:54,847]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:17:55,049]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:17:55,753]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:17:55,854]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:17:56,054]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:17:56,859]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:17:57,068]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:17:57,866]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:17:57,917]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:17:58,073]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:17:58,871]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:17:59,078]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:17:59,898]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:00,085]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:00,911]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:01,095]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:01,916]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:02,132]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:02,567]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:18:02,921]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:03,137]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:18:03,928]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:04,142]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:18:04,698]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:18:04,935]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:05,147]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:18:05,939]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:06,152]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:18:06,944]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:07,157]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:18:07,949]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:08,162]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:18:08,967]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:09,167]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:18:09,307]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:18:09,972]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:10,184]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:18:10,977]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:11,191]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:18:11,441]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:18:11,983]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:12,198]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:18:12,988]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:13,203]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:18:13,993]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:14,208]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:18:14,998]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:15,225]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:18:16,002]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:16,105]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:18:16,230]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:18:17,008]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:17,237]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:18:18,012]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:18,209]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:18:18,247]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:18:19,261]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:18:20,266]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:18:21,273]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:18:22,282]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:18:22,886]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:18:23,287]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:24,296]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:25,039]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:18:25,081]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:25,301]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:26,091]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:26,305]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:27,097]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:27,322]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:28,113]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:28,331]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:29,118]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:29,337]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:29,769]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:18:30,130]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:30,342]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:31,136]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:31,359]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:31,888]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:18:32,141]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:32,365]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:33,146]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:33,371]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:34,152]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:34,375]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:35,168]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:35,382]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:36,175]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:36,391]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:36,535]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:18:37,184]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:37,397]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:38,193]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:38,404]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:38,722]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:18:39,197]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:39,411]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:40,206]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:40,501]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:41,228]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:41,509]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:42,235]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:42,519]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:43,240]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:43,317]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:18:43,525]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:44,363]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:44,538]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:45,387]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:45,549]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:45,769]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:18:46,392]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:46,560]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:47,403]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:47,566]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:48,408]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:48,570]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:49,413]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:49,575]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:50,376]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:18:50,417]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:50,580]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:51,429]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:51,589]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:52,435]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:18:52,597]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:18:52,741]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:18:53,443]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:18:54,449]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:18:55,461]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:18:56,472]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:18:57,230]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:18:57,477]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:18:58,482]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:18:59,493]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:18:59,554]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:19:00,498]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:19:01,503]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:19:02,520]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:19:03,538]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:19:04,111]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:19:04,544]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:19:05,549]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:19:06,554]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:19:06,842]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:19:07,561]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:19:08,566]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:19:09,572]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:19:10,577]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:19:10,865]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:19:11,586]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:19:12,596]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:19:13,605]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:19:13,648]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:19:14,614]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:19:15,742]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:19:16,750]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:19:17,719]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:19:17,758]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:19:18,768]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:19:19,776]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:19:20,762]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:19:20,783]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:19:21,790]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:19:22,799]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:19:23,803]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:19:24,811]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:19:24,993]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:19:25,816]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:19:26,831]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:19:27,530]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:19:27,837]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:19:28,841]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:19:29,855]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:19:30,860]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:19:31,774]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:19:31,864]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:19:32,869]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:19:33,873]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:19:34,302]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:19:34,879]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:19:35,886]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:19:36,890]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:19:38,522]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:19:41,071]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:19:45,274]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:19:47,917]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:19:52,039]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:19:54,661]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:19:58,778]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:20:01,438]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:20:05,810]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:20:08,897]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:20:12,601]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:20:15,630]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:20:19,354]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:20:22,390]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:20:26,206]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:20:29,402]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:20:32,965]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:20:36,281]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:20:39,782]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:20:43,070]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:20:46,670]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:20:49,973]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:20:53,445]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:20:57,092]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:21:00,205]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:21:03,872]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:21:07,193]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:21:10,858]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:21:13,979]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:21:17,621]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:21:18,565]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:19,569]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:20,590]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:20,757]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:21:21,599]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:21,654]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:21:22,603]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:22,660]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:21:23,611]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:23,669]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:21:24,395]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:21:24,619]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:24,674]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:21:25,623]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:25,679]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:21:26,627]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:26,684]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:21:27,537]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:21:27,633]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:27,687]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:21:28,637]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:28,691]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:21:29,642]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:29,695]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:21:30,650]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:30,701]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:21:31,139]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:21:31,654]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:31,708]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:21:32,663]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:32,715]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:21:33,672]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:33,724]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:21:34,270]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:21:34,677]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:34,737]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -80.0)
+INFO     [2021-05-31 10:21:35,683]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:35,741]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -80.0)
+INFO     [2021-05-31 10:21:36,697]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:36,745]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -80.0)
+INFO     [2021-05-31 10:21:37,702]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:37,751]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -80.0)
+INFO     [2021-05-31 10:21:37,952]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:21:38,707]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:38,757]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -80.0)
+INFO     [2021-05-31 10:21:39,712]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:39,761]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -80.0)
+INFO     [2021-05-31 10:21:40,716]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:40,767]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -80.0)
+INFO     [2021-05-31 10:21:41,067]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:21:41,729]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:41,773]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -80.0)
+INFO     [2021-05-31 10:21:42,733]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:42,782]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -80.0)
+INFO     [2021-05-31 10:21:43,739]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:43,787]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -80.0)
+INFO     [2021-05-31 10:21:44,744]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:44,792]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -80.0)
+INFO     [2021-05-31 10:21:44,854]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:21:45,750]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:45,798]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -80.0)
+INFO     [2021-05-31 10:21:46,757]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:46,804]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -80.0)
+INFO     [2021-05-31 10:21:47,771]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:47,809]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -80.0)
+INFO     [2021-05-31 10:21:48,101]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:21:48,776]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:48,817]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:49,781]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:49,823]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:50,787]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:50,832]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:51,604]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:21:51,847]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:52,856]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:53,860]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:54,868]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:54,994]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:21:55,873]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:56,878]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:57,882]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:58,369]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:21:58,889]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:21:59,894]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:22:00,900]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:22:01,763]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:22:01,908]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:22:02,915]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:22:03,919]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:22:04,925]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:22:05,141]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:22:05,930]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:22:06,935]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:22:07,941]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:22:08,535]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:22:08,946]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:22:09,950]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:22:10,955]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:22:11,897]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:22:11,961]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:22:12,969]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:22:13,975]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:22:14,980]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:22:15,281]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:22:15,988]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:22:16,997]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:22:18,006]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:22:18,676]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:22:19,015]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:22:20,019]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:22:21,023]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:22:22,113]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:22:25,453]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:22:29,354]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:22:32,610]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:22:33,063]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:22:34,070]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:22:35,076]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:22:36,089]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:22:36,157]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:22:37,094]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:22:38,101]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:22:39,106]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:22:39,426]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:22:40,112]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:22:41,118]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:22:42,127]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:22:42,946]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:22:43,139]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:22:44,150]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:22:45,155]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:22:46,164]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:22:46,186]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:22:47,173]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:22:48,183]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:22:49,189]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:22:49,773]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:22:50,316]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:22:50,321]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:22:51,321]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:22:51,337]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:22:52,325]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:22:52,354]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:22:53,062]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:22:53,330]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:22:53,359]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:22:54,340]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:22:54,364]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:22:55,349]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:22:55,373]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:22:56,360]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:22:56,391]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:22:56,778]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:22:57,367]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:22:57,397]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:22:58,372]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:22:58,411]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:22:59,380]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:22:59,417]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:22:59,873]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:23:00,385]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:00,421]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:23:01,389]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:01,426]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:23:02,393]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:02,432]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:23:03,401]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:03,439]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:23:03,652]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:23:04,451]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:04,453]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:23:05,473]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:23:05,480]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:06,479]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:23:06,485]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:06,722]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:23:07,484]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:23:07,490]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:23:08,491]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:23:08,498]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:23:09,502]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:23:09,503]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:23:10,517]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:23:10,518]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:23:11,069]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:23:11,523]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:11,524]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:23:12,527]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:12,531]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:23:13,490]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:23:13,533]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:13,536]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:23:14,540]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:14,542]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:23:15,545]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:15,547]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:23:16,549]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:16,553]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:23:17,555]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:17,558]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:23:17,841]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:23:18,565]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:23:18,566]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:19,570]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:19,571]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:23:20,227]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:23:20,584]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:20,584]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:23:21,590]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:22,594]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:23:22,595]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:23,130]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:23:23,603]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:23,605]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:23:24,609]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:23:24,611]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:25,616]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:23:25,616]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:26,621]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:26,622]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:23:27,075]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:23:27,625]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:27,627]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:23:28,634]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:28,635]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:23:29,640]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:29,642]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:23:29,914]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:23:30,685]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:30,687]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:23:31,690]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:31,692]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:23:32,695]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:32,698]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:23:33,701]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:33,705]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:23:33,915]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:23:34,710]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:34,711]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:23:35,715]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:35,717]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:23:36,719]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -87.0 / -80.0)
+INFO     [2021-05-31 10:23:36,723]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:23:36,813]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:23:37,734]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:23:37,740]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:23:38,741]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:23:39,749]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:23:40,649]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:23:40,756]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:23:41,761]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:23:41,764]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:23:42,768]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -89.0 / -80.0)
+INFO     [2021-05-31 10:23:42,769]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:23:43,567]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:23:43,778]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:23:43,782]: *** sta3-wlan1: Scan detected ap1-ssid in range (signal: -90.0 / -80.0)
+INFO     [2021-05-31 10:23:44,783]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:23:45,787]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:23:46,791]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:23:47,604]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:23:47,797]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:23:48,819]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:23:49,829]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -88.0 / -80.0)
+INFO     [2021-05-31 10:23:50,550]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:23:50,835]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -86.0 / -80.0)
+INFO     [2021-05-31 10:23:51,839]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -86.0 / -80.0)
+INFO     [2021-05-31 10:23:52,845]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -86.0 / -80.0)
+INFO     [2021-05-31 10:23:53,851]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -86.0 / -80.0)
+INFO     [2021-05-31 10:23:54,790]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:23:54,860]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -86.0 / -80.0)
+INFO     [2021-05-31 10:23:55,914]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -86.0 / -80.0)
+INFO     [2021-05-31 10:23:56,933]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -86.0 / -80.0)
+INFO     [2021-05-31 10:23:57,355]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:23:57,941]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -86.0 / -80.0)
+INFO     [2021-05-31 10:23:58,946]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -86.0 / -80.0)
+INFO     [2021-05-31 10:23:59,957]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -86.0 / -80.0)
+INFO     [2021-05-31 10:24:00,962]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -86.0 / -80.0)
+INFO     [2021-05-31 10:24:01,910]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:24:01,976]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -86.0 / -80.0)
+INFO     [2021-05-31 10:24:02,982]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -86.0 / -80.0)
+INFO     [2021-05-31 10:24:03,986]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -86.0 / -80.0)
+INFO     [2021-05-31 10:24:04,295]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:24:04,998]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -80.0)
+INFO     [2021-05-31 10:24:06,005]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -80.0)
+INFO     [2021-05-31 10:24:07,012]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -80.0)
+INFO     [2021-05-31 10:24:08,023]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -80.0)
+INFO     [2021-05-31 10:24:08,703]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:24:09,028]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -80.0)
+INFO     [2021-05-31 10:24:10,039]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -80.0)
+INFO     [2021-05-31 10:24:11,155]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:24:11,172]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -86.0 / -80.0)
+INFO     [2021-05-31 10:24:12,177]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -82.0 / -80.0)
+INFO     [2021-05-31 10:24:13,180]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -82.0 / -80.0)
+INFO     [2021-05-31 10:24:14,185]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -82.0 / -80.0)
+INFO     [2021-05-31 10:24:15,194]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -82.0 / -80.0)
+INFO     [2021-05-31 10:24:15,746]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:24:16,205]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -82.0 / -80.0)
+INFO     [2021-05-31 10:24:17,210]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -82.0 / -80.0)
+INFO     [2021-05-31 10:24:18,021]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:24:18,215]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -80.0)
+INFO     [2021-05-31 10:24:19,221]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -80.0)
+INFO     [2021-05-31 10:24:20,238]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -80.0)
+INFO     [2021-05-31 10:24:21,244]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -80.0)
+INFO     [2021-05-31 10:24:22,250]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -80.0)
+INFO     [2021-05-31 10:24:22,719]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:24:23,261]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -80.0)
+INFO     [2021-05-31 10:24:24,269]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -80.0)
+INFO     [2021-05-31 10:24:25,114]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:24:25,285]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -86.0 / -80.0)
+INFO     [2021-05-31 10:24:26,291]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -86.0 / -80.0)
+INFO     [2021-05-31 10:24:27,301]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -86.0 / -80.0)
+INFO     [2021-05-31 10:24:28,310]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -86.0 / -80.0)
+INFO     [2021-05-31 10:24:29,316]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -86.0 / -80.0)
+INFO     [2021-05-31 10:24:29,517]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:24:30,323]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -86.0 / -80.0)
+INFO     [2021-05-31 10:24:31,328]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -86.0 / -80.0)
+INFO     [2021-05-31 10:24:31,900]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:24:32,334]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -84.0 / -80.0)
+INFO     [2021-05-31 10:24:33,346]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -84.0 / -80.0)
+INFO     [2021-05-31 10:24:34,354]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -84.0 / -80.0)
+INFO     [2021-05-31 10:24:35,358]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -84.0 / -80.0)
+INFO     [2021-05-31 10:24:36,334]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:24:36,363]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -84.0 / -80.0)
+INFO     [2021-05-31 10:24:37,368]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -84.0 / -80.0)
+INFO     [2021-05-31 10:24:38,373]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -84.0 / -80.0)
+INFO     [2021-05-31 10:24:38,712]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:24:39,396]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -86.0 / -80.0)
+INFO     [2021-05-31 10:24:40,405]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -86.0 / -80.0)
+INFO     [2021-05-31 10:24:41,424]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -86.0 / -80.0)
+INFO     [2021-05-31 10:24:42,443]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -86.0 / -80.0)
+INFO     [2021-05-31 10:24:43,085]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:24:43,459]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -86.0 / -80.0)
+INFO     [2021-05-31 10:24:44,464]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -86.0 / -80.0)
+INFO     [2021-05-31 10:24:45,470]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -86.0 / -80.0)
+INFO     [2021-05-31 10:24:45,494]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:24:46,475]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -75.0 / -80.0)
+INFO     [2021-05-31 10:24:49,870]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:24:50,229]: *** sta1-wlan0: Connected interface to ap1-ssid
+INFO     [2021-05-31 10:24:56,645]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:25:03,770]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:25:10,563]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:25:17,490]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:25:24,351]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:25:31,306]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:25:38,357]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:25:45,253]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:25:52,280]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:25:59,698]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:26:06,823]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:26:14,009]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:26:20,855]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:26:27,743]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:26:34,680]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:26:41,527]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:26:48,434]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:26:55,412]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:27:02,667]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:27:09,613]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:27:16,766]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:27:23,621]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:27:30,494]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:27:37,289]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:27:44,122]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:27:50,940]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:27:57,784]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:28:04,643]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:28:11,466]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:28:18,368]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:28:25,219]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:28:32,273]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:28:39,279]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:28:46,230]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:28:53,049]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:28:59,884]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:29:06,802]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:29:13,641]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:29:20,579]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:29:27,829]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:29:34,653]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:29:41,617]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:29:48,462]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:29:55,329]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:30:02,138]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:30:09,284]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:30:16,436]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:30:23,252]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:30:30,059]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:30:36,852]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:30:43,642]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:30:50,456]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:30:57,353]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:31:04,276]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:31:11,117]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:31:18,069]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:31:25,166]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:31:32,052]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:31:38,854]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:31:45,725]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:31:52,542]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:31:59,313]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:32:06,130]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:32:13,062]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:32:19,859]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:32:26,926]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:32:33,759]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:32:40,822]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:32:47,723]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:32:54,600]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:33:01,482]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:33:08,628]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:33:15,477]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:33:22,590]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:33:30,120]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:33:37,603]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:33:44,821]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:33:51,937]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:33:58,846]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:34:05,674]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:34:12,933]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:34:19,762]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:34:26,682]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:34:33,996]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:34:40,801]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:34:47,626]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:34:54,540]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:35:01,341]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:35:08,237]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:35:15,128]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:35:22,113]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:35:29,279]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:35:36,176]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:35:43,032]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:35:49,825]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:35:56,628]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:36:03,431]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:36:10,246]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:36:17,042]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:36:23,874]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:36:30,772]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:36:37,539]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:36:44,526]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:36:51,511]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:36:58,340]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:37:05,250]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:37:12,060]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:37:18,832]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:37:25,607]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:37:32,461]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:37:39,318]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:37:46,108]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:37:52,984]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:38:00,074]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:38:06,886]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:38:13,804]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:38:20,593]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:38:27,399]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:38:34,190]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:38:41,008]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:38:47,858]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:38:54,720]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:39:01,662]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:39:08,506]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:39:15,415]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:39:22,237]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:39:29,065]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:39:36,232]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:39:43,174]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:39:50,032]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:39:56,976]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:40:03,838]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:40:10,718]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:40:17,538]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:40:24,497]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:40:31,611]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:40:38,538]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:40:45,654]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:40:52,620]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:40:59,426]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:41:06,387]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:41:13,188]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:41:20,300]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:41:27,111]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:41:33,989]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:41:40,812]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:41:47,689]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:41:54,506]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:42:01,342]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:42:08,150]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:42:15,065]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:42:22,012]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:42:28,955]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:42:35,802]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:42:42,706]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:42:49,556]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:42:56,339]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:43:03,119]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:43:09,928]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:43:16,838]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:43:23,722]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:43:30,539]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:43:37,448]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:43:44,215]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:43:51,020]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:43:57,977]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:44:04,845]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:44:11,673]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:44:18,519]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:44:25,293]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:44:32,090]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:44:38,962]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:44:45,841]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:44:52,683]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:44:59,586]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:45:06,480]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:45:13,367]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:45:20,247]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:45:27,208]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:45:34,148]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:45:41,030]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:45:48,038]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:45:54,866]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:46:01,699]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:46:08,495]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:46:15,281]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:46:22,218]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:46:29,071]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:46:35,985]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:46:42,800]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:46:49,709]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:46:56,721]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:47:03,603]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:47:10,384]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:47:17,176]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:47:24,059]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:47:30,979]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:47:37,881]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:47:44,840]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:47:51,811]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:47:58,848]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:48:05,802]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:48:12,666]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:48:19,764]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:48:26,784]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:48:33,586]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:48:40,479]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:48:47,762]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:48:54,648]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:49:01,487]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:49:08,296]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:49:15,099]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:49:22,001]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:49:29,050]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:49:36,167]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:49:42,966]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:49:49,729]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:49:56,897]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:50:03,828]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:50:10,658]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:50:17,471]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:50:24,343]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:50:31,179]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:50:38,308]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:50:45,129]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:50:51,974]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:50:59,050]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:51:05,830]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:51:12,617]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:51:19,512]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:51:26,301]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:51:33,145]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:51:39,993]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:51:46,916]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:51:53,818]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:52:00,608]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:52:07,400]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:52:14,233]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:52:21,131]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:52:28,002]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:52:34,896]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:52:41,683]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:52:48,615]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:52:55,447]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:53:02,706]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:53:09,462]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:53:16,263]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:53:23,130]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-31 10:53:26,992]: *** sta1-wlan1: Scanner started. Searching for ap1-ssid with interval 3.0

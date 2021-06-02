@@ -1,0 +1,55 @@
+INFO     [2021-06-02 03:46:53,127]: *** sta1-wlan0: Started flexible_sdn.py
+INFO     [2021-06-02 03:46:53,130]: *** sta1: Interface: sta1-wlan0, Scan-interface: sta1-wlan1
+INFO     [2021-06-02 03:46:53,184]: *** sta3-wlan0: Started flexible_sdn.py
+INFO     [2021-06-02 03:46:53,190]: *** sta3: Interface: sta3-wlan0, Scan-interface: sta3-wlan1
+INFO     [2021-06-02 03:47:31,424]: *** sta3-wlan1: Scanner started. Searching for ap1-ssid with interval 1.0
+INFO     [2021-06-02 03:47:31,446]: *** sta3-wlan0: Set type to ibss
+INFO     [2021-06-02 03:47:31,453]: *** sta3-wlan0: Set ip link up
+INFO     [2021-06-02 03:47:31,459]: *** sta3-wlan0: Join ibss adhocNet
+INFO     [2021-06-02 03:47:31,464]: *** sta3-wlan0: Starting OLSR
+INFO     [2021-06-02 03:47:31,831]: *** sta1-wlan1: Scanner started. Searching for ap1-ssid with interval 1.0
+INFO     [2021-06-02 03:47:31,842]: *** sta1-wlan0: Set type to ibss
+INFO     [2021-06-02 03:47:31,847]: *** sta1-wlan0: Set ip link up
+INFO     [2021-06-02 03:47:31,853]: *** sta1-wlan0: Join ibss adhocNet
+INFO     [2021-06-02 03:47:31,858]: *** sta1-wlan0: Starting OLSR
+INFO     [2021-06-02 03:47:32,426]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:32,832]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:33,448]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:33,855]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:34,468]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:34,876]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:35,490]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:35,899]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:36,511]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:36,524]: *** sta3-wlan0: Started olsrd in the background (PID: )
+INFO     [2021-06-02 03:47:36,902]: *** sta1-wlan0: Started olsrd in the background (PID: )
+INFO     [2021-06-02 03:47:36,919]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:37,530]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:37,930]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:38,551]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:38,945]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:39,572]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:39,951]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:40,584]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:40,981]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:41,606]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:42,003]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:42,613]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:43,027]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:43,621]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:44,049]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:44,647]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:45,064]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:45,667]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:46,088]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:46,690]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:47,094]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:47,707]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:48,113]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:48,743]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:49,121]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:49,766]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:50,141]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:50,791]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:51,815]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-02 03:47:52,831]: *** sta3-wlan1: Scanning for ap1-ssid

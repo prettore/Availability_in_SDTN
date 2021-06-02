@@ -1,0 +1,26 @@
+INFO     [2021-05-27 10:48:05,309]: *** sta1-wlan0: Started flexible_sdn.py
+INFO     [2021-05-27 10:48:05,311]: *** sta1: Interface: sta1-wlan0, Scan-interface: sta1-wlan1
+INFO     [2021-05-27 10:48:13,162]: *** sta1-wlan1: Scanner started. Searching for ap1-ssid with interval 5.0
+INFO     [2021-05-27 10:48:13,179]: *** sta1-wlan0: Set type to ibss
+INFO     [2021-05-27 10:48:13,187]: *** sta1-wlan0: Set ip link up
+INFO     [2021-05-27 10:48:13,196]: *** sta1-wlan0: Join ibss adhocNet
+INFO     [2021-05-27 10:48:18,165]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-27 10:48:22,550]: *** sta1-wlan0: Starting OLSR
+INFO     [2021-05-27 10:48:22,578]: *** sta1-wlan0: Started olsrd in the background (PID: )
+INFO     [2021-05-27 10:48:23,586]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -77.0 / -65.0)
+INFO     [2021-05-27 10:48:24,596]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -77.0 / -65.0)
+INFO     [2021-05-27 10:48:25,607]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -77.0 / -65.0)
+INFO     [2021-05-27 10:48:26,627]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -77.0 / -65.0)
+INFO     [2021-05-27 10:48:26,956]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-27 10:48:27,648]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -65.0)
+INFO     [2021-05-27 10:48:28,654]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -65.0)
+INFO     [2021-05-27 10:48:29,662]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -65.0)
+INFO     [2021-05-27 10:48:30,706]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -65.0)
+INFO     [2021-05-27 10:48:31,722]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -65.0)
+INFO     [2021-05-27 10:48:32,731]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -65.0)
+INFO     [2021-05-27 10:48:33,747]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -65.0)
+INFO     [2021-05-27 10:48:34,764]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -65.0)
+INFO     [2021-05-27 10:48:35,780]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -65.0)
+INFO     [2021-05-27 10:48:35,819]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-05-27 10:48:36,796]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -65.0)
+INFO     [2021-05-27 10:48:37,814]: *** sta1-wlan1: Scan detected ap1-ssid in range (signal: -85.0 / -65.0)

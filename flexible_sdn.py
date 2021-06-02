@@ -138,10 +138,15 @@ class FlexibleSdnOlsrController:
             scan_signal = self.get_scan_dump_signal()
             if scan_signal and 'signal' in scan_signal:
                 self.scan_signal_deque.append(scan_signal['signal'])
-                scan_signal.update({'signal_avg': sum(self.scan_signal_deque) / len(self.scan_signal_deque)})
-                log.info("*** {}: Scan detected {} in range (signal: {} / {})".format(self.scan_interface, self.ap_ssid,
-                                                                                      scan_signal['signal'],
-                                                                                      self.reconnect_threshold))
+                #Rettore
+                try:
+                    scan_signal.update({'signal_avg': sum(self.scan_signal_deque) / len(self.scan_signal_deque)})
+                except:
+                    print("An exception occurred during sum(self.scan_signal_deque) / len(self.scan_signal_deque).")
+                log.info(
+                    "*** {}: Scan detected {} in range (signal: {} / {})".format(self.scan_interface, self.ap_ssid,
+                                                                                 scan_signal['signal'],
+                                                                                 self.reconnect_threshold))
                 self.write_signal_to_file(scan_signal)
                 print("{}, {}, {}, {:.2f}".format(scan_signal['SSID'], scan_signal['time'], scan_signal['signal'],
                                                   scan_signal['signal_avg']))

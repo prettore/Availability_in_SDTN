@@ -1,0 +1,22 @@
+INFO     [2021-06-01 02:56:15,087]: *** sta1-wlan0: Started flexible_sdn.py
+INFO     [2021-06-01 02:56:15,097]: *** sta1: Interface: sta1-wlan0, Scan-interface: sta1-wlan1
+INFO     [2021-06-01 02:56:15,112]: *** sta3-wlan0: Started flexible_sdn.py
+INFO     [2021-06-01 02:56:15,116]: *** sta3: Interface: sta3-wlan0, Scan-interface: sta3-wlan1
+INFO     [2021-06-01 02:56:41,216]: *** sta3-wlan1: Scanner started. Searching for ap1-ssid with interval 3.0
+INFO     [2021-06-01 02:56:41,562]: *** sta1-wlan1: Scanner started. Searching for ap1-ssid with interval 3.0
+INFO     [2021-06-01 02:56:44,222]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-01 02:56:44,566]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-01 02:56:47,263]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-01 02:56:47,588]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-01 02:56:50,289]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-01 02:56:50,614]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-01 02:56:53,320]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-01 02:56:53,635]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-01 02:56:56,343]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-01 02:56:56,659]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-01 02:56:59,366]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-01 02:56:59,683]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-01 02:57:02,394]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-01 02:57:02,731]: *** sta1-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-01 02:57:05,415]: *** sta3-wlan1: Scanning for ap1-ssid
+INFO     [2021-06-01 02:57:05,755]: *** sta1-wlan1: Scanning for ap1-ssid

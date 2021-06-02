@@ -1,0 +1,4 @@
+INFO     [2021-05-31 07:56:46,701]: *** sta3-wlan0: Started flexible_sdn.py
+INFO     [2021-05-31 07:56:46,704]: *** sta3: Interface: sta3-wlan0, Scan-interface: sta3-wlan1
+INFO     [2021-05-31 07:56:46,713]: *** sta1-wlan0: Started flexible_sdn.py
+INFO     [2021-05-31 07:56:46,718]: *** sta1: Interface: sta1-wlan0, Scan-interface: sta1-wlan1
