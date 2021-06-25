@@ -37,7 +37,6 @@ Besides the Mininet-Wifi framework the experiment requires the following Python 
  - numpy
  - pandas
  - matplotlib
- - pyshark
 
 Additionally, Mininet-Wifi has to be modified for this experiment to work properly.
 The modification is explained in detail in the next [section](#how-to-modify-mininet-wifi-to-work-with-this-experiment) 
@@ -47,15 +46,6 @@ Furthermore, the experiment uses `D-ITG` to generate a data flow.
 Documentation and installation instructions can be found here:
 [http://traffic.comics.unina.it/software/ITG/index.php](http://traffic.comics.unina.it/software/ITG/index.php)
 
-```shell
-install d-itg: $ sudo apt install d-itg
-```
-
-```shell
-git clone https://github.com/KimiNewt/pyshark.git
-cd pyshark/src
-python setup.py install
-```
 
 ### How to modify Mininet-Wifi to work with this experiment
 _**Note:** If you don't care about the explanation why this modification is necessary and just want to know how to apply it then you can jump to [How to apply the modification](#how-to-apply-the-modification)._
@@ -108,12 +98,6 @@ class ReplayingMobility(Mobility):
 After that re-install the modified Mininet-Wifi using the original installation script.
 Without the re-installation the fix will not be applied to the version which is used by python.
 
-```shell
-re-install Mininet-Wifi: $ cd mininet-wifi
-re-install Mininet-Wifi: $ sudo util/install.sh -Wlnfv
-OLSR: $ sudo util/install.sh -O
-```
-
 To undo this modification just undo the comment in the mentioned line and reinstall Mininet-Wifi again.
 
 
@@ -124,7 +108,6 @@ We assume that you have completed the following steps at this point:
  - Installed the modified version of Mininet-Wifi (preferably in the Mininet-Wifi VM)
  - Installed OLSR
  - Installed all required Python libraries
- - Installed D-ITG
 
 If you did not complete all of the above setup steps then please refer to the previous section: [Setup](#setup).
 If you have set everything up then you can continue with the next steps.
