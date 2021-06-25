@@ -11,6 +11,8 @@ def main(data_path: str, start_time: float):
     subprocess.Popen(["ITGDec", "{}/receiver.log".format(data_path), "-o", "{}/ditg-packets-recv.csv".format(data_path)]).communicate()
     print("\n\n")
 
+    bitrate_window = 30
+
     ditg_packets_send = data_path + "/ditg-packets-send.csv"
     ditg_packets_recv = data_path + "/ditg-packets-recv.csv"
     packets_columns = ['packet_id', 'hour_tx', 'min_tx', 'sec_tx', 'hour_rx', 'min_rx', 'sec_rx', 'packet_length']
@@ -33,11 +35,12 @@ def main(data_path: str, start_time: float):
     # create summary dataframe
     csv_columns_summary = ['total_time_s', 'packet_sent', 'packet_received', 'packet_dropped', 'packet_dropped_rate',
                            'min_latency_s', 'max_latency_s', 'avg_latency_s', 'sd_latency_s', 'avg_jitter_s',
-                           'sd_jitter_s', 'avg_packetrate_pkts', 'round']
+                           'sd_jitter_s', 'avg_bitrate','sd_bitrate', 'avg_packetrate_pkts', 'round']
     df_summary = pd.DataFrame(columns=csv_columns_summary)
 
     # create time series dataframe
-    csv_columns_time_series = ['time', 'latency', 'jitter', 'packet_loss']
+    #csv_columns_time_series = ['time', 'latency', 'jitter', 'packet_loss']
+    csv_columns_time_series = ['time', 'bitrate', 'latency', 'jitter', 'packet_loss']
     df_time_series = pd.DataFrame(columns=csv_columns_time_series)
 
     print("*** Eval: Compute experiment duration")
@@ -46,6 +49,13 @@ def main(data_path: str, start_time: float):
     df_summary.loc[0, 'total_time_s'] = np.nanmax(df_packets_merged['time_rx_recv']) - np.nanmin(df_packets_merged['time_tx_send'])
     # df_time_series['time'] = np.array(df_packets_merged['time_rx_recv']) - start_time
     df_time_series['time'] = np.array(df_packets_merged['time_rx_recv']) - start_time
+
+    print("*** Eval: Compute bitrate")
+    df_time_series['bitrate'] = pd.Series(
+        computing_bit_rate(df_packets_merged, 'time_rx_recv', 'packet_length_send', bitrate_window))
+    df_summary.loc[0, 'avg_bitrate'] = np.nanmean(df_time_series['bitrate'])
+    df_summary.loc[0, 'sd_bitrate'] = np.nanstd(df_time_series['bitrate'])
+
 
     print("*** Eval: Compute latency")
     # end to end latency and latency summary
@@ -94,6 +104,8 @@ def main(data_path: str, start_time: float):
         index = df_tmp.loc[row, 'index']
         jitter = df_tmp.loc[row, 'jitter']
         df_time_series.loc[index, 'jitter'] = jitter
+    df_summary.loc[0, 'avg_jitter_s'] = np.mean(df_time_series['jitter'])
+    df_summary.loc[0, 'sd_jitter_s'] = np.nanstd(df_time_series['jitter'])
 
     print("*** Eval: Interpolate missing timestamps")
     # interpolate missed timestamp
@@ -109,6 +121,47 @@ def main(data_path: str, start_time: float):
     df_summary.to_csv(data_path + 'summary.csv', index=False)
     df_time_series.to_csv(data_path + 'metrics_time_series.csv', index=False)
 
+# computing the bit rate
+def computing_bit_rate(df,column_time,column_pct_len,window):
+    bit_rate_dict = {}
+    bits_received_second = []
+    df_clear = df.copy()
+    df_clear.dropna(inplace=True)
+
+    df_clear[column_time] = df_clear[column_time].astype(int)
+    df_grouped = df_clear.groupby(pd.cut(df_clear[column_time], np.arange(np.min(df_clear[column_time])-window, np.max(df_clear[column_time])+window, window)))
+    #df_grouped = df_clear.groupby(column_time)
+    for exp, df_s in df_grouped:
+        bit_rate = sum((df_s[column_pct_len].astype(float).dropna()))*8/window#/ 1000
+        for index, row in df_s.iterrows():
+            bit_rate_dict[df_s.loc[index,'packet_id']] =  bit_rate
+            #bits_received_second.append(bit_rate_dict)
+
+    # filling gaps from the receiver side with 0 bitrate
+    for index, row in df.iterrows():
+        missing = False
+        for key in bit_rate_dict:
+            if df.loc[index, 'packet_id'] == key:
+                bits_received_second.append(bit_rate_dict[key])
+                missing = False
+                break
+            else:
+                missing = True
+        if missing:
+            bits_received_second.append(0)
+
+    # # computing using date time
+    # df_clear = df.copy()
+    # df_clear.dropna(inplace=True)
+    # for j in range(0,len(df_clear)):
+    #     df_clear.loc[j,column_time] = datetime.datetime.fromtimestamp(df_clear.loc[j,column_time])
+    # bit_rate = (df_clear.resample('S', on=column_time, offset=str(5)+'s')[column_pct_len].sum()*8)/5
+    ## bit_rate2 = (df_clear.groupby([pd.Grouper(key=column_time, freq=str(5)+'s')])[column_pct_len].sum()*8)/5
+    # # filling gaps from the receiver side with 0 bitrate
+    # for index in range(0,len(bit_rate),5):
+    #     bits_received_second.append(bit_rate[index])
+
+    return bits_received_second
 
 def time_columns_to_timestamp(df: pd.DataFrame, today: datetime = None):
     if not today:

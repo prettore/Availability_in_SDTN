@@ -23,6 +23,9 @@ def main(data_path, show, noolsr):
     time_series_columns = ['time', 'latency', 'jitter', 'packet_loss']
     df_time_series = df_time_series[time_series_columns]
 
+    # starting from time 0
+    df_time_series['time'] = df_time_series['time'].apply(lambda x: x - df_time_series['time'].iloc[0])
+
     df_packet_loss_peaks = df_time_series[
         (df_time_series.packet_loss > 0) & (df_time_series.packet_loss.shift(-1) == 0)].append(
         df_time_series.tail(1)[df_time_series.tail(1).packet_loss > 0])
@@ -175,7 +178,7 @@ def main(data_path, show, noolsr):
     if show:
         plt.show()
     else:
-        plt.savefig(path + 'pendulum_olsr_no-qdisc_disconnect-88_reconnect-75_scaninterval-3.pdf')
+        plt.savefig(path + 'pendulum_no-olsr.pdf')
 
 
 def draw_brace_top(ax, xspan, text, color):

@@ -1,5 +1,0 @@
-INFO     [2021-06-01 03:09:34,597]: *** sta1-wlan0: Started flexible_sdn.py
-INFO     [2021-06-01 03:09:34,599]: *** sta1: Interface: sta1-wlan0, Scan-interface: sta1-wlan1
-INFO     [2021-06-01 03:09:34,620]: *** sta3-wlan0: Started flexible_sdn.py
-INFO     [2021-06-01 03:09:34,622]: *** sta3: Interface: sta3-wlan0, Scan-interface: sta3-wlan1
-INFO     [2021-06-01 03:10:14,950]: *** sta1-wlan1: Scanner started. Searching for ap1-ssid with interval 3.0

@@ -24,7 +24,7 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
     Note: If you do not want to use a remote SDN controller but the controller class that is included in Mininet-Wifi you will have to change some
     """
     net = Mininet_wifi(topo=None, build=False, link=wmediumd, wmediumd_mode=interference, noise_th=-91, fading_cof=3,
-                       autoAssociation=False, allAutoAssociation=False)
+                       allAutoAssociation=False)#,autoAssociation=False)
 
     info('*** Adding controller\n')
     # Use this if you have a remote controller (e.g. RYU controller) intalled and running in the background
@@ -161,9 +161,9 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
         subprocess.Popen(['killall', 'olsrd'])
     subprocess.Popen(["python3", "{}/eval_ditg.py".format(path), "-d", statistics_dir, "-t", str(start_time.timestamp())]).communicate()
     if no_olsr:
-        plot_cmd = ["python3", "{}/plot_statistics_new.py".format(path), "-d", statistics_dir, '-O']
+        plot_cmd = ["python3", "{}/plot_statistics.py".format(path), "-d", statistics_dir, '-O']
     else:
-        plot_cmd = ["python3", "{}/plot_statistics_new.py".format(path), "-d", statistics_dir]
+        plot_cmd = ["python3", "{}/plot_statistics.py".format(path), "-d", statistics_dir]
     subprocess.Popen(plot_cmd).communicate()
     os.system("chown -R wifi {}".format(path + '/data/statistics/'))
 

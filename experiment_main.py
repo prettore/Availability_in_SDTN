@@ -1,4 +1,5 @@
 import os
+import random
 import argparse
 import subprocess
 import pandas as pd
@@ -14,7 +15,6 @@ from mn_wifi.wmediumdConnector import interference
 from mn_wifi.replaying import ReplayingMobility
 
 
-
 def topology(scenario: int, signal_window: int, scan_interval: float, disconnect_threshold: float,
              reconnect_threshold: float, scan_iface: bool = False, no_olsr: bool = False,
              qdisc_rates: dict = {'disconnect': 0, 'reconnect': 0}, auto: bool = False):
@@ -23,10 +23,11 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
 
     Note: If you do not want to use a remote SDN controller but the controller class that is included in Mininet-Wifi you will have to change some
     """
-    net = Mininet_wifi(topo=None, build=False, link=wmediumd, wmediumd_mode=interference, noise_th=-91, fading_cof=3,
-                       autoAssociation=False, allAutoAssociation=False)
-    #net = Mininet_wifi(controller=Controller, link=wmediumd, wmediumd_mode=interference,
-    #                   noise_th=-91, fading_cof=3)
+    #if no_olsr:
+    net = Mininet_wifi(topo=None, build=False, link=wmediumd, wmediumd_mode=interference, noise_th=-91,
+                           fading_cof=3, allAutoAssociation=True)
+    #else:
+    #    net = Mininet_wifi(link=wmediumd, wmediumd_mode=interference, noise_th=-91, fading_cof=3)
 
     info('*** Adding controller\n')
     # Use this if you have a remote controller (e.g. RYU controller) intalled and running in the background
@@ -48,22 +49,21 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
     if scan_iface:
         scanif = 1
         sta1 = net.addStation('sta1', wlans=2, ip='10.0.0.1', position='30,10,0', color='r')
-        #sta2 = net.addStation('sta2', wlans=2, ip='10.0.0.2', position='10,40,0')
+        # sta2 = net.addStation('sta2', wlans=2, ip='10.0.0.2', position='10,40,0')
         sta3 = net.addStation('sta3', wlans=2, ip='10.0.0.3', position='50,40,0', color='b')
     else:
         scanif = 0
         sta1 = net.addStation('sta1', mac='00:00:00:00:00:01', ip='10.0.0.1', position='30,10,0', color='r')
-        #sta2 = net.addStation('sta2', mac='00:00:00:00:00:02', ip='10.0.0.2', position='10,40,0')
+        # sta2 = net.addStation('sta2', mac='00:00:00:00:00:02', ip='10.0.0.2', position='10,40,0')
         sta3 = net.addStation('sta3', mac='00:00:00:00:00:03', ip='10.0.0.3', position='50,40,0', color='b')
 
     info("*** Configuring propagation model\n")
-    #net.setPropagationModel(model="logDistance", exp=4.4)
-    if scenario == 4:
+    # net.setPropagationModel(model="logDistance", exp=4.4)
+    if scenario >= 4:
         net.setPropagationModel(model="logDistance", exp=2.257)  # around 2000meters range uhf
     else:
         net.setPropagationModel(model="logDistance", exp=3.8)  # around 100meters range wifi
 
-        
     info("*** Configuring wifi nodes\n")
     net.configureWifiNodes()
 
@@ -80,30 +80,40 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
         info("*** Configuring moblity\n")
         if scenario == 2:
             trace_file = 'Trace_Pendulum_Filled_Shortest(WIFI).csv'
+            trace_manet_file = ''
             smooth_motion = False
             path = os.path.dirname(os.path.abspath(__file__)) + '/data/'
-            get_trace([sta1, sta3, ap1], path + trace_file, smooth_motion)
+            get_trace([sta1, sta3, ap1], path + trace_file, smooth_motion,False)
             net.isReplaying = True
             info("*** Creating plot\n")
             net.plotGraph(max_x=250, max_y=350)
         if scenario == 3:
             trace_file = 'Trace_GaussMarkov_WIFI.csv'
+            trace_manet_file = ''
             smooth_motion = False
             path = os.path.dirname(os.path.abspath(__file__)) + '/data/'
-            get_trace([sta1, sta3, ap1], path + trace_file, smooth_motion)
+            get_trace([sta1, sta3, ap1], path + trace_file, smooth_motion,False)
             net.isReplaying = True
             info("*** Creating plot\n")
             net.plotGraph(max_x=250, max_y=350)
         if scenario == 4:
-            trace_file = 'Trace_Pendulum_Filled_Shortest(UHF).csv'
+            trace_file = 'Trace_Pendulum_Filled_Shortest_NtoBS_UHF.csv'
+            trace_manet_file = 'Trace_Pendulum_Filled_Shortest_NtoN_UHF.csv'
             smooth_motion = False
             path = os.path.dirname(os.path.abspath(__file__)) + '/data/'
-            get_trace([sta1, sta3, ap1], path + trace_file, smooth_motion)
+            get_trace([sta1, sta3, ap1], path + trace_file, smooth_motion,False)
             net.isReplaying = True
             info("*** Creating plot\n")
             net.plotGraph(max_x=5000, max_y=6000)
-
-
+        if scenario == 5:
+            trace_file = 'Trace_GaussMarkov2_NtoBS_UHF.csv'
+            trace_manet_file = 'Trace_GaussMarkov2_NtoN_UHF.csv'
+            smooth_motion = False
+            path = os.path.dirname(os.path.abspath(__file__)) + '/data/'
+            get_trace([sta1, sta3, ap1], path + trace_file, smooth_motion,True)
+            net.isReplaying = True
+            info("*** Creating plot\n")
+            net.plotGraph(max_x=3500, max_y=3500)
 
     info("*** Starting network\n")
     net.build()
@@ -112,14 +122,13 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
     net.get('s1').start([c0])
     sleep(1)
 
-
     if scenario > 1:
         info("\n*** Replaying Mobility\n")
         ReplayingMobility(net)
 
     experiment_time = int(sta1.time[len(sta1.time) - 1])
 
-    #makeTerm(sta1, title='Radio Buffer (Qdisc)', cmd="watch tc -s -j qdisc show dev sta1-wlan0")
+    # makeTerm(sta1, title='Radio Buffer (Qdisc)', cmd="watch tc -s -j qdisc show dev sta1-wlan0")
 
     start_time = datetime.now()
     info("*** Starting flexible SDN script (time: {})\n".format(start_time.timestamp()))
@@ -130,6 +139,9 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
         os.makedirs(statistics_dir)
 
     cmd = "sudo python"
+    # no_olsr:
+    #    cmd += " {}/flexible_sdn_new.py".format(path)
+    #else:
     cmd += " {}/flexible_sdn.py".format(path)
     cmd += " -i sta1-wlan0"
     cmd += " -s {}".format(scan_interval)
@@ -145,9 +157,12 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
     if qdisc_rates['disconnect'] > 0 and qdisc_rates['reconnect'] > 0:
         cmd += " -qr {} -qd {}".format(qdisc_rates['reconnect'], qdisc_rates['disconnect'])
     makeTerm(sta1, title='Station 1', cmd=cmd + " ; sleep 5")
-    #print(cmd)
+    # print(cmd)
 
     cmd = "sudo python"
+    #if no_olsr:
+    #    cmd += " {}/flexible_sdn_new.py".format(path)
+    #else:
     cmd += " {}/flexible_sdn.py".format(path)
     cmd += " -i sta3-wlan0"
     cmd += " -s {}".format(scan_interval)
@@ -166,9 +181,12 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
 
     info("*** Changing the link rate based on node mobility\n")
     # changing the link rate based on node mobility
-    network_change(sta1, 'sta1-wlan0', '-latency 2000 -dest 10.0.0.3/8 -src 10.0.0.1/8', trace=trace_file,buffer_size=100,exp_round=0,log_dir=statistics_dir,manet=no_olsr)
-    network_change(sta3, 'sta3-wlan0', '-latency 2000 -dest 10.0.0.1/8 -src 10.0.0.3/8', trace=trace_file,buffer_size=100,exp_round=0,log_dir=False,manet=no_olsr)
-
+    network_change(sta1, 'sta1-wlan0', '-latency 2000 -dest 10.0.0.3 -src 10.0.0.1',
+                   trace=trace_file, trace_manet=trace_manet_file, buffer_size=100, exp_round=0,
+                   log_dir=statistics_dir, event="sta1_events.csv",manet=no_olsr)
+    #network_change(sta3, 'sta3-wlan0', '-latency 2000 -dest 10.0.0.1/8 -src 10.0.0.3/8',
+    #               trace=trace_file, trace_manet=trace_manet_file, buffer_size=100, exp_round=0,
+    #               log_dir=False, event="sta3_events.csv",manet=no_olsr)
 
     # cmd = "python3 {}/packet_sniffer.py -i sta1-wlan0 -o {}send_packets.csv -f 'icmp[icmptype] = icmp-echo'".format(path, stat_dir)
     # cmd = "python3 {}/packet_sniffer.py -i sta1-wlan0 -o {}send_packets.csv -f '-p udp -m udp --dport 8999' -T True".format(path, stat_dir)
@@ -176,25 +194,25 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
     # cmd = "python3 {}/packet_sniffer.py -i sta3-wlan0 -o {}recv_packets.csv -f 'icmp[icmptype] = icmp-echo'".format(path, stat_dir)
     # cmd = "python3 {}/packet_sniffer.py -i sta3-wlan0 -o {}recv_packets.csv -f 'udp dst port 8999'".format(path, stat_dir)
     # makeTerm(sta3, title='Packet Sniffer sta3', cmd=cmd + " ; sleep 10")
-    #packet_sniffer(sta1, sta3, 'sta1-wlan0' ,'sta3-wlan0', trace_file, 0)
+    # packet_sniffer(sta1, sta3, 'sta1-wlan0' ,'sta3-wlan0', trace_file, 0)
 
     sleep(2)
     # info("*** Starting ping: sta1 (10.0.0.1) -> sta3 (10.0.0.3)\n")
     # makeTerm(sta1, title='ping', cmd="ping 10.0.0.3")
     info("*** Start sending generated packets: sta1 (10.0.0.1) -> sta3 (10.0.0.3)\n")
-    #makeTerm(sta3, title='Recv', cmd="ITGRecv -a 10.0.0.3 -i sta3-wlan0 -l {}/receiver.log".format(statistics_dir))
-    #makeTerm(sta1, title='Send', cmd="ITGSend -T UDP -C 10 -a 10.0.0.3 -c 1264 -s 0.123456 -t 600000 -l {}/sender.log -c 1000 ; sleep 10".format(statistics_dir))
-    user_data_flow(sta1, sta3,statistics_dir)
+    # makeTerm(sta3, title='Recv', cmd="ITGRecv -a 10.0.0.3 -i sta3-wlan0 -l {}/receiver.log".format(statistics_dir))
+    # makeTerm(sta1, title='Send', cmd="ITGSend -T UDP -C 10 -a 10.0.0.3 -c 1264 -s 0.123456 -t 600000 -l {}/sender.log -c 1000 ; sleep 10".format(statistics_dir))
+    user_data_flow(sta1, sta3, statistics_dir)
 
     print(auto)
 
     if auto:
         info("*** Experiment duration - " + str(experiment_time + 20) + " seconds \n")
-        sleep(experiment_time+20)
-        #sleep(250)
+        sleep(experiment_time + 20)
+        # sleep(250)
         queue_has_packet = True
         while queue_has_packet:
-            with open(statistics_dir+'sta1_packet_queue.txt', 'r') as file:
+            with open(statistics_dir + 'sta1_packet_queue.txt', 'r') as file:
                 line = file.readline()
                 if line != 'True':
                     queue_has_packet = False
@@ -235,28 +253,67 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
         subprocess.Popen(plot_cmd).communicate()
         os.system("chown -R wifi {}".format(path + '/data/statistics/'))
 
+
 # changing the link rate based on node mobility using Qdisc
-def network_change(station1, interface1, extra_arg, trace, buffer_size, exp_round,log_dir,manet):
+def network_change(station1, interface1, extra_arg, trace, trace_manet, buffer_size, exp_round, log_dir, event, manet):
     # adding TC and NetEm rule
-    if manet: # using olsr
-        makeTerm(station1, title='Changing the network - '+interface1,
-                 cmd="python change_link.py -i "+interface1+ " -qlen " + str(
-                     buffer_size) + " " + extra_arg+" -t '" + trace + "' -O")
-    else: # no olsr
+    if not manet:  # using olsr
+        makeTerm(station1, title='Changing the network - ' + interface1,
+                 cmd="python change_link.py -i " + interface1 + " -qlen " + str(
+                     buffer_size) + " " + extra_arg + " -t '" + trace + "' -t2 '"+trace_manet+"' -e "+log_dir+event)
+    else:  # no olsr
         makeTerm(station1, title='Changing the network - ' + interface1,
                  cmd="python change_link.py -i " + interface1 + " -qlen " + str(
                      buffer_size) + " " + extra_arg + " -t '" + trace + "'")
+        #print("python change_link.py -i " + interface1 + " -qlen " + str(
+        #             buffer_size) + " " + extra_arg + " -t '" + trace + "'")
     sleep(2)
     if log_dir:
-        #makeTerm(station1, title='Qdisc', cmd="python packet_queue.py -i "+interface1)
-        makeTerm(station1, title='Qdisc', cmd="python packet_queue.py -i "+interface1+" -o "+log_dir+station1.name + "_buffer.csv" +
-                                                             " -r " + str(exp_round) + " -qlen " + str(buffer_size))
-        #print("python packet_queue.py -i "+interface1+" -o "+log_dir+station1.name + "_buffer.csv" +
+        # makeTerm(station1, title='Qdisc', cmd="python packet_queue.py -i "+interface1)
+        makeTerm(station1, title='Qdisc',
+                 cmd="python packet_queue.py -i " + interface1 + " -o " + log_dir + station1.name + "_buffer.csv" +
+                     " -r " + str(exp_round) + " -qlen " + str(buffer_size))
+        # print("python packet_queue.py -i "+interface1+" -o "+log_dir+station1.name + "_buffer.csv" +
         #                                                     " -r " + str(exp_round) + " -qlen " + str(buffer_size))
 
 
+# creating packet sniffer
+def packet_sniffer(station1, station2, interface1, interface2, exp_round):
+    command = "sudo python packet_sniffer.py -i " + interface2 + " -o recv_packets.csv -r " + exp_round + " -f 'udp and port 8999'"
+    makeTerm(station2, title='Monitoring IP packets at Receiver', cmd=command)
+
+    command = "sudo python packet_sniffer.py -i " + interface1 + " -o send_packets.csv -r " + exp_round + " -f '-p udp -m udp --dport 8999' -T True"
+    makeTerm(station1, title='Monitoring IP packets at Sender', cmd=command)
+
+
+# creating user data flows
+def user_data_flow(station1, station2, statistics_dir):
+    # Receiver
+    # reference: http://traffic.comics.unina.it/software/ITG/manual/index.html
+    # makeTerm(station2, title='Server', cmd="ITGRecv -a 10.0.0.3 -i sta3-wlan0 -l {}/receiver.log".format(statistics_dir))
+    makeTerm(station2, title='Server',
+             cmd="ITGRecv -Si sta3-eth2 -Sp 9090 -a 10.0.0.3 -i sta3-wlan0 -l {}/receiver.log".format(statistics_dir))
+
+    sleep(10)
+    # Sender
+    # makeTerm(sta1, title = 'Client', cmd="ITGSend -T UDP -a 10.0.0.2 -c 1264 -s 0.123456 -U .5 10 -z 100 -t 10000000")
+    # makeTerm(station1, title='Client',
+    #         cmd="ITGSend -Sda 192.168.0.3 -Sdp 9090 -T UDP -a 10.0.0.3 -C 10 -z 6000 -s 0.123456 -c 1264 -t 760000 "
+    #             "-l {}/sender.log -c 1000".format(statistics_dir)) # wifi
+
+    if scenario == 4:
+    #experiment 10 min Pendulum
+        makeTerm(station1, title='Client',
+                 cmd="ITGSend -Sda 192.168.0.3 -Sdp 9090 -T UDP -a 10.0.0.3 -U 2 30 -z 2500 -s 0.123456 -c 1264 -t 10000000 "
+                     "-l {}/sender.log -c 1000".format(statistics_dir))  # uhf
+    if scenario == 5:
+        # long experiment 30 min GM
+        makeTerm(station1, title='Client',
+                 cmd="ITGSend -Sda 192.168.0.3 -Sdp 9090 -T UDP -a 10.0.0.3 -U 2 20 -z 6000 -s 0.123456 -c 1264 -t 10000000 "
+                     "-l {}/sender.log -c 1000".format(statistics_dir))  # uhf
+
 # reading trace files
-def get_trace(sta_list, file_, smooth):
+def get_trace(sta_list, file_, smooth, addrand):
     """Read a trace file"""
     df_trace = pd.read_csv(file_)
     df_trace['node'] = df_trace['node'].astype(int)
@@ -270,41 +327,18 @@ def get_trace(sta_list, file_, smooth):
         trace = trace_node.get_group(n)
         # for row in trace:
         for index, row in trace.iterrows():
-            x = row['x']
-            y = row['y']
+            if addrand: # in case the nodes are at the same location
+                x = row['x'] + random.randint(-10, 10)
+                y = row['y'] + random.randint(-10, 10)
+            else:
+                x = row['x']
+                y = row['y']
             t = row['time']
             if smooth:
                 sta_list[n].coord.append(str(x) + "," + str(y) + ",0.0")
             pos = float(x), float(y), 0.0
             sta_list[n].p.append(pos)
             sta_list[n].time.append(t)
-
-# creating packet sniffer
-def packet_sniffer(station1, station2, interface1, interface2, exp_round):
-    command = "sudo python packet_sniffer.py -i "+interface2+" -o recv_packets.csv -r " + exp_round + " -f 'udp and port 8999'"
-    makeTerm(station2, title='Monitoring IP packets at Receiver', cmd=command)
-
-    command = "sudo python packet_sniffer.py -i "+interface1+" -o send_packets.csv -r " + exp_round + " -f '-p udp -m udp --dport 8999' -T True"
-    makeTerm(station1, title='Monitoring IP packets at Sender', cmd=command)
-
-# creating user data flows
-def user_data_flow(station1, station2, statistics_dir):
-
-    # Receiver
-    # reference: http://traffic.comics.unina.it/software/ITG/manual/index.html
-    #makeTerm(station2, title='Server', cmd="ITGRecv -a 10.0.0.3 -i sta3-wlan0 -l {}/receiver.log".format(statistics_dir))
-    makeTerm(station2, title='Server', cmd="ITGRecv -Si sta3-eth2 -Sp 9090 -a 10.0.0.3 -i sta3-wlan0 -l {}/receiver.log".format(statistics_dir))
-
-    sleep(10)
-    # Sender
-    # makeTerm(sta1, title = 'Client', cmd="ITGSend -T UDP -a 10.0.0.2 -c 1264 -s 0.123456 -U .5 10 -z 100 -t 10000000")
-    #makeTerm(station1, title='Client',
-    #         cmd="ITGSend -Sda 192.168.0.3 -Sdp 9090 -T UDP -a 10.0.0.3 -C 10 -z 6000 -s 0.123456 -c 1264 -t 760000 "
-    #             "-l {}/sender.log -c 1000".format(statistics_dir)) # wifi
-    makeTerm(station1, title='Client',
-             cmd="ITGSend -Sda 192.168.0.3 -Sdp 9090 -T UDP -a 10.0.0.3 -U 2 30 -z 2500 -s 0.123456 -c 1264 -t 10000000 "
-                 "-l {}/sender.log -c 1000".format(statistics_dir)) # uhf
-
 
 
 if __name__ == '__main__':
@@ -314,18 +348,18 @@ if __name__ == '__main__':
                         type=int, required=False, default=1)
     parser.add_argument("-s", "--scaninterval", help="Time interval in seconds (float) for scanning if the wifi access "
                                                      "point is in range while being in adhoc mode (default: 3.0)",
-                        type=float, default=3.0)
+                        type=float, default=2.0)
     parser.add_argument("-d", "--disconnectthreshold", help="Signal strength (float) below which station dissconnects "
                                                             "from AP and activates OLSR (default: -87.0 dBm)",
                         type=float, default=-88.0)
     parser.add_argument("-r", "--reconnectthreshold", help="Minimal signal strength (float) of AP required for trying "
-                                                           "reconnect (default: -75.0 dBm)", type=float, default=-72.0)
+                                                           "reconnect (default: -72.0 dBm)", type=float, default=-82.0)
     parser.add_argument("-S", "--scaninterface", help="Use a second interface for scanning to prevent blocking the "
                                                       "primary interface and thus disrupting the data flow (default: True)",
                         action="store_true", default=True)
     parser.add_argument("-w", "--signalwindow", help="Window for the moving average calculation of the AP signal "
                                                      "strength (default: 5)",
-                        type=int, default=5)
+                        type=int, default=10)
     parser.add_argument("-O", "--noolsr", help="Set to disable the usage of olsr when connection to AP is lost "
                                                "(default: False)", action='store_true', default=False)
     parser.add_argument("-qd", "--qdiscdisconnect", help="Bandwidth in bits/s to throttle qdisc to during handover AP "
@@ -334,7 +368,7 @@ if __name__ == '__main__':
     parser.add_argument("-qr", "--qdiscreconnect", help="Bandwidth in bits/s to throttle qdisc to during handover AP to"
                                                         " OLSR. If set to 0 qdisc feature is deactivated (default: 0)",
                         type=int, default=0)
-    parser.add_argument("-auto", "--auto", help="Auto experiment", type=bool, required=False, default=False)
+    parser.add_argument("-auto", "--auto", help="Auto experiment", action='store_true', required=False, default=False)
 
     args = parser.parse_args()
     scenario = args.mobilityscenario

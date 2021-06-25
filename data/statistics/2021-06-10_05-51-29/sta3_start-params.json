@@ -1,0 +1,25 @@
+{
+    "start_time": 1623318689.23303,
+    "OLSR": "on",
+    "interface": "sta3-wlan0",
+    "qdisc": {
+        "mode": "off",
+        "rates": {
+            "disconnect": 0,
+            "reconnect": 0,
+            "unit": "bit"
+        }
+    },
+    "AP": {
+        "ssid": "ap1-ssid",
+        "bssid": "00:00:00:00:01:00",
+        "ip": "10.0.0.10"
+    },
+    "scan": {
+        "interface": "sta3-wlan1",
+        "interval": 2.0,
+        "moving_avg_window": 10,
+        "reconnect_threshold": -82.0,
+        "disconnect_threshold": -88.0
+    }
+}
