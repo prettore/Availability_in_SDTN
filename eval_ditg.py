@@ -13,8 +13,8 @@ def main(data_path: str, start_time: float):
 
     bitrate_window = 30
 
-    ditg_packets_send = data_path + "/ditg-packets-send.csv"
-    ditg_packets_recv = data_path + "/ditg-packets-recv.csv"
+    ditg_packets_send = data_path + "ditg-packets-send.csv"
+    ditg_packets_recv = data_path + "ditg-packets-recv.csv"
     packets_columns = ['packet_id', 'hour_tx', 'min_tx', 'sec_tx', 'hour_rx', 'min_rx', 'sec_rx', 'packet_length']
     df_packets_send = pd.read_csv(ditg_packets_send, sep=' ', header=None, names=packets_columns, skipinitialspace=True)
     df_packets_recv = pd.read_csv(ditg_packets_recv, sep=' ', header=None, names=packets_columns, skipinitialspace=True)

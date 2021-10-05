@@ -77,7 +77,7 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
 
     trace_file = ""
     if scenario > 1:
-        info("*** Configuring moblity\n")
+        info("*** Configuring mobility\n")
         if scenario == 2:
             trace_file = 'Trace_Pendulum_Filled_Shortest(WIFI).csv'
             trace_manet_file = ''
