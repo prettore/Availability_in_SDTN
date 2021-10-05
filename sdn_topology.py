@@ -24,7 +24,7 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
     Note: If you do not want to use a remote SDN controller but the controller class that is included in Mininet-Wifi you will have to change some
     """
     net = Mininet_wifi(topo=None, build=False, link=wmediumd, wmediumd_mode=interference, noise_th=-91, fading_cof=3,
-                       allAutoAssociation=False)#,autoAssociation=False)
+                       allAutoAssociation=False)  # ,autoAssociation=False)
 
     info('*** Adding controller\n')
     # Use this if you have a remote controller (e.g. RYU controller) intalled and running in the background
@@ -131,26 +131,26 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
         cmd += " -qr {} -qd {}".format(qdisc_rates['reconnect'], qdisc_rates['disconnect'])
     makeTerm(sta3, title='Station 3', cmd=cmd + " ; sleep 10")
     # cmd = "python3 {}/packet_sniffer.py -i sta1-wlan0 -o {}send_packets.csv -f 'icmp[icmptype] = icmp-echo'".format(path, stat_dir)
-    #cmd = "python3 {}/packet_sniffer.py -i sta1-wlan0 -o {}send_packets.csv -f '-p udp -m udp --dport 8999' -T True".format(path, stat_dir)
-    #makeTerm(sta1, title='Packet Sniffer sta1', cmd=cmd + " ; sleep 10")
+    # cmd = "python3 {}/packet_sniffer.py -i sta1-wlan0 -o {}send_packets.csv -f '-p udp -m udp --dport 8999' -T True".format(path, stat_dir)
+    # makeTerm(sta1, title='Packet Sniffer sta1', cmd=cmd + " ; sleep 10")
     # cmd = "python3 {}/packet_sniffer.py -i sta3-wlan0 -o {}recv_packets.csv -f 'icmp[icmptype] = icmp-echo'".format(path, stat_dir)
-    #cmd = "python3 {}/packet_sniffer.py -i sta3-wlan0 -o {}recv_packets.csv -f 'udp dst port 8999'".format(path, stat_dir)
-    #makeTerm(sta3, title='Packet Sniffer sta3', cmd=cmd + " ; sleep 10")
+    # cmd = "python3 {}/packet_sniffer.py -i sta3-wlan0 -o {}recv_packets.csv -f 'udp dst port 8999'".format(path, stat_dir)
+    # makeTerm(sta3, title='Packet Sniffer sta3', cmd=cmd + " ; sleep 10")
     sleep(2)
 
     info("*** Starting packet sniffer\n")
     # Starting the packet sniffer
-    #packet_sniffer(sta1, sta3, 0)
+    # packet_sniffer(sta1, sta3, 0)
 
-    #sleep(2)
+    # sleep(2)
 
     # info("*** Starting ping: sta1 (10.0.0.1) -> sta3 (10.0.0.3)\n")
     # makeTerm(sta1, title='ping', cmd="ping 10.0.0.3")
     info("*** Start sending generated packets: sta1 (10.0.0.1) -> sta3 (10.0.0.3)\n")
-    #makeTerm(sta3, title='Recv', cmd="ITGRecv -a 10.0.0.3 -i sta3-wlan0 -l {}/receiver.log".format(statistics_dir))
-    #makeTerm(sta1, title='Send', cmd="ITGSend -T UDP -C 10 -a 10.0.0.3 -c 1264 -s 0.123456 -t 170000 -l {}/sender.log -c 1000 ; sleep 10".format(statistics_dir))
+    # makeTerm(sta3, title='Recv', cmd="ITGRecv -a 10.0.0.3 -i sta3-wlan0 -l {}/receiver.log".format(statistics_dir))
+    # makeTerm(sta1, title='Send', cmd="ITGSend -T UDP -C 10 -a 10.0.0.3 -c 1264 -s 0.123456 -t 170000 -l {}/sender.log -c 1000 ; sleep 10".format(statistics_dir))
     # creating user data flows
-    user_data_flow(sta1, sta3,statistics_dir)
+    user_data_flow(sta1, sta3, statistics_dir)
 
     info("\n*** Running CLI\n")
     CLI(net)
@@ -159,7 +159,8 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
     out, err = subprocess.Popen(['pgrep', 'olsrd'], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
     if out:
         subprocess.Popen(['killall', 'olsrd'])
-    subprocess.Popen(["python3", "{}/eval_ditg.py".format(path), "-d", statistics_dir, "-t", str(start_time.timestamp())]).communicate()
+    subprocess.Popen(["python3", "{}/eval_ditg.py".format(path), "-d", statistics_dir, "-t",
+                      str(start_time.timestamp())]).communicate()
     if no_olsr:
         plot_cmd = ["python3", "{}/plot_statistics.py".format(path), "-d", statistics_dir, '-O']
     else:
@@ -194,25 +195,28 @@ def get_trace(sta_list, file_, smooth):
 
 # creating packet sniffer
 def packet_sniffer(station1, station2, exp_round):
-    command = "sudo python packet_sniffer.py -i sta3-wlan0 -o recv_packets.csv -r " + exp_round + " -f 'udp and port 8999'"
+    command = "sudo python packet_sniffer.py -i sta3-wlan0 -o recv_packets.csv -r " + exp_round + "-f 'udp and port " \
+                                                                                                  "8999' "
     makeTerm(station2, title='Monitoring IP packets at Receiver', cmd=command)
 
-    command = "sudo python packet_sniffer.py -i sta1-wlan0 -o send_packets.csv -r " + exp_round + " -f '-p udp -m udp --dport 8999' -T True"
+    command = "sudo python packet_sniffer.py -i sta1-wlan0 -o send_packets.csv -r " + exp_round + "-f '-p udp -m udp " \
+                                                                                                  "--dport 8999' -T " \
+                                                                                                  "True "
     makeTerm(station1, title='Monitoring IP packets at Sender', cmd=command)
 
-# creating user data flows
-def user_data_flow(station1, station2,statistics_dir):
 
+# creating user data flows
+def user_data_flow(station1, station2, statistics_dir):
     # Receiver
     # reference: http://traffic.comics.unina.it/software/ITG/manual/index.html
-    makeTerm(station2, title='Server', cmd="ITGRecv -a 10.0.0.3 -i sta3-wlan0 -l {}/receiver.log".format(statistics_dir))
+    makeTerm(station2, title='Server',
+             cmd="ITGRecv -a 10.0.0.3 -i sta3-wlan0 -l {}/receiver.log".format(statistics_dir))
 
     # Sender
     # makeTerm(sta1, title = 'Client', cmd="ITGSend -T UDP -a 10.0.0.2 -c 1264 -s 0.123456 -U .5 10 -z 100 -t 10000000")
     makeTerm(station1, title='Client',
              cmd="ITGSend -T UDP -C 10 -a 10.0.0.3 -c 1264 -s 0.123456 -t 170000 -l {}/sender.log -c 1000 ; sleep 10".format(
                  statistics_dir))  # -l sender.log -x receiver.log")
-
 
 
 if __name__ == '__main__':
@@ -223,13 +227,14 @@ if __name__ == '__main__':
     parser.add_argument("-s", "--scaninterval", help="Time interval in seconds (float) for scanning if the wifi access "
                                                      "point is in range while being in adhoc mode (default: 10.0)",
                         type=float, default=5.0)
-    parser.add_argument("-d", "--disconnectthreshold", help="Signal strength (float) below which station dissconnects "
+    parser.add_argument("-d", "--disconnectthreshold", help="Signal strength (float) below which station disconnects "
                                                             "from AP and activates OLSR (default: -70.0 dBm)",
                         type=float, default=-70.0)
     parser.add_argument("-r", "--reconnectthreshold", help="Minimal signal strength (float) of AP required for trying "
                                                            "reconnect (default: -65.0 dBm)", type=float, default=-65.0)
     parser.add_argument("-S", "--scaninterface", help="Use a second interface for scanning to prevent blocking the "
-                                                      "primary interface and thus disrupting the data flow (default: True)",
+                                                      "primary interface and thus disrupting the data flow (default: "
+                                                      "True)",
                         action="store_true",
                         default=True)
     parser.add_argument("-w", "--signalwindow", help="Window for the moving average calculation of the AP signal "
