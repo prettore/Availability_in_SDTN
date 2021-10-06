@@ -1,16 +1,22 @@
 # Availability in SDTN
 [![N|Solid](https://www.fkie.fraunhofer.de/content/dam/fkie/fkie.svg)](https://www.fkie.fraunhofer.de)
 
-This is an experiment addressing availability issues in Software-Defined Tactical Networks.
+This is an experiment addressing availability issues in Software-Defined Tactical Networks (SDTN).
 The availability of services in those networks can be affected by disruptive network scenarios that can be caused by interference, barriers or the mobility of nodes.
 
 We developed an approach to reduce the probability that such situations of unavailability occur.
 To test our approach we used Mininet-Wifi to emulate a wireless network and simulate a mobility scenario.
-This scenario includes two nodes (1, 2) with wireless interfaces and an access point (AP) that is also a SDN switch and has a wired link to a SDN controller.
+This scenario includes two nodes (1, 2) with wireless interfaces and an command post (CP) that is a SDN switch and has a wired link to a SDN controller.
 The scenario also includes a permanent data flow from node 1 to node 2.
-At first, the nodes 1 and 2 are connected to the SDN controller through the access point.
-Then the nodes are being disrupted from the access point.
+At first, the nodes 1 and 2 are connected to the SDN controller through the command post.
+Then the nodes are being disrupted from it.
 This also disrupts the data flow between them because the two nodes have no connection to each other anymore.
+
+Through mobility models, we created trace files that dictate the node's mobility patterns.
+Moreover, by transforming the mobility patterns into network states [TNT](https://doi.org/10.36227/techrxiv.14141501.v1), we used the discrete states to change the Linux Queue Discipline (qdisc),  
+responsible  to  create  the  respective  link  constraints (bandwidth and delay), in order to simulate the link behavior in tactical networks, 
+such as High Frequency (HF), Ultra High Frequency (UHF), Very High Frequency (VHF), and Satellite Communications (SatCom). 
+Here we provide exemplars of UHF nodes moving following a  [Pendulum](data/img/Trace_Pendulum_Filled_Shortest_NtoBS_UHF.pdf) and [Gauss Markov](data/img/Trace_GaussMarkov2_NtoBS_UHF.pdf) patterns.
 
 The central part of the approach towards improving the availability in this scenario is a script that can be run in each of the data forwarding nodes.
 The script enables the nodes to switch their wireless interfaces from managed mode to ad-hoc mode whenever they are disrupted from the infrastructure.
@@ -117,6 +123,16 @@ OLSR: $ sudo util/install.sh -O
 
 To undo this modification just undo the comment in the mentioned line and reinstall Mininet-Wifi again.
 
+## Issue?
+
+If you have experienced any issue to modify the mininet-wifi, or you experienced a different behavior noticed in the paper [Reference](#How to cite), 
+replace the mininet-wifi folder with the one we provided [mininet-wifi](doc/mininet-wifi.zip).
+
+```shell
+Rename the current folder (like 'mininet-wifi' -> 'mininet-wifi_old')
+copy our mininet-wifi at the same folder
+execute the steps above (re-install Mininet-Wifi)
+```
 
 ## How to use the experiment setup
 We assume that you have completed the following steps at this point:
