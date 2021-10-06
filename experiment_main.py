@@ -234,8 +234,6 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
         subprocess.Popen(plot_cmd).communicate()
         os.system("chown -R wifi {}".format(path + '/data/statistics/'))
     else:
-        # logs_IP = 'sudo python packet_processing.py -s send_packets_Markov_Filled.csv -r recv_packets_Markov_Filled_100p_2s.csv -o ip_statistics_Markov_Filled_100p_2s_test.csv'
-        # os.system(logs_IP)
         info("*** Running CLI\n")
         CLI(net)
         info("*** Stopping network\n")

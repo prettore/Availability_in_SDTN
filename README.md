@@ -28,7 +28,7 @@ You can also find instructions for that in the documentation of Mininet-Wifi.
 If you have not used the scripts of this project before we recommend reading the following sections.
 There, you will find important information about how to set everything up initially.
 
-_**Note:** Additional important information for the usage of this project can be found in the comments of the python scripts, especially in the files `sdn_topology.py` and `flexible_sdn.py`.
+_**Note:** Additional important information for the usage of this project can be found in the comments of the python scripts, especially in the files `experiment_main.py` and `flexible_sdn_new.py`.
 We strongly recommend looking into the code of those files before using them._
 
 ### Dependencies
@@ -132,103 +132,96 @@ If you have set everything up then you can continue with the next steps.
 
 In the standard configuration the experiment needs a remote SDN controller to be available under the Address 
 
-To start the experiment with the default values set for the variables you can just execute the included script `sdn_topology.py` like this:
+To start the experiment with the default values set for the variables you can just execute the included script `experiment_main.py` like this:
 
 ```shell
-sudo python ./sdn_topology.py
+sudo python ./experiment_main.py
 ```
 
 To get an explanation of the available options and flags and their default values of the CLI just use:
 
 ```shell
-python ./sdn_topology.py --help
-```
-
-To perform experiments over constraint links (UHF) execute this script:
-
-```shell
-sudo python ./experiment_main.py
+python ./experiment_main.py --help
 ```
  
 ## Structure and Design
-The script `sdn_topology.py` initializes the experiment with a Mininet-Wifi topology.
-The script `flexible_sdn.py` is run in the nodes of that topology and contains the actual approach of this project.
+The script `experiment_main.py` initializes the experiment with a Mininet-Wifi topology.
+The script `flexible_sdn_new.py` is run in the nodes of that topology and contains the actual approach of this project.
 After running the experiment the main script directly executes evaluation scripts which produce statistic summaries and plots.
 Statistics and plots of each run are saved in a new directory under `./data/statistics/`.
 The directory will be named with the date and time of the start of the experiment.
 
 The mobility patterns can be found in CSV files under `./data/`.
-The mobility patterns that can be used through the CLI of `sdn_topology.py` are in the files `Scenario_*.csv`
+The mobility patterns that can be used through the CLI of `experiment_main.py` are in the files `Scenario_*.csv`
 
 The scripts `eval_ditg.py` and `eval_statistics.py` are used to evaluate the statistics after running the experiment.
-The output of those are needed to plot the results with `plot_statistics.py` or `plot_animated.py`.
+The output of those are needed to plot the results with `plot_statistics_new.py` or `plot_animated.py`.
 
 `scanner.py` contains the Multiprocessing class that is used inside the nodes to scan for the AP.
 `cmd_utils.py` contains some wrapper functions for the shell commands of `iw dev`.
 `sta1-wlan0-olsrd.conf` and `sta3-wlan0-olsrd.conf` contain the configurations needed to start OLSRd. 
 
 ### Design
-The approach that we implemented in `flexible_sdn.py` is designed as follows:
+The approach that we implemented in `flexible_sdn_new.py` is designed as follows:
 
-The basic idea behind our solution is that devices follow SDN policies as long as they are connected to the SDN infrastructure including a controller and an access point connecting the controller with the other nodes and the nodes among each other. 
+The basic idea behind our solution is that devices follow SDN policies as long as they are connected to the SDN infrastructure including a controller and a Command Post (CP) connecting the controller with the other nodes and the nodes among each other. 
 If this infrastructure is not available to the nodes because of alink disconnection they switch to using a MANET avoiding disruptions of data flows. 
 Switching betweenSDN and MANET is managed by a control mechanism which can be run in the nodes of a SDTN and thereby control the network interfaces of the respective node.
 
+Our solution is inspired by the concept of using decentralized (D) control as a backup in case of unavailability of centralized (C) infrastructure. 
+The decentralized control D is represented by a MANET routing protocol and the SDN infrastructure represents the centralized control C, although it is not limited to these examples. 
+Moreover, we assume that the tactical nodes follow SDN policies as long as they are connected to the SDTN infrastructure, including controllers and SDN-capable CP. 
+If, due to link disconnections, the SDTN infrastructure is unavailable (SDN-capable CP) the nodes switch to use a MANET protocol, mitigating disruptions of data flows and keep the military operation going at the tactical edge.
+
 ![Activity Diagram](doc/activity-diagram.png)
 
-An activity diagram is shown in Figure illustrating the different states and the activity flow of the control mechanism. 
-In the diagram the state of the respective node is represented by the four lanes. 
-The node can either be connected to the SDN infrastructure, switch from a SDN connection to MANET, be connected to a MANET or switch from a MANET connection to SDN. 
-For the diagram it is assumed that the node is connected to the access point and the SDN controller in the beginning. 
-Therefore, the start point is located in the top lane during representing the state in which the node is connected to the SDN although the activity flow is a loop and could start in any of the two connected states.
+The  process  to  switch  between  centralized  control C (using  a  SDN  controller)  and  decentralized  control D (using  a MANET) is managed by a handover mechanism deployed to the SDTN nodes. 
+Thereby, the handover mechanism controls the  network  interfaces  activating  a  MANET  routing  protocol whenever  the  signal  reaches  a  predefined  connectivity  limit with the SDN-capable CP and controller. 
+The activity diagram shown  in  the above Figure  illustrates  the  flow  of  states  within  the handover mechanism. The state of a node is organized in four horizontal lanes as follows, the node can either be connected to C; 
+switch from C to D; be connected to D; or switch from D to C. It is assumed that the node is connected to the CP and orchestrated by a SDN controller in the beginning. 
+Therefore, the  start  point  is  located  in  the  top  lane  where  the  node  is connected to the SDN infrastructure, although the activity flow is a loop and could start in any of the two connected states.
 
-To detect a disruption of the node from the SDN infrastructure the control mechanism has to monitor the network state.
-The connection to the SDN infrastructure is given by the wireless link to the access point in our use case scenario.
-Therefore, we choose to monitor the received signal strength of the access point as an indicator for a controller disruption.
+To  detect  a  disruption  of  the  node  fromC,  the  handover mechanism  monitors  a  set  of  performance  metrics  defining the  network  state.
+Assuming  that  the  connection  to C is given  by  wireless  links  to  the  CP,  the  mechanism  monitors the  Received  Signal  Strength  Indicator  (RSSI)  of  the  CP  to identify  a  disruption  from  the  SDN  infrastructure.
+At  the connected C state,  the  queuing  discipline  creating  the  link constraints and reducing packet loss together with the control mechanism  monitoring  the  signal  are  both  at  the  top  lane  of the activity diagram.
 
-The state in which the node is connected to the SDN infrastructure and the control mechanism monitors the signal can be found in the top lane of the activity diagram.
-The signal monitor takes the Received Signal Strength Indicator (RSSI) of the access point as a measurement every second and calculates a moving average of a fixed number of measurements where the number of measurements taken for the moving average is defined by a variable `WindowSigAvg`.
-The moving average is used instead of the raw measurements because the raw measurements are values of a stochastic process with a variance and outlier values disturb the control mechanism.
-This risk of disturbance by outliers can be reduced by using the moving average for the monitoring.
+The  RSSI,  between  the  mobile  node  and  the  CP,  is  monitored  by  a  process  taking  measurements  every RSSI_scan seconds  and  calculating  a  Simple  Moving  Average  (SMA) RSSI_avg within a given time window W_SMA = n. 
+The moving  average  is  used  to  reduce  the  noise  in  the  measurements because  the  raw  values  are  the  result  of  a  stochastic  process with a significant variance that disturbs the control mechanism. 
+In  sequence,  the RSSI_avg is  compared  to  a  threshold  value C_TH which   is  the   minimum   signal  strength   expected  to provide a reliable connection for centralized control C. 
+Then the  control  mechanism  can  switch  from C to D (SDN  to MANET) when the averaged signal is too weak to be reliable RSSI_avg < C_TH. 
+Otherwise, RSSI_avg ≥ C_TH the nodes are still  connected  to C.  Notice  that  the  definition  of  the  signal threshold,  between  reliable  and  unreliable,  depends  on  the wireless technology, such as HF, VHF, UHF, SatCom or WI-FI and the noise levels in the propagation medium. 
+Thus, the C_TH should be set depending on the type of communication technology. Moreover, the scan interval RSSI_scan is defined in  seconds,  and  increasing  the  scanning  time  will  reduce  the mechanism  responsiveness  over  the  topology  changes  and vice-versa.
 
-The moving average is compared to a threshold value `Threshold_SigSDN` which is the minimum signal strength expected to provide a reliable connection.
-Then the control mechanism can switch from SDN to MANET when the latest average signal is too weak to be sufficiently reliable.
-Which signal strength is considered to be reliable depends on the wireless technology.
-The value might vary for different technologies like VHF or UHF which are common in TNs and thus the `Threshold_SigSDN` can be changed depending on that.
+For  switching  the  network  from C to D the  node  enters a  handover  state  depicted  in  the  second  lane  of  the  activity diagram.  
+During  the  handover,  the  node  activates  a  scanner, re-configures its network interface to disconnect from the CP and  activate  a  fully  distributed  routing  protocol  used  in D. 
+At  this  point,  any  protocol  designed  for  MANETs  such  as BATMAN,  OLSR,  and  BABEL  can  be  used.  
+The  scanner  is needed  to  monitor  the  signal  strength  of  the  CP  to  decide when  to  switch  back  to C when  the  node  is  under  the decentralized network D. 
+After that, the topology changes due to the new communication radius between the nodes, and the link  constraint  mechanism  is  called  again  according  to  the waveforms, resulting in different link data rates (bandwidth).
 
-For switching the network from SDN to MANET the node enters a handover state depicted in the second lane of the activity diagram.
-During the handover the node activates a scanner, shapes the data flow and reconfigures its network interface to disconnect from the access point and connect to the MANET.
-The scanner is needed to monitor the signal strength of the access point to decide when to switch back to theSDN when the node is connected to the MANET.
-The shaping is needed to reduce packet loss during the handover.
+The scanner activated during the handover is used over the D connection  shown  in  the  third  lane  of  the  diagram.  
+Since the  node  has  no  active  connection  to  the  CP,  in  this  state the signal strength can not be monitored as simple as before. 
+Therefore, the control mechanism has to scan actively for the Service  Set  Identifier  (SSID)  of  the  CP  to  get  measurements of the signal strength. 
+This is done by the scanner on a second wireless network interface, because active scanning blocks the interface, thereby causing packet loss if it is executed on the primary interface.
 
-Between the disconnection from the access point and the connection to the MANET a gap in the connectivity is inevitable if only one network interface is used for both.
-With an active data flow this leads to packet loss.
-To minimize the packet loss at this point the control mechanism reduces the outgoing data rate before the handover and increases it back to the normal value after the handover.
-The value `Bandwidth_qdisc` to which the data rate is reduced can be configured.
-By reducing the outbound data rate during the handover the number of outgoing packets during that time is reduced as well which reduces the number of lost packets.
-A Queuing Discipline (qdisc) is used by the control mechanism for the shaping.
+When the node is connected to D the active scanner periodically triggers scans for the CP on the second interface. 
+In this state, the control mechanism continues to take measurements of  the  signal  strength  every RSSI_scan seconds,  calculating the W_SMA based on n measurements. 
+The RSSI_avg is then used by the control mechanism to decide when to switch the network. 
+To  do  so, D_TH threshold  is  used  as  a  minimum signal  strength  that  is  considered  strong  enough  for  a  reliable  connection  to  the  CP.  Notice  that,  to  avoid  a  loop  of handovers  between  the  two  networks  the  thresholds  must  be D_TH > C_TH.
 
-The scanner activated during the handover is used during the MANET connection state which can be found in the third lane of the diagram.
-Since the node has no active connection to the access point in this state the signal strength can not be monitored as simple as before.
-The control mechanism has to scan actively for the SSID of the access point to get measurements of the signal strength.
-This is done by the scanner on a second wireless network interface because active scanning blocks the interface.
-Therefore,it would cause packet loss if it was executed on the primary interface.
+When RSSI_avg ≥ D_TH, the control mechanism enters the handover state, bottom lane of the diagram, switching from D to C. 
+Otherwise, RSSI_avg < D_TH, the nodes keep connected to a fully distributed network D. 
+Having reached the first case,the handover starts, the scanner is deactivated, and in parallel,the  network  interface  is  reconfigured  to  disconnect  from D and  connect  to  the  CP. 
+Before  the  connection  to C,  the  dataflow  is  shaped  by  the  link  constraint  mechanism  using  qdisc to control the packet delivery rate reducing packet loss during the handover. 
+Therefore, based on this approach any changes caused by the mobility of the nodes can now benefit from both types of networks mitigating packet loss.
 
-When the node is connected to the MANET the scanner periodically triggers scans for the access point on the second interface.
-The scan interval `Interval_Scan` given in seconds can be freely configured but should not be too short since completing a scan can take multiple seconds.
-The state of the node being connected to the MANET can be found in the third lane of the activity diagram.
-In this state the control mechanism continues to take a measurement of the signal strength every second and to calculate a moving average based on the latest measurements inside the moving average `Window_SigAvg`.
-
-The moving average of the signal is then again used by the control mechanism to decide when to switch the network.
-Another threshold `Threshold_SigMANET` is used here as a minimum signal strength that is considered strong enough for a reliable connection.
-It can be configured depending on the wireless technology that is used as explained above.
-This threshold should be equal or higher than the `Threshold_SigSDN` to avoid a loop of handovers between the two networks when the measured signal is between the two thresholds.
-
-When the value of the measured signal is higher than the `Threshold_SigMANET` the control mechanism enters the handover state represented in the bottom lane of the diagram switching from MANET to SDN.
-The activity flow during this handover is the reverse of the handover in the other direction described above.
-The scanner is deactivated and in parallel the network interface is reconfigured to disconnect from the MANET and connect to the access point.
-Before the disconnection from the MANET and after the connection to the access point is established the data flow is shaped using a qdisc to reduce packet loss in the same way as during the first handover.
-The outbound data rate is set to the same value given by `Bandwidth_qdisc` during this handover.
+The major steps of our handover solution are summarized as follows: i) The control mechanism monitors the connection to the CP and switches from a centralized network C to a decentralized  network D by  re-configuring  the  wireless  interfaces. 
+It scans for the SSID of the CP during the ad-hoc connection to  detect  when  switching  back  from D to C is  possible. 
+ii) Instead of switching the network when the connection to the CP is lost completely, the connection monitor can measure the signal strength and uses thresholds to determine if the signal is  strong  enough  for  a  reliable  connection  to C. 
+The  control mechanism  uses  a  moving  average  of  the  measurements  to smooth  out  the  stochastic  variations  of  the  signal  strength. 
+iii)  A  Linux  qdisc  is  used  to  control  the  outbound  traffic, reducing packet loss during the topology changes. 
+iv) Multiple metrics  are  logged,  including  the  signal  strength,  buffer,  and IP  packets  at  the  sender  and  receiver  nodes.  
+The  IP  packets are processed to extract network metrics such as packet loss,end-to-end latency, jitter, data rate, and the buffer occupancy is acquired from the implemented qdisc. 
+We use these metrics to  quantify  the  performance  of  our  handover  mechanism  in the next section.
 
 How to cite
 ----
