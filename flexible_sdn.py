@@ -26,8 +26,7 @@ def main(args):
     While OLSR is activated the program continuously scans for the APs SSID to reappear in range.
     When the APs SSID is again in range the program deactivates OLSR and reconnects to the AP.
     """
-    #Rettore
-    #cmd_iw_dev(args.interface, "connect", args.apssid)
+    cmd_iw_dev(args.interface, "connect", args.apssid)
     if args.scaninterface:
         scaninterface = args.scaninterface
     else:
@@ -96,16 +95,16 @@ class FlexibleSdnOlsrController:
         self.scanner = Scanner(scaninterface, scan_interval, out_path, self.station, start_time, ap_ssid)
 
         log.info("*** {}: Interface: {}, Scan-interface: {}".format(interface.split('-')[0], interface, scaninterface))
-        #Rettore
-        #stdout, stderr = cmd_iw_dev(interface, "link")
-        #while b'Connected to ' + ap_bssid.encode() not in stdout:
-        #    stdout, stderr = cmd_iw_dev(interface, "link")
-        #stdout, stderr = Popen(["ping", "-c1", ap_ip], stdout=PIPE, stderr=PIPE).communicate()
-        #if self.pingto:
-        #    Popen(["ping", "-c1", pingto]).communicate()
+        stdout, stderr = cmd_iw_dev(interface, "link")
+        while b'Connected to ' + ap_bssid.encode() not in stdout:
+            stdout, stderr = cmd_iw_dev(interface, "link")
+        stdout, stderr = Popen(["ping", "-c1", ap_ip], stdout=PIPE, stderr=PIPE).communicate()
+        if self.pingto:
+            Popen(["ping", "-c1", pingto]).communicate()
 
     def run_controller(self):
         print("ssid, time (s), signal (dBm), signal_avg (dBm)")
+        num_of_cases = 0
         while True:
             time.sleep(1)
             ap_link_signal = self.get_link_signal_quality()
@@ -114,85 +113,63 @@ class FlexibleSdnOlsrController:
                 self.link_signal_deque.append(signal)
                 ap_link_signal.update({'signal': signal,
                                        'signal_avg': sum(self.link_signal_deque) / len(self.link_signal_deque)})
-                #Rettote
-                #if ap_link_signal['signal_avg'] >= self.disconnect_threshold:
-                print("{}, {}, {}, {:.2f}".format(ap_link_signal['SSID'], ap_link_signal['time'],
-                                                  ap_link_signal['signal'], ap_link_signal['signal_avg']))
-                self.write_signal_to_file(ap_link_signal)
-                # if self.qdisc['disconnect'] > 0:
-                #     if ap_link_signal['signal_avg'] <= self.disconnect_threshold + 2 and not self.qdisc['throttled']:
-                #         update_qdisc(self.interface, self.qdisc['disconnect'], self.qdisc['throttle_unit'])
-                #         self.qdisc.update({'throttled': True})
-                #     elif ap_link_signal['signal_avg'] > self.disconnect_threshold + 2 and self.qdisc['throttled']:
-                #         update_qdisc(self.interface, self.qdisc['standard'], self.qdisc['std_unit'])
-                #         self.qdisc.update({'throttled': False})
-                continue
-            #if not self.scanner.is_alive():
-                #if ap_link_signal is None:
-                    #print("*** AP signal too weak (last signal: {} / {})".format(ap_link_signal['signal'],
-                    #                                                             self.disconnect_threshold))
-                #else:
-                    #print("*** AP connection lost")
-
-                    #print("*** Starting background scan")
-                    #self.scanner.start()
-                    #self.log_event('scanner_start', 1)
-
-                    #scan_data = {'time': datetime.now().timestamp() - self.start_time, 'signal': -90,
-                    #             'SSID': None, 'rx_bitrate': 0, 'tx_bitrate': 0}
-                    #print("{}, {}, {}".format(scan_data['SSID'], scan_data['time'],
-                    #                                  scan_data['signal']))
-
-                    #self.write_signal_to_file(scan_data)
-                    #self.reconnect_to_access_point()
-
+                if ap_link_signal['signal_avg'] >= self.disconnect_threshold:
+                    print("{}, {}, {}, {:.2f}".format(ap_link_signal['SSID'], ap_link_signal['time'],
+                                                      ap_link_signal['signal'], ap_link_signal['signal_avg']))
+                    self.write_signal_to_file(ap_link_signal)
+                    # if self.qdisc['disconnect'] > 0:
+                    #     if ap_link_signal['signal_avg'] <= self.disconnect_threshold + 2 and not self.qdisc['throttled']:
+                    #         update_qdisc(self.interface, self.qdisc['disconnect'], self.qdisc['throttle_unit'])
+                    #         self.qdisc.update({'throttled': True})
+                    #     elif ap_link_signal['signal_avg'] > self.disconnect_threshold + 2 and self.qdisc['throttled']:
+                    #         update_qdisc(self.interface, self.qdisc['standard'], self.qdisc['std_unit'])
+                    #         self.qdisc.update({'throttled': False})
+                    continue
             if not self.scanner.is_alive():
                 if ap_link_signal:
                     print("*** AP signal too weak (last signal: {} / {})".format(ap_link_signal['signal'],
                                                                                  self.disconnect_threshold))
+                    num_of_cases = num_of_cases + 1
                 else:
                     print("*** AP connection lost")
+                    num_of_cases = 2
+
                 # Rettore
-                #if not self.no_olsr:
-                print("*** Starting background scan")
-                self.scanner.start()
-                self.log_event('scanner_start', 1)
+                if num_of_cases >=2:
+                    #if not self.no_olsr:
+                    print("*** Starting background scan")
+                    self.scanner.start()
+                    self.log_event('scanner_start', 1)
+                    num_of_cases = 0
 
             scan_signal = self.get_scan_dump_signal()
+            #print(scan_signal)
             if scan_signal and 'signal' in scan_signal:
-
-                if scan_signal['signal'] is not None:
-
-                    self.scan_signal_deque.append(scan_signal['signal'])
-                    #Rettore
-                    try:
-                        scan_signal.update({'signal_avg': sum(self.scan_signal_deque) / len(self.scan_signal_deque)})
-                    except:
-                        print("An exception occurred during sum(self.scan_signal_deque) / len(self.scan_signal_deque).")
-                        #print(str(scan_signal['signal']))
-                    log.info(
-                        "*** {}: Scan detected {} in range (signal: {} / {})".format(self.scan_interface, self.ap_ssid,
-                                                                                     scan_signal['signal'],
-                                                                                     self.reconnect_threshold))
-                    self.write_signal_to_file(scan_signal)
-                    print("{}, {}, {}, {:.2f}".format(scan_signal['SSID'], scan_signal['time'], scan_signal['signal'],
-                                                      scan_signal['signal_avg']))
-                    #Rettore
-                    if scan_signal['signal'] >= -89:
-                    #if scan_signal['signal'] >= self.reconnect_threshold:
-                        self.log_event('reconnect', 1)
-                        self.reconnect_to_access_point()
-                        self.connected_to_ap = True
-                        self.log_event('reconnect', 2)
-                        if self.scanner.is_alive():
-                            print("*** Stopping background scan")
-                            self.scanner.terminate()
-                            self.log_event('scanner_stop', 1)
-                            self.scanner = Scanner(self.scan_interface, self.scan_interval, self.out_path, self.station,
-                                                   self.start_time, self.ap_ssid)
+                # Rettore
+                #if scan_signal['signal'] is not None:
+                self.scan_signal_deque.append(scan_signal['signal'])
+                scan_signal.update({'signal_avg': sum(self.scan_signal_deque) / len(self.scan_signal_deque)})
+                #print("An exception occurred during sum(self.scan_signal_deque) / len(self.scan_signal_deque).")
+                log.info(
+                    "*** {}: Scan detected {} in range (signal: {} / {})".format(self.scan_interface, self.ap_ssid,
+                                                                                 scan_signal['signal'],
+                                                                                 self.reconnect_threshold))
+                self.write_signal_to_file(scan_signal)
+                print("{}, {}, {}, {:.2f}".format(scan_signal['SSID'], scan_signal['time'], scan_signal['signal'],
+                                                  scan_signal['signal_avg']))
+                if scan_signal['signal'] >= self.reconnect_threshold:
+                    self.log_event('reconnect', 1)
+                    self.reconnect_to_access_point()
+                    self.connected_to_ap = True
+                    self.log_event('reconnect', 2)
+                    if self.scanner.is_alive():
+                        print("*** Stopping background scan")
+                        self.scanner.terminate()
+                        self.log_event('scanner_stop', 1)
+                        self.scanner = Scanner(self.scan_interface, self.scan_interval, self.out_path, self.station,
+                                               self.start_time, self.ap_ssid)
                     time.sleep(0.5)
                     print("*** Reconnected to AP.")
-                    #Rettore
                     print("*** OLSRd PID: ", self.olsrd_pid)
                     stdout, stderr = Popen(["ping", "-c1", self.ap_ip], stdout=PIPE, stderr=PIPE).communicate()
                     continue
@@ -203,10 +180,10 @@ class FlexibleSdnOlsrController:
                 self.connected_to_ap = False
                 self.log_event('disconnect', 2)
                 if self.pingto:
-                    spthread = threading.Thread(target=sleep_and_ping,
-                                                kwargs={'sleep_interval': 1.0, 'ip': self.pingto},
-                                                daemon=True)
-                    spthread.start()
+                   spthread = threading.Thread(target=sleep_and_ping,
+                                               kwargs={'sleep_interval': 1.0, 'ip': self.pingto},
+                                               daemon=True)
+                   spthread.start()
             elif self.no_olsr and self.connected_to_ap:
                 self.log_event('disconnect', 1)
                 cmd_iw_dev(self.interface, 'disconnect')
