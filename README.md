@@ -127,7 +127,7 @@ We assume that you have completed the following steps at this point:
  - Installed all required Python libraries
  - Installed D-ITG
 
-If you did not complete all of the above setup steps then please refer to the previous section: [Setup](#setup).
+If you did not complete all of the above setup steps then please refer to the previous section: [Setup](#Dependencies).
 If you have set everything up then you can continue with the next steps.
 
 In the standard configuration the experiment needs a remote SDN controller to be available under the Address 
@@ -143,7 +143,7 @@ To get an explanation of the available options and flags and their default value
 ```shell
 python ./sdn_topology.py --help
 ```
-
+ 
 ## Structure and Design
 The script `sdn_topology.py` initializes the experiment with a Mininet-Wifi topology.
 The script `flexible_sdn.py` is run in the nodes of that topology and contains the actual approach of this project.
@@ -168,7 +168,7 @@ The basic idea behind our solution is that devices follow SDN policies as long a
 If this infrastructure is not available to the nodes because of alink disconnection they switch to using a MANET avoiding disruptions of data flows. 
 Switching betweenSDN and MANET is managed by a control mechanism which can be run in the nodes of a SDTN and thereby control the network interfaces of the respective node.
 
-![Activity Diagram](/doc/activity-diagram.png)
+![Activity Diagram](doc/activity-diagram.png)
 
 An activity diagram is shown in Figure illustrating the different states and the activity flow of the control mechanism. 
 In the diagram the state of the respective node is represented by the four lanes. 
