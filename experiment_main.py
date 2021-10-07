@@ -26,24 +26,21 @@ from mn_wifi.replaying import ReplayingMobility
 
 def topology(scenario: int, signal_window: int, scan_interval: float, disconnect_threshold: float,
              reconnect_threshold: float, bufferSize, scan_iface: bool = False, no_olsr: bool = False,
-             qdisc_rates: dict = {'disconnect': 0, 'reconnect': 0}, auto: bool = False):
+             auto: bool = False):
     """
     Build a custom topology and start it.
 
     Note: If you do not want to use a remote SDN controller but the controller class that is included in Mininet-Wifi you will have to change some
     """
-    # if no_olsr:
     net = Mininet_wifi(topo=None, build=False, link=wmediumd, wmediumd_mode=interference, noise_th=-91,
                        fading_cof=3, allAutoAssociation=True)
-    # else:
-    #    net = Mininet_wifi(link=wmediumd, wmediumd_mode=interference, noise_th=-91, fading_cof=3)
 
     info('*** Adding controller\n')
-    # Use this if you have a remote controller (e.g. RYU controller) intalled and running in the background
-    c0 = net.addController(name='c0', controller=RemoteController, ip='127.0.0.1', port=6633)
+    # Use this if you have a remote controller (e.g. RYU controller) installed and running in the background
+    # c0 = net.addController(name='c0', controller=RemoteController, ip='127.0.0.1', port=6633)
 
     # Use this instead if you want to use the SDN controller provided by Mininet-Wifi
-    # c0 = net.addController(name='c0', controller=Controller)
+    c0 = net.addController(name='c0', controller=Controller)
 
     info('*** Adding switches/APs\n')
     # Use this SDN switch configuration if you use the RYU controller as a remote controller
@@ -67,11 +64,8 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
         sta3 = net.addStation('sta3', mac='00:00:00:00:00:03', ip='10.0.0.3', position='50,40,0', color='b')
 
     info("*** Configuring propagation model\n")
-    # net.setPropagationModel(model="logDistance", exp=4.4)
-    if scenario >= 3:
-        net.setPropagationModel(model="logDistance", exp=2.257)  # around 2000meters range uhf
-    else:
-        net.setPropagationModel(model="logDistance", exp=3.8)  # around 100meters range wifi
+    net.setPropagationModel(model="logDistance", exp=2.257)  # around 2000meters range uhf
+    # net.setPropagationModel(model="logDistance", exp=3.8)  # around 100meters range wifi
 
     info("*** Configuring wifi nodes\n")
     net.configureWifiNodes()
@@ -85,36 +79,17 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
     sta3.setMAC('00:00:00:00:00:05', intf='sta3-eth2')
 
     trace_file = ""
-    # if scenario > 1:
     info("*** Configuring mobility\n")
     if scenario == 1:
-        trace_file = 'Trace_Pendulum_Filled_Shortest(WIFI).csv'
-        trace_manet_file = ''
-        smooth_motion = False
-        path = os.path.dirname(os.path.abspath(__file__)) + '/data/'
-        get_trace([sta1, sta3, ap1], path + trace_file, smooth_motion, False)
-        net.isReplaying = True
-        info("*** Creating plot\n")
-        net.plotGraph(max_x=250, max_y=350)
-    if scenario == 2:
-        trace_file = 'Trace_GaussMarkov_WIFI.csv'
-        trace_manet_file = ''
-        smooth_motion = False
-        path = os.path.dirname(os.path.abspath(__file__)) + '/data/'
-        get_trace([sta1, sta3, ap1], path + trace_file, smooth_motion, False)
-        net.isReplaying = True
-        info("*** Creating plot\n")
-        net.plotGraph(max_x=250, max_y=350)
-    if scenario == 3:
         trace_file = 'Trace_Pendulum_Filled_Shortest_NtoBS_UHF.csv'
-        trace_manet_file = 'Trace_Pendulum_Filled_Shortest_NtoN_UHF.csv'
+        trace_manet_file = 'Trace_Pendulum_Filled_Shortest_NtoN_UHF.csv'  # used to change qdisc once the nodes are in a MANET mode
         smooth_motion = False
         path = os.path.dirname(os.path.abspath(__file__)) + '/data/'
         get_trace([sta1, sta3, ap1], path + trace_file, smooth_motion, False)
         net.isReplaying = True
         info("*** Creating plot\n")
         net.plotGraph(max_x=5000, max_y=6000)
-    if scenario == 4:
+    if scenario == 2:
         trace_file = 'Trace_GaussMarkov2_NtoBS_UHF.csv'
         trace_manet_file = 'Trace_GaussMarkov2_NtoN_UHF.csv'
         smooth_motion = False
@@ -131,7 +106,6 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
     net.get('s1').start([c0])
     sleep(1)
 
-    # if scenario > 1:
     info("\n*** Replaying Mobility\n")
     ReplayingMobility(net)
 
@@ -160,8 +134,6 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
         cmd += " -S sta1-wlan1"
     if no_olsr:
         cmd += " -O"
-    if qdisc_rates['disconnect'] > 0 and qdisc_rates['reconnect'] > 0:
-        cmd += " -qr {} -qd {}".format(qdisc_rates['reconnect'], qdisc_rates['disconnect'])
     makeTerm(sta1, title='Station 1', cmd=cmd + " ; sleep 5")
 
     cmd = "sudo python"
@@ -177,8 +149,6 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
         cmd += " -S sta3-wlan1"
     if no_olsr:
         cmd += " -O"
-    if qdisc_rates['disconnect'] > 0 and qdisc_rates['reconnect'] > 0:
-        cmd += " -qr {} -qd {}".format(qdisc_rates['reconnect'], qdisc_rates['disconnect'])
     makeTerm(sta3, title='Station 3', cmd=cmd + " ; sleep 5")
 
     info("*** Changing the link rate based on node mobility\n")
@@ -211,7 +181,6 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
     if auto:
         info("*** Experiment duration - " + str(experiment_time + 20) + " seconds \n")
         sleep(experiment_time + 20)
-        # sleep(250)
         queue_has_packet = True
         while queue_has_packet:
             with open(statistics_dir + 'sta1_packet_queue.txt', 'r') as file:
@@ -296,22 +265,11 @@ def user_data_flow(station1, station2, statistics_dir):
     sleep(10)
 
     if scenario == 1:
-        # experiment 30 min Pendulum
-        makeTerm(station1, title='Client',
-                 cmd="ITGSend -Sda 192.168.0.3 -Sdp 9090 -T UDP -a 10.0.0.3 -C 10 -s 0.123456 -c 1264 -t 600000 "
-                     "-l {}/sender.log -c 1000".format(statistics_dir))  # wifi
-    if scenario == 2:
-        # experiment 30 min GM
-        makeTerm(station1, title='Client',
-                 cmd="ITGSend -Sda 192.168.0.3 -Sdp 9090 -T UDP -a 10.0.0.3 -C 10 -s 0.123456 -c 1264 -t 1800000 "
-                     "-l {}/sender.log -c 1000".format(statistics_dir))  # wifi
-
-    if scenario == 3:
         # experiment 10 min Pendulum
         makeTerm(station1, title='Client',
                  cmd="ITGSend -Sda 192.168.0.3 -Sdp 9090 -T UDP -a 10.0.0.3 -U 2 30 -z 2500 -s 0.123456 -c 1264 -t "
                      "10000000 -l {}/sender.log -c 1000".format(statistics_dir))  # uhf
-    if scenario == 4:
+    if scenario == 2:
         # long experiment 30 min GM
         makeTerm(station1, title='Client',
                  cmd="ITGSend -Sda 192.168.0.3 -Sdp 9090 -T UDP -a 10.0.0.3 -U 2 20 -z 6000 -s 0.123456 -c 1264 -t 10000000 "
@@ -350,39 +308,32 @@ def get_trace(sta_list, file_, smooth, addrand):
 if __name__ == '__main__':
     setLogLevel('info')
     parser = argparse.ArgumentParser(description="Tactical network experiment!")
-    parser.add_argument("-m", "--mobilityscenario",
-                        help="Select a mobility scenario (Integer: 1, 2, 3 or 4) (default: 3)"
-                             " where 1: Pendulum (WiFi), 2: GaussMarkov (WiFi),"
-                             " 3: Pendulum (UHF), 2: GaussMarkov (UHF)",
-                        type=int, required=False, default=3)
-    parser.add_argument("-s", "--scaninterval", help="Time interval in seconds (float) for scanning if the wifi CP"
+    parser.add_argument("-m", "--mobilityScenario",
+                        help="Select a mobility scenario (Integer: 1 or 2) (default: 1)"
+                             " where 1: Pendulum (UHF), 2: GaussMarkov (UHF)",
+                        type=int, required=False, default=1)
+    parser.add_argument("-s", "--scanInterval", help="Time interval in seconds (float) for scanning if the wifi CP"
                                                      " is in range while being in adhoc mode (default: 2.0)",
                         type=float, default=2.0)
-    parser.add_argument("-d", "--disconnectthreshold", help="Signal strength (float) below which station dissconnects "
-                                                            "from CP and activates OLSR (default: -88.0 dBm)",
-                        type=float, default=-88.0)
-    parser.add_argument("-r", "--reconnectthreshold", help="Minimal signal strength (float) of CP required for trying "
+    parser.add_argument("-d", "--disconnectThreshold", help="Signal strength (float) below which station dissconnects "
+                                                            "from CP and activates OLSR (default: -87.0 dBm)",
+                        type=float, default=-87.0)
+    parser.add_argument("-r", "--reconnectThreshold", help="Minimal signal strength (float) of CP required for trying "
                                                            "reconnect (default: -82.0 dBm)", type=float, default=-82.0)
-    parser.add_argument("-S", "--scaninterface", help="Use a second interface for scanning to prevent blocking the "
+    parser.add_argument("-S", "--scanInterface", help="Use a second interface for scanning to prevent blocking the "
                                                       "primary interface and thus disrupting the data flow (default: "
                                                       "True)", action="store_true", default=True)
-    parser.add_argument("-w", "--signalwindow", help="Window for the moving average calculation of the CP signal "
+    parser.add_argument("-w", "--signalWindow", help="Window for the moving average calculation of the CP signal "
                                                      "strength (default: 10)", type=int, default=10)
-    parser.add_argument("-O", "--noolsr", help="Set to disable the usage of olsr when connection to CP is lost "
+    parser.add_argument("-O", "--noOlsr", help="Set to disable the usage of olsr when connection to CP is lost "
                                                "(default: False)", action='store_true', default=False)
     parser.add_argument("-b", "--bufferSize", help="Set the node buffer size (default: 100 packets)",
-                        action='store_true', type=int, required=False, default=100)
+                        type=int, required=False, default=100)
 
-    parser.add_argument("-qd", "--qdiscdisconnect", help="Bandwidth in bits/s to throttle qdisc to during handover CP "
-                                                         "to OLSR. If set to 0 qdisc feature is deactivated "
-                                                         "(default: 0)", type=int, default=0)
-    parser.add_argument("-qr", "--qdiscreconnect", help="Bandwidth in bits/s to throttle qdisc to during handover CP to"
-                                                        " OLSR. If set to 0 qdisc feature is deactivated (default: 0)",
-                        type=int, default=0)
-    parser.add_argument("-auto", "--auto", help="Auto experiment", action='store_true', required=False, default=False)
+    parser.add_argument("-auto", "--auto", help="Automatically stop the experiment after the buffer is empty",
+                        action='store_true', required=False, default=False)
 
     args = parser.parse_args()
-    scenario = args.mobilityscenario
-    qdisc_rates = {'disconnect': args.qdiscdisconnect, 'reconnect': args.qdiscreconnect}
-    topology(scenario, args.signalwindow, args.scaninterval, args.disconnectthreshold, args.reconnectthreshold,
-             args.bufferSize, args.scaninterface, args.noolsr, qdisc_rates, args.auto)
+    scenario = args.mobilityScenario
+    topology(scenario, args.signalWindow, args.scanInterval, args.disconnectThreshold, args.reconnectThreshold,
+             args.bufferSize, args.scanInterface, args.noOlsr, args.auto)

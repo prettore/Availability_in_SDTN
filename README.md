@@ -34,7 +34,7 @@ You can also find instructions for that in the documentation of Mininet-Wifi.
 If you have not used the scripts of this project before we recommend reading the following sections.
 There, you will find important information about how to set everything up initially.
 
-_**Note:** Additional important information for the usage of this project can be found in the comments of the python scripts, especially in the files `experiment_main.py` and `flexible_sdn_new.py`.
+_**Note:** Additional important information for the usage of this project can be found in the comments of the python scripts, especially in the files `experiment_main.py` and `flexible_sdn.py`.
 We strongly recommend looking into the code of those files before using them._
 
 ### Dependencies
@@ -162,7 +162,7 @@ python ./experiment_main.py --help
  
 ## Structure and Design
 The script `experiment_main.py` initializes the experiment with a Mininet-Wifi topology.
-The script `flexible_sdn_new.py` is run in the nodes of that topology and contains the actual approach of this project.
+The script `flexible_sdn.py` is run in the nodes of that topology and contains the actual approach of this project.
 After running the experiment the main script directly executes evaluation scripts which produce statistic summaries and plots.
 Statistics and plots of each run are saved in a new directory under `./data/statistics/`.
 The directory will be named with the date and time of the start of the experiment.
@@ -171,14 +171,14 @@ The mobility patterns can be found in CSV files under `./data/`.
 The mobility patterns that can be used through the CLI of `experiment_main.py` are in the files `Scenario_*.csv`
 
 The scripts `eval_ditg.py` and `eval_statistics.py` are used to evaluate the statistics after running the experiment.
-The output of those are needed to plot the results with `plot_statistics_new.py` or `plot_animated.py`.
+The output of those are needed to plot the results with `plot_statistics_new.py`.
 
 `scanner.py` contains the Multiprocessing class that is used inside the nodes to scan for the AP.
 `cmd_utils.py` contains some wrapper functions for the shell commands of `iw dev`.
 `sta1-wlan0-olsrd.conf` and `sta3-wlan0-olsrd.conf` contain the configurations needed to start OLSRd. 
 
 ### Design
-The approach that we implemented in `flexible_sdn_new.py` is designed as follows:
+The approach that we implemented in `flexible_sdn.py` is designed as follows:
 
 The basic idea behind our solution is that devices follow SDN policies as long as they are connected to the SDN infrastructure including a controller and a Command Post (CP) connecting the controller with the other nodes and the nodes among each other. 
 If this infrastructure is not available to the nodes because of alink disconnection they switch to using a MANET avoiding disruptions of data flows. 
