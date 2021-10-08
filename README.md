@@ -158,6 +158,43 @@ To get an explanation of the available options and flags and their default value
 
 ```shell
 python ./experiment_main.py --help
+
+usage: experiment_main.py [-h] [-m MOBILITYSCENARIO] [-s SCANINTERVAL]
+                          [-d DISCONNECTTHRESHOLD]
+                          [-r RECONNECTTHRESHOLD] [-S] [-w SIGNALWINDOW]
+                          [-O] [-b BUFFERSIZE] [-auto]
+
+Tactical network experiment!
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -m MOBILITYSCENARIO, --mobilityScenario MOBILITYSCENARIO
+                        Select a mobility scenario (Integer: 1 or 2)
+                        (default: 1) where 1: Pendulum (UHF), 2:
+                        GaussMarkov (UHF)
+  -s SCANINTERVAL, --scanInterval SCANINTERVAL
+                        Time interval in seconds (float) for scanning if
+                        the wifi CP is in range while being in adhoc mode
+                        (default: 2.0)
+  -d DISCONNECTTHRESHOLD, --disconnectThreshold DISCONNECTTHRESHOLD
+                        Signal strength (float) below which station
+                        dissconnects from CP and activates OLSR (default:
+                        -87.0 dBm)
+  -r RECONNECTTHRESHOLD, --reconnectThreshold RECONNECTTHRESHOLD
+                        Minimal signal strength (float) of CP required
+                        for trying reconnect (default: -82.0 dBm)
+  -S, --scanInterface   Use a second interface for scanning to prevent
+                        blocking the primary interface and thus
+                        disrupting the data flow (default: True)
+  -w SIGNALWINDOW, --signalWindow SIGNALWINDOW
+                        Window for the moving average calculation of the
+                        CP signal strength (default: 10)
+  -O, --noOlsr          Set to disable the usage of olsr when connection
+                        to CP is lost (default: False)
+  -b BUFFERSIZE, --bufferSize BUFFERSIZE
+                        Set the node buffer size (default: 100 packets)
+  -auto, --auto         Automatically stop the experiment after the
+                        buffer is empty
 ```
  
 ## Structure and Design

@@ -55,12 +55,10 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
     if scan_iface:
         scanif = 1
         sta1 = net.addStation('sta1', wlans=2, ip='10.0.0.1', position='30,10,0', color='r')
-        # sta2 = net.addStation('sta2', wlans=2, ip='10.0.0.2', position='10,40,0')
         sta3 = net.addStation('sta3', wlans=2, ip='10.0.0.3', position='50,40,0', color='b')
     else:
         scanif = 0
         sta1 = net.addStation('sta1', mac='00:00:00:00:00:01', ip='10.0.0.1', position='30,10,0', color='r')
-        # sta2 = net.addStation('sta2', mac='00:00:00:00:00:02', ip='10.0.0.2', position='10,40,0')
         sta3 = net.addStation('sta3', mac='00:00:00:00:00:03', ip='10.0.0.3', position='50,40,0', color='b')
 
     info("*** Configuring propagation model\n")
@@ -199,9 +197,9 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
         subprocess.Popen(["python3", "{}/eval_ditg.py".format(path), "-d", statistics_dir, "-t",
                           str(start_time.timestamp())]).communicate()
         if no_olsr:
-            plot_cmd = ["python3", "{}/plot_statistics_new.py".format(path), "-d", statistics_dir, '-O']
+            plot_cmd = ["python3", "{}/plot_statistics_new.py".format(path), "-d", statistics_dir, '-O', '-f', trace_file]
         else:
-            plot_cmd = ["python3", "{}/plot_statistics_new.py".format(path), "-d", statistics_dir]
+            plot_cmd = ["python3", "{}/plot_statistics_new.py".format(path), "-d", statistics_dir, '-f', trace_file]
         subprocess.Popen(plot_cmd).communicate()
         os.system("chown -R wifi {}".format(path + '/data/statistics/'))
     else:
@@ -216,9 +214,9 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
         subprocess.Popen(["python3", "{}/eval_ditg.py".format(path), "-d", statistics_dir, "-t",
                           str(start_time.timestamp())]).communicate()
         if no_olsr:
-            plot_cmd = ["python3", "{}/plot_statistics_new.py".format(path), "-d", statistics_dir, '-O']
+            plot_cmd = ["python3", "{}/plot_statistics_new.py".format(path), "-d", statistics_dir, '-O', '-f', trace_file]
         else:
-            plot_cmd = ["python3", "{}/plot_statistics_new.py".format(path), "-d", statistics_dir]
+            plot_cmd = ["python3", "{}/plot_statistics_new.py".format(path), "-d", statistics_dir, '-f', trace_file]
         subprocess.Popen(plot_cmd).communicate()
         os.system("chown -R wifi {}".format(path + '/data/statistics/'))
 
