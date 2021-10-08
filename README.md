@@ -290,9 +290,9 @@ Publications
 Contacts
 ----
 
-merlin.rechenberg@fkie.fraunhofer.de
-
 paulo.lopes.rettore@fkie.fraunhofer.de
+
+merlin.rechenberg@fkie.fraunhofer.de
 
 License
 ----
