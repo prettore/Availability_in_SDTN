@@ -118,7 +118,7 @@ def update_rules(interface_arg, latency_arg, dest_ip, src_ip, states, time_inter
         # first case
         if i - 1 == 0:
             # if a disconnected state appears set the data-rate manually
-            if (states[i - 1] == 0):
+            if states[i - 1] == 0:
                 setting_initial_rules(interface_arg, str(datarate_dic[4]), latency_arg, dest_ip, src_ip, queue_size)
             else:
                 print('0, State %d, Rate %s, Datetime %s for %f second' %
@@ -141,7 +141,7 @@ def update_rules(interface_arg, latency_arg, dest_ip, src_ip, states, time_inter
                      str(datarate_dic[states[i]]) + 'bit ', shell=True)
                 sleep(time_interval[i])
 
-# fuction to raplace the qdisc rules
+# function to replace the qdisc rules
 def update_rules_two_networks(interface_arg, latency_arg, dest_ip, src_ip, states, states2, time_interval, time_interval2, queue_size,eventFile):
     # datarate_dic = dict([(5, "9600"),
     #                      (4, "4800"), (3, "2400"), (2, "1200"),
@@ -160,7 +160,7 @@ def update_rules_two_networks(interface_arg, latency_arg, dest_ip, src_ip, state
         # first case
         if i - 1 == 0:
             # if a disconnected state appears set the data-rate manually
-            if (states[i - 1] == 0):
+            if states[i - 1] == 0:
                 setting_initial_rules(interface_arg, str(datarate_dic[4]), latency_arg, dest_ip, src_ip, queue_size)
             else:
                 print('0, State %d, Rate %s, Datetime %s for %f second' %
@@ -214,7 +214,7 @@ if __name__ == '__main__':
     parser.add_argument("-i", "--interface", help="The interface to be shaped", type=str,
                         required=True)
     parser.add_argument("-rate", "--rate", help="Maximum rate in bit", type=str, default=240000)  # , required=True)
-    # parser.add_argument("-burst", "--burst", help="Maximum allowed burst in kbit", type=str, default=2048)#, required=True)
+
     parser.add_argument("-latency", "--latency", help="Latency parameter in ms", type=str,
                         default=2000)  # , required=True)
     parser.add_argument("-qlen", "--qlen", help="Max queue size in packets", type=int,
@@ -223,13 +223,10 @@ if __name__ == '__main__':
                         type=str, required=True)
     parser.add_argument("-src", "--src", help="Source ip - filtering packets by Source ip and udp protocol", type=str,
                         required=True)
-    # parser.add_argument("-update", "--update", help="Boolean to update the qdisc rule", type=str, default='False')
     parser.add_argument("-t", "--traceFile", help="Trace file CP->Node to update the qdisc rule", type=str, required=False)
     parser.add_argument("-t2", "--traceFile2", help="Trace file Node->Node to update the qdisc rule", type=str, required=False)
     parser.add_argument("-e", "--eventFile", help="File reporting the events of handover", type=str,
                         required=False)
-    #parser.add_argument("-O", "--noolsr", help="Do not use olsr when connection to AP is lost (default: False)",
-    #                   action='store_true', default=False)
 
     args = parser.parse_args()
 
