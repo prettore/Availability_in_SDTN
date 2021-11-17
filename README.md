@@ -22,6 +22,11 @@ The central part of the approach towards improving the availability in this scen
 The script enables the nodes to switch their wireless interfaces from managed mode to ad-hoc mode whenever they are disrupted from the infrastructure.
 In ad-hoc mode the nodes use OLSR to establish a communication channel to prevent the data flow from being disrupted.
 
+## Virtual Presentation
+
+[![N|Solid](https://cdn.iconscout.com/icon/free/png-256/social-334-116368.png)](https://youtu.be/o5MBS2nbPUA)
+
+
 ## Getting Started
 The experiment is based on the Mininet-Wifi framework.
 We recommend the usage of the Mininet-Wifi VM to test this experimental setup.
