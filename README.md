@@ -1,5 +1,5 @@
 # Availability in SDTN
-[![N|Solid](https://www.fkie.fraunhofer.de/content/dam/fkie/fkie.svg)](https://www.fkie.fraunhofer.de)
+
 
 This is an experiment addressing availability issues in Software-Defined Tactical Networks (SDTN).
 The availability of services in those networks can be affected by disruptive network scenarios that can be caused by interference, barriers or the mobility of nodes.
