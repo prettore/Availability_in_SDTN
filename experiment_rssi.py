@@ -23,6 +23,7 @@ from mn_wifi.net import Mininet_wifi
 from mn_wifi.wmediumdConnector import interference
 from mn_wifi.replaying import ReplayingMobility
 
+
 # changing the link rate based on node mobility using Qdisc
 def network_change(station1, interface1, extra_arg, trace, trace_manet, buffer_size, exp_round, log_dir, event, manet):
     # adding TC and NetEm rule
@@ -45,6 +46,7 @@ def network_change(station1, interface1, extra_arg, trace, trace_manet, buffer_s
         # print("python packet_queue.py -i "+interface1+" -o "+log_dir+station1.name + "_buffer.csv" +
         #                                                     " -r " + str(exp_round) + " -qlen " + str(buffer_size))
 
+
 # creating packet sniffer
 def packet_sniffer(station1, station2, interface1, interface2, exp_round):
     command = "sudo python packet_sniffer.py -i " + interface2 + " -o recv_packets.csv -r " + exp_round + " -f 'udp and port 8999'"
@@ -52,6 +54,7 @@ def packet_sniffer(station1, station2, interface1, interface2, exp_round):
 
     command = "sudo python packet_sniffer.py -i " + interface1 + " -o send_packets.csv -r " + exp_round + " -f '-p udp -m udp --dport 8999' -T True"
     makeTerm(station1, title='Monitoring IP packets at Sender', cmd=command)
+
 
 # creating user data flows
 def user_data_flow(station1, station2, statistics_dir):
@@ -75,6 +78,7 @@ def user_data_flow(station1, station2, statistics_dir):
         makeTerm(station1, title='Client',
                  cmd="ITGSend -Sda 192.168.0.3 -Sdp 9090 -T UDP -a 10.0.0.3 -U 2 20 -z 6000 -s 0.123456 -c 1264 -t 10000000 "
                      "-l {}/sender.log -c 1000".format(statistics_dir))  # uhf
+
 
 # reading trace files
 def get_trace(sta_list, file_, smooth, addrand):
@@ -300,8 +304,6 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
             plot_cmd = ["python3", "{}/plot_statistics_new.py".format(path), "-d", statistics_dir, '-f', trace_file]
         subprocess.Popen(plot_cmd).communicate()
         os.system("chown -R wifi {}".format(path + '/data/statistics/'))
-
-
 
 
 if __name__ == '__main__':
