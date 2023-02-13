@@ -13,7 +13,8 @@ class TraceReader(ABC):
 
 class TraceReaderMobilityPrediction(TraceReader):
     columns = {'time': float, 'x': float, 'y': float, 'state': int,
-               'x_pred': float, 'y_pred': float, 'state_pred': float}
+               'x_pred': float, 'y_pred': float, 'state_pred': float,
+               'dtime': float}
 
     @classmethod
     def read_trace(cls, trace_file: str) -> pd.DataFrame:

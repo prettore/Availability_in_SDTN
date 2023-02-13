@@ -19,6 +19,7 @@ from mn_wifi.telemetry import telemetry
 
 from trace_reader import TraceReaderMobilityPrediction
 from preprocessing_traces_mobility_prediction import get_coord_min_max
+from replay_mobility import CustomMobilityReplayer
 
 # Can be executed for testing and debugging in the mininet wifi VM with:
 # sudo python3 experiment_mobility_prediction.py -m GaussMarkov -p 5 --auto
@@ -85,7 +86,7 @@ def main(scenario: str, prediction_interval: int, disconnect_state: int, reconne
     _, x_max_1, _, y_max_1 = get_coord_min_max(df_trace_sta1)
     _, x_max_3, _, y_max_3 = get_coord_min_max(df_trace_sta3)
     info(f"*** Plot size: max(x)={max(x_max_1, x_max_3) + 100} max(y)={max(y_max_1, y_max_3) + 100}\n")
-    # net.plotGraph(max_x=100, max_y=100)
+    net.plotGraph(max_x={max(x_max_1, x_max_3) + 100}, max_y={max(y_max_1, y_max_3) + 100})
 
     info("*** Starting network\n")
     net.build()
@@ -94,28 +95,30 @@ def main(scenario: str, prediction_interval: int, disconnect_state: int, reconne
     # net.get('s1').start([c0])
     sleep(1)
 
+    info("*** Replaying mobility\n")
     nodes = net.stations
-    info(f"{type(nodes)}\n{nodes}\n")
-    telemetry(nodes=nodes, data_type='position', min_x=0, min_y=0,
-              max_x=max(x_max_1, x_max_3) + 100, max_y=max(y_max_1, y_max_3) + 100)
+    time_factor = 1
+    # replayer = CustomMobilityReplayer(sta1, sta3, df_trace_sta1, df_trace_sta3, statistics_dir, time_factor)
+    # replayer.start_replaying()
+    sleep(5)
 
-    host = "10.0.2.15"
-    port = 12345
-    info(f"*** Starting Socket Server: {host}:{port}\n")
-    net.socketServer(ip=host, port=port)
+    # telemetry(nodes=nodes, data_type='position', min_x=0, min_y=0,
+    #           max_x=max(x_max_1, x_max_3) + 100, max_y=max(y_max_1, y_max_3) + 100)
 
     cmd = f"sudo python {path}/flexible_sdn_mobility_prediction.py"
     cmd += " -i sta1-wlan0"
     cmd += f" -s {statistics_dir}"
     cmd += f" -t {start_time.timestamp()}"
-    cmd += f" -f {path}/data/{scenario}/{scenario}_sta1_{prediction_interval}-sec_pred-results_pp.csv"
+    # cmd += f" -f {replayer.file_a}"
+    cmd += f" -d 0 -r 2"
     makeTerm(sta1, title="Station 1", cmd=cmd + " ; sleep 60")
 
     cmd = f"sudo python {path}/flexible_sdn_mobility_prediction.py"
     cmd += " -i sta3-wlan0"
     cmd += f" -s {statistics_dir}"
     cmd += f" -t {start_time.timestamp()}"
-    cmd += f" -f {path}/data/{scenario}/{scenario}_sta3_{prediction_interval}-sec_pred-results_pp.csv"
+    # cmd += f" -f {replayer.file_b}"
+    cmd += f" -d 0 -r 2"
     makeTerm(sta3, title="Station 3", cmd=cmd + " ; sleep 60")
 
     info("*** Changing the link rate based on node mobility\n")

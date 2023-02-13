@@ -24,15 +24,15 @@ def main(args):
     print(f"min(y) = {y_min}")
     for file, df_trace in df_traces.items():
         dtimes = []
-        start_time = 0
+        df_trace = df_trace.sort_values(by=['time'])
+        start_time = df_trace.loc[0, 'time']
         for idx, row in df_trace.iterrows():
+            df_trace.loc[idx, 'time'] = row['time'] - start_time
             if idx == 0:
-                start_time = row['time']
                 dtimes.append(0)
             else:
-                dtime = row['time'] - df_trace.loc[idx - 1, 'time']
+                dtime = df_trace.loc[idx, 'time'] - df_trace.loc[idx - 1, 'time']
                 dtimes.append(dtime)
-            df_trace.loc[idx, 'time'] = row['time'] - start_time
             df_trace.loc[idx, 'x'] = row['x'] - x_min + 100
             df_trace.loc[idx, 'y'] = row['y'] - y_min + 100
             df_trace.loc[idx, 'x_pred'] = row['x_pred'] - x_min + 100

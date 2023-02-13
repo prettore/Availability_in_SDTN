@@ -4,14 +4,13 @@ import logging
 import argparse
 import subprocess
 import json
-import socket
+import csv
 from datetime import datetime
 
 import pandas as pd
 from time import sleep
 from subprocess import Popen, PIPE
 
-from trace_reader import TraceReaderMobilityPrediction
 from cmd_utils import cmd_iw_dev, cmd_ip_link_set, cmd_ip_link_show
 
 
@@ -20,7 +19,7 @@ log = logging.getLogger('logger')
 
 def main(args: argparse.Namespace):
     statistics_dir = args.statisticsdir
-    df_trace = TraceReaderMobilityPrediction.read_trace(args.tracefile)
+    # df_trace = TraceReaderMobilityPrediction.read_trace(args.tracefile)
 
     print("*** Initial connect to AP")
     cmd_iw_dev(args.interface, "connect", args.apssid)
@@ -43,16 +42,22 @@ def main(args: argparse.Namespace):
         json.dump(parameters, file, indent=4)
 
     controller = FlexibleSdnOlsrControllerNetState(args.interface, args.apssid, args.apbssid, args.apip, args.pingto,
-                                                   args.starttime, qdisc_rates, df_trace, args.realtime)
+                                                   args.starttime, qdisc_rates, args.state_file,
+                                                   args.disconnect_state, args.reconnect_state, args.statisticsdir)
     controller.run_controller()
 
 
 class FlexibleSdnOlsrControllerNetState:
+    columns = {'time': float, 'x': float, 'y': float, 'state': int,
+               'x_pred': float, 'y_pred': float, 'state_pred': float,
+               'dtime': float}
+
     def __init__(self, interface: str, ap_ssid: str, ap_bssid: str, ap_ip: str, pingto: str, start_time: float,
-                 qdisc: dict, trace: pd.DataFrame, realtime: bool = True):
+                 qdisc: dict, state_file: str, disconnect_state: int, reconnect_state: int, statistics_dir: str):
+        self.out_path = statistics_dir
         self.interface = interface
         self.station = interface.split('-')[0]
-        self.connected_to_ap = True
+        self.connected_to_ap = None
         self.pingto = pingto
         self.ap_ssid = ap_ssid
         self.ap_bssid = ap_bssid
@@ -61,39 +66,62 @@ class FlexibleSdnOlsrControllerNetState:
         self.qdisc = qdisc
         self.qdisc.update({'throttled': False})
         self.olsrd_pid = 0
-        self.df_trace = trace
-        self.host = "10.0.2.15"
-        self.port = 12345
-        self.realtime = realtime
+        self.state_file = f"{state_file}"
+        self.state_change_stamp = 0
+        self.disconnect_state = disconnect_state
+        self.reconnect_state = reconnect_state
+        self.current_state = pd.read_csv(self.state_file, dtype=self.columns)
 
         log.info("*** {}: Interface: {}".format(interface.split('-')[0], interface))
-        stdout, stderr = cmd_iw_dev(interface, "link")
+        if self.current_state.loc[0, 'state'] > 0:
+            self.initial_connect_to_ap()
+            self.connected_to_ap = True
+        else:
+            self.initial_connect_to_olsr()
+            self.connected_to_ap = False
+
+    def run_controller(self):
+        while True:
+            sleep(0.1)
+            if self.has_state_changed():
+                df_position_states = pd.read_csv(self.state_file, dtype=self.columns)
+                new_state = df_position_states.tail(1).reset_index().loc[0].to_dict()
+                print(f"*** New state: {new_state}")
+                if self.connected_to_ap and new_state['state_pred'] <= self.disconnect_state:
+                    print("*** Starting OLSRd")
+                    self.log_event('disconnect', 1)
+                    self.switch_to_olsr()
+                    self.connected_to_ap = False
+                    self.log_event('disconnect', 2)
+                    print("*** Reconnected to AP.")
+                if not self.connected_to_ap and new_state['state_pred'] >= self.reconnect_state:
+                    print("*** Reconnecting to AP")
+                    self.log_event('reconnect', 1)
+                    self.reconnect_to_access_point()
+                    self.connected_to_ap = True
+                    self.log_event('reconnect', 2)
+
+    def has_state_changed(self):
+        state_change_stamp = os.stat(self.state_file).st_mtime_ns
+        if state_change_stamp != self.state_change_stamp:
+            return True
+        return False
+
+    def initial_connect_to_ap(self):
+        stdout, stderr = cmd_iw_dev(self.interface, "link")
         print("*** Checking connection to AP...")
-        while b'Connected to ' + ap_bssid.encode() not in stdout:
-            stdout, stderr = cmd_iw_dev(interface, "link")
+        while b'Connected to ' + self.ap_bssid.encode() not in stdout:
+            stdout, stderr = cmd_iw_dev(self.interface, "link")
             print(stdout)
             sleep(0.5)
         print("*** Connected to AP")
-        stdout, stderr = Popen(["ping", "-c1", ap_ip], stdout=PIPE, stderr=PIPE).communicate()
+        stdout, stderr = Popen(["ping", "-c1", self.ap_ip], stdout=PIPE, stderr=PIPE).communicate()
         if self.pingto:
-            Popen(["ping", "-c1", pingto]).communicate()
+            Popen(["ping", "-c1", self.pingto]).communicate()
 
-    def run_controller(self):
-        print("*** Starting mobility")
-        s = socket.socket()
-        print(f"*** Socket server: {self.host}:{self.port}")
-        s.connect((self.host, self.port))
-        for idx, row in self.df_trace.iterrows():
-            if self.realtime:
-                sleep(row['dtime'])
-            else:
-                sleep(0.5 * row['dtime'])
-            message = f"set.{self.station}.setPosition.{row['x']},{row['y']},0"
-            s.send(message.encode('utf-8'))
-            print(f"Sent command: {message}")
-            data = s.recv(1024).decode('utf-8')
-            print(f"Received: {data}")
-        s.close()
+    def initial_connect_to_olsr(self):
+        self.prepare_olsrd(self.interface)
+        self.start_olsrd()
 
     def reconnect_to_access_point(self):
         """
@@ -177,6 +205,25 @@ class FlexibleSdnOlsrControllerNetState:
             log.info("*** {}: Starting olsrd failed".format(self.interface))
             print("*** Starting OLSRd failed!")
 
+    def log_event(self, event: str, value: int):
+        csv_columns = ['time', 'disconnect', 'reconnect', 'scanner_start', 'scanner_stop', 'scan_trigger']
+        data = {k: 0 for k in csv_columns}
+        data.update({'time': datetime.now().timestamp() - self.start_time, event: value})
+        file = self.out_path + self.station + '_events.csv'
+        write_or_append_csv_to_file(data, csv_columns, file)
+
+
+def write_or_append_csv_to_file(data: dict, csv_columns: list, file: str):
+    if os.path.isfile(file):
+        with open(file, 'a') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
+            writer.writerow(data)
+    else:
+        with open(file, 'w') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
+            writer.writeheader()
+            writer.writerow(data)
+
 
 # function to create the qdisc
 def init_qdisc(interface: str, rate: float, rate_unit: str, latency: float = 2.0, latency_unit: str = 's'):
@@ -219,10 +266,12 @@ def parse_args() -> argparse.Namespace:
                         type=int, default=0)
     parser.add_argument("-s", "--statisticsdir", help="Path to save statistics in", type=str, required=True)
     parser.add_argument("-t", "--starttime", help="Timestamp of the start of the experiment as synchronizing reference for measurements", type=float, required=True)
-    parser.add_argument("-f", "--tracefile", help="Trace file CP->Node to update the qdisc rule",
+    parser.add_argument("-f", "--state-file", help="Trace file CP->Node to update the qdisc rule",
                         type=str, required=True)
-    parser.add_argument("-r", "--realtime", action="store_true", default=True,
-                        help="The replay will be in realtime")
+    parser.add_argument("-d", "--disconnect_state", type=int, required=True, default=0,
+                        help="When this state is predicted while connected to AP, then switch to OLSR connection")
+    parser.add_argument("-r", "--reconnect-state", type=int, required=True, default=2,
+                        help="When this state is predicted while connected to OLSR then switch to AP connection")
     parser.add_argument("--no-realtime", dest="realtime", action="store_false",
                         help="The replay will be faster than realtime by factor 2")
     args = parser.parse_args()
