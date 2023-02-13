@@ -71,7 +71,7 @@ def main(scenario: str, prediction_interval: int, disconnect_state: int, reconne
     info("*** Configuring mobility\n")
     df_trace_sta1 = get_trace(scenario, "sta1", prediction_interval)
     df_trace_sta3 = get_trace(scenario, "sta3", prediction_interval)
-    net.isReplaying = True
+    # net.isReplaying = False
 
     info("*** Preparing logs\n")
     start_time = datetime.now()
@@ -83,33 +83,32 @@ def main(scenario: str, prediction_interval: int, disconnect_state: int, reconne
 
     info("*** Creating plot\n")
     # FIXME plot does not work
-    _, x_max_1, _, y_max_1 = get_coord_min_max(df_trace_sta1)
-    _, x_max_3, _, y_max_3 = get_coord_min_max(df_trace_sta3)
-    info(f"*** Plot size: max(x)={max(x_max_1, x_max_3) + 100} max(y)={max(y_max_1, y_max_3) + 100}\n")
-    net.plotGraph(max_x={max(x_max_1, x_max_3) + 100}, max_y={max(y_max_1, y_max_3) + 100})
+    # _, x_max_1, _, y_max_1 = get_coord_min_max(df_trace_sta1)
+    # _, x_max_3, _, y_max_3 = get_coord_min_max(df_trace_sta3)
+    # info(f"*** Plot size: max(x)={max(x_max_1, x_max_3) + 100} max(y)={max(y_max_1, y_max_3) + 100}\n")
+    # net.plotGraph(max_x=5000, max_y=5000)
 
     info("*** Starting network\n")
     net.build()
     c0.start()
     net.get('ap1').start([c0])
     # net.get('s1').start([c0])
-    sleep(1)
+    sleep(10)
 
-    info("*** Replaying mobility\n")
-    nodes = net.stations
-    time_factor = 1
-    # replayer = CustomMobilityReplayer(sta1, sta3, df_trace_sta1, df_trace_sta3, statistics_dir, time_factor)
-    # replayer.start_replaying()
+    info("*** Config replaying mobility\n")
+    time_factor = 10
+    replayer = CustomMobilityReplayer(sta1, sta3, df_trace_sta1, df_trace_sta3, statistics_dir, time_factor)
+    replayer.start_replaying()
     sleep(5)
 
-    # telemetry(nodes=nodes, data_type='position', min_x=0, min_y=0,
-    #           max_x=max(x_max_1, x_max_3) + 100, max_y=max(y_max_1, y_max_3) + 100)
+    telemetry(nodes=[sta1, sta3, ap1], data_type='position', min_x=0, min_y=0,
+              max_x=5000, max_y=5000)
 
     cmd = f"sudo python {path}/flexible_sdn_mobility_prediction.py"
     cmd += " -i sta1-wlan0"
     cmd += f" -s {statistics_dir}"
     cmd += f" -t {start_time.timestamp()}"
-    # cmd += f" -f {replayer.file_a}"
+    cmd += f" -f {replayer.file_a}"
     cmd += f" -d 0 -r 2"
     makeTerm(sta1, title="Station 1", cmd=cmd + " ; sleep 60")
 
@@ -117,7 +116,7 @@ def main(scenario: str, prediction_interval: int, disconnect_state: int, reconne
     cmd += " -i sta3-wlan0"
     cmd += f" -s {statistics_dir}"
     cmd += f" -t {start_time.timestamp()}"
-    # cmd += f" -f {replayer.file_b}"
+    cmd += f" -f {replayer.file_b}"
     cmd += f" -d 0 -r 2"
     makeTerm(sta3, title="Station 3", cmd=cmd + " ; sleep 60")
 

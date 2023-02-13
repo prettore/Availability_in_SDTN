@@ -205,7 +205,7 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
         os.makedirs(statistics_dir)
 
     cmd = "sudo python"
-    cmd += " {}/flexible_sdn.py".format(path)
+    cmd += " {}/flexible_sdn_rssi.py".format(path)
     cmd += " -i sta1-wlan0"
     cmd += " -s {}".format(scan_interval)
     cmd += " -d {}".format(disconnect_threshold)
@@ -220,7 +220,7 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
     makeTerm(sta1, title='Station 1', cmd=cmd + " ; sleep 5")
 
     cmd = "sudo python"
-    cmd += " {}/flexible_sdn.py".format(path)
+    cmd += " {}/flexible_sdn_rssi.py".format(path)
     cmd += " -i sta3-wlan0"
     cmd += " -s {}".format(scan_interval)
     cmd += " -d {}".format(disconnect_threshold)
