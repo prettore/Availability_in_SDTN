@@ -1,3 +1,4 @@
+import csv
 import os
 import argparse
 import socket
@@ -16,9 +17,9 @@ from mn_wifi.link import wmediumd, mesh
 from mn_wifi.wmediumdConnector import interference
 from mininet.node import RemoteController, Controller, OVSKernelSwitch
 from mn_wifi.telemetry import telemetry
+from mn_wifi.node import Node_wifi
 
 from trace_reader import TraceReaderMobilityPrediction
-from preprocessing_traces_mobility_prediction import get_coord_min_max
 from replay_mobility import CustomMobilityReplayer
 
 # Can be executed for testing and debugging in the mininet wifi VM with:
@@ -97,8 +98,12 @@ def main(scenario: str, prediction_interval: int, disconnect_state: int, reconne
 
     info("*** Config replaying mobility\n")
     time_factor = 10
-    replayer = CustomMobilityReplayer(sta1, sta3, df_trace_sta1, df_trace_sta3, statistics_dir, time_factor)
-    replayer.start_replaying()
+    file_sta1 = f"{statistics_dir}/{sta1.name}_position_state.csv"
+    file_sta3 = f"{statistics_dir}/{sta3.name}_position_state.csv"
+    write_or_append_csv_to_file(dict(df_trace_sta1.loc[0].to_dict()), file_sta1)
+    write_or_append_csv_to_file(dict(df_trace_sta3.loc[0].to_dict()), file_sta3)
+    #replayer = CustomMobilityReplayer(sta1, sta3, df_trace_sta1, df_trace_sta3, statistics_dir, time_factor)
+    #replayer.start_replaying()
     sleep(5)
 
     telemetry(nodes=[sta1, sta3, ap1], data_type='position', min_x=0, min_y=0,
@@ -108,7 +113,7 @@ def main(scenario: str, prediction_interval: int, disconnect_state: int, reconne
     cmd += " -i sta1-wlan0"
     cmd += f" -s {statistics_dir}"
     cmd += f" -t {start_time.timestamp()}"
-    cmd += f" -f {replayer.file_a}"
+    cmd += f" -f {file_sta1}"
     cmd += f" -d 0 -r 2"
     makeTerm(sta1, title="Station 1", cmd=cmd + " ; sleep 60")
 
@@ -116,7 +121,7 @@ def main(scenario: str, prediction_interval: int, disconnect_state: int, reconne
     cmd += " -i sta3-wlan0"
     cmd += f" -s {statistics_dir}"
     cmd += f" -t {start_time.timestamp()}"
-    cmd += f" -f {replayer.file_b}"
+    cmd += f" -f {file_sta3}"
     cmd += f" -d 0 -r 2"
     makeTerm(sta3, title="Station 3", cmd=cmd + " ; sleep 60")
 
@@ -125,10 +130,12 @@ def main(scenario: str, prediction_interval: int, disconnect_state: int, reconne
     network_change(path, scenario, prediction_interval, sta1, 'sta1-wlan0',
                    '-latency 2000 -dest 10.0.0.3 -src 10.0.0.1',
                    buffer_size=buffer_size, exp_round=0,
-                   log_dir=statistics_dir, event="sta1_events.csv")
+                   log_dir=statistics_dir, event="sta1_events.csv", time_factor=time_factor)
     sleep(2)
     info("*** Start sending generated packets: sta1 (10.0.0.1) -> sta3 (10.0.0.3)\n")
     user_data_flow(2, sta1, sta3, statistics_dir)
+
+    replay_mobility(sta1, sta3, df_trace_sta1, df_trace_sta3, file_sta1, file_sta3, time_factor)
 
     info("\n*** Running CLI\n")
     CLI(net)
@@ -137,6 +144,11 @@ def main(scenario: str, prediction_interval: int, disconnect_state: int, reconne
     out, err = subprocess.Popen(['pgrep', 'olsrd'], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
     if out:
         subprocess.Popen(['killall', 'olsrd'])
+    subprocess.Popen(["python3", "{}/eval_ditg.py".format(path), "-d", statistics_dir, "-t",
+                      str(start_time.timestamp())]).communicate()
+    plot_cmd = ["python3", "{}/plot_statistics_new.py".format(path), "-d", statistics_dir, '-f', f"{scenario}.csv"]
+    subprocess.Popen(plot_cmd).communicate()
+    os.system("chown -R wifi {}".format(path + '/data/statistics/'))
 
 
 def get_init_positions(scenario: str, prediction_interval: int) -> Tuple[str, str, str]:
@@ -163,19 +175,20 @@ def get_trace(scenario: str, node: str, prediction_interval: int) -> pd.DataFram
 
 
 def network_change(path: str, scenario: str, prediction_interval: int, station1, interface1, extra_arg, buffer_size,
-                   exp_round, log_dir, event, no_manet: bool = False):
+                   exp_round, log_dir, event, no_manet: bool = False, time_factor: float = 1.0):
     trace_file = f"{path}/data/{scenario}/{scenario}_{station1.name}_{prediction_interval}-sec_pred-results_pp.csv"
     trace_manet_file = f"{path}/data/{scenario}/{scenario}_{station1.name}_{prediction_interval}-sec_pred-results_NtoN.csv"
     # adding TC and NetEm rule
     if not no_manet:  # using olsr
         makeTerm(station1, title='Changing the network - ' + interface1,
                  cmd="python change_link_mobility_prediction.py -i " + interface1 + " -qlen " + str(
-                     buffer_size) + " " + extra_arg + " -t '" + trace_file + "' -t2 '" + trace_manet_file + "' -e " +
-                     log_dir + event + " ; sleep 20")
+                     buffer_size) + " " + extra_arg + " -t '" + trace_file + "' -t2 '" + trace_manet_file + " -f " +
+                     str(time_factor) + "' -e " + log_dir + event + " ; sleep 20")
     else:  # no olsr
         makeTerm(station1, title='Changing the network - ' + interface1,
                  cmd="python change_link_mobility_prediction.py -i " + interface1 + " -qlen " + str(
-                     buffer_size) + " " + extra_arg + " -t '" + trace_file + "'" + " ; sleep 20")
+                     buffer_size) + " " + extra_arg + " -t '" + trace_file + " -f " + str(time_factor) +
+                     "'" + " ; sleep 20")
         # print("python change_link.py -i " + interface1 + " -qlen " + str(
         #             buffer_size) + " " + extra_arg + " -t '" + trace + "'")
     sleep(2)
@@ -226,10 +239,34 @@ def user_data_flow(scenario, station1, station2, statistics_dir):
         #              "-l {}/sender.log -c 1000".format(statistics_dir))  # uhf
 
 
+def replay_mobility(node_a: Node_wifi, node_b: Node_wifi, trace_a: pd.DataFrame, trace_b: pd.DataFrame, file_a: str,
+                    file_b: str, time_factor: float = 1.0):
+    for row_a, row_b in zip(trace_a.iterrows(), trace_b.iterrows()):
+        i, row_a = row_a
+        j, row_b = row_b
+        sleep(row_a['dtime'] * (1/time_factor))
+        node_a.setPosition(f"{row_a['x']},{row_a['y']},0")
+        node_b.setPosition(f"{row_b['x']},{row_b['y']},0")
+        write_or_append_csv_to_file(dict(row_a.to_dict()), file_a)
+        write_or_append_csv_to_file(dict(row_b.to_dict()), file_b)
+
+
+def write_or_append_csv_to_file(data: dict, file: str):
+    columns = ["time", "x", "y", "state", "x_pred", "y_pred", "state_pred", "dtime"]
+    if os.path.isfile(file):
+        with open(file, 'a') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=columns)
+            writer.writerow(data)
+    else:
+        with open(file, 'w') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=columns)
+            writer.writeheader()
+            writer.writerow(data)
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Tactical network experiment!")
     parser.add_argument("-m", "--mobilityScenario", type=str, required=False, default=1,
-                        help="Name of the scenario (the trace file has to have this as filename)")
+                        help="Name of the scenario (the trace files have to have this as filename)")
     parser.add_argument("-p", "--predictionInterval", type=int, required=True,
                         help="Time in seconds how far into the future the model predicts "
                              "the network state in the given scenario")

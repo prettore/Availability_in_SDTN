@@ -37,8 +37,9 @@ def get_event(file_):
 
     return event
 
+
 # reading trace files
-def get_trace(node, file_):
+def get_trace(node, file_, time_factor: float = 1.0):
     df_trace = pd.read_csv(file_)
     df_trace['node'] = df_trace['node'].astype(int)
     trace_node = df_trace.groupby('node')
@@ -53,11 +54,12 @@ def get_trace(node, file_):
                 t_1 = float(trace.loc[line, "time"])
                 if line == 1:
                     state.append(int(float(trace.loc[line-1, "state"])))
-                    state_interval.append(t_1 - t)
+                    state_interval.append((t_1 - t) * 1/time_factor)
                 state.append(int(float(trace.loc[line, "state"])))
-                state_interval.append(t_1 - t)
+                state_interval.append((t_1 - t) * 1/time_factor)
 
     return state, state_interval
+
 
 # function to create the qdisc
 def setting_initial_rules(interface_arg, rate_arg, latency_arg, dest_ip, src_ip, queue_size):
@@ -99,6 +101,7 @@ def setting_initial_rules(interface_arg, rate_arg, latency_arg, dest_ip, src_ip,
          shell=True)  # ceil 9600bit
     call('tc qdisc add dev ' + interface_arg + ' parent 1:2 handle 2: netem delay ' + latency_arg + 'ms limit ' + str(queue_size), shell=True)
 
+
 # fuction to raplace the qdisc rules
 def update_rules(interface_arg, latency_arg, dest_ip, src_ip, states, time_interval, queue_size):
     # datarate_dic = dict([(5, "9600"),
@@ -110,7 +113,7 @@ def update_rules(interface_arg, latency_arg, dest_ip, src_ip, states, time_inter
                          (3, "60000"),
                          (2, "30000"),
                          (1, "15000"),
-                         (0,"Previous")])
+                         (0, "Previous")])
 
     print('***Starting ever-changing network***')
 
@@ -141,6 +144,7 @@ def update_rules(interface_arg, latency_arg, dest_ip, src_ip, states, time_inter
                      str(datarate_dic[states[i]]) + 'bit ', shell=True)
                 sleep(time_interval[i])
 
+
 # function to replace the qdisc rules
 def update_rules_two_networks(interface_arg, latency_arg, dest_ip, src_ip, states, states2, time_interval, time_interval2, queue_size,eventFile):
     # datarate_dic = dict([(5, "9600"),
@@ -152,7 +156,7 @@ def update_rules_two_networks(interface_arg, latency_arg, dest_ip, src_ip, state
                          (3, "60000"),
                          (2, "30000"),
                          (1, "15000"),
-                         (0,"Previous")])
+                         (0, "Previous")])
 
     print('***Starting ever-changing network***')
 
@@ -225,6 +229,8 @@ if __name__ == '__main__':
                         required=True)
     parser.add_argument("-t", "--traceFile", help="Trace file CP->Node to update the qdisc rule", type=str, required=False)
     parser.add_argument("-t2", "--traceFile2", help="Trace file Node->Node to update the qdisc rule", type=str, required=False)
+    parser.add_argument("-f", "--time-factor", type=float, required=True, default=1.0,
+                        help="Set time factor higher than 1.0 for replaying faster than real time (default: 1.0)")
     parser.add_argument("-e", "--eventFile", help="File reporting the events of handover", type=str,
                         required=False)
 
@@ -235,13 +241,14 @@ if __name__ == '__main__':
 
     if args.eventFile == '':
         if args.interface and args.latency and args.dest and args.src and args.traceFile and args.qlen:
-            states, state_interval = get_trace(0, path + args.traceFile)
+            states, state_interval = get_trace(0, path + args.traceFile, time_factor=args.time_factor)
             update_rules(args.interface, args.latency, args.dest, args.src, states, state_interval, args.qlen)
     else:
         if args.interface and args.latency and args.dest and args.src and args.traceFile and args.traceFile2 and args.qlen and args.eventFile:
             states, state_interval = get_trace(0, path + args.traceFile)
             states2, state_interval2 = get_trace(0, path + args.traceFile2)
 
-            update_rules_two_networks(args.interface, args.latency, args.dest, args.src, states, states2, state_interval, state_interval2, args.qlen, args.eventFile)
+            update_rules_two_networks(args.interface, args.latency, args.dest, args.src, states, states2,
+                                      state_interval, state_interval2, args.qlen, args.eventFile)
 
 

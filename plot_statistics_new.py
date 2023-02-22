@@ -49,15 +49,15 @@ def main(data_path, show, noOlsr, file_name, short):
     signal_columns = ["time", "SSID", "signal", "signal_avg", "rx_bitrate", "tx_bitrate"]
     events_columns = ['time', 'disconnect', 'reconnect', 'scanner_start', 'scanner_stop', 'scan_trigger']
 
-    df_signal_send = pd.read_csv(send_signal_file, sep=',')
-    df_signal_recv = pd.read_csv(recv_signal_file, sep=',')
+    # df_signal_send = pd.read_csv(send_signal_file, sep=',')
+    # df_signal_recv = pd.read_csv(recv_signal_file, sep=',')
 
-    df_signal_send = df_signal_send[signal_columns]
-    df_signal_recv = df_signal_recv[signal_columns]
+    # df_signal_send = df_signal_send[signal_columns]
+    # df_signal_recv = df_signal_recv[signal_columns]
 
     df_time_series['time'] = df_time_series['time'].apply(lambda x: x / 60)
-    df_signal_send['time'] = df_signal_send['time'].apply(lambda x: x / 60)
-    df_signal_recv['time'] = df_signal_recv['time'].apply(lambda x: x / 60)
+    # df_signal_send['time'] = df_signal_send['time'].apply(lambda x: x / 60)
+    # df_signal_recv['time'] = df_signal_recv['time'].apply(lambda x: x / 60)
     df_sender_buffer['buffer_timestamp'] = df_sender_buffer['buffer_timestamp'].apply(lambda x: x / 60)
 
     if os.path.isfile(send_events_file):
@@ -121,10 +121,10 @@ def main(data_path, show, noOlsr, file_name, short):
     # fig, ax = plt.subplots(6, 1, sharex='col', gridspec_kw={'hspace': 0.0, 'wspace': 0}, tight_layout=True)
     # fig.set_size_inches(6, 5)
 
-    line0 = ax[0].plot(df_signal_send['time'], df_signal_send['signal'], marker='v',  # label='Sender',
-                       color='tab:blue', linewidth=0, markersize=0.5)
-    line01 = ax[0].plot(df_signal_send['time'], df_signal_send['signal_avg'], label='Sender',
-                        marker=',', color='tab:blue')
+    # line0 = ax[0].plot(df_signal_send['time'], df_signal_send['signal'], marker='v',  # label='Sender',
+    #                    color='tab:blue', linewidth=0, markersize=0.5)
+    # line01 = ax[0].plot(df_signal_send['time'], df_signal_send['signal_avg'], label='Sender',
+    #                     marker=',', color='tab:blue')
 
     if os.path.isfile(send_events_file):
         for i, j in send_disconnect:
@@ -167,10 +167,10 @@ def main(data_path, show, noOlsr, file_name, short):
                                # bbox=dict(boxstyle="round", fc="0.8"),
                                arrowprops=dict(arrowstyle="->", color='#006ab5'))
 
-    line02 = ax[0].plot(df_signal_recv['time'], df_signal_recv['signal'], marker='x',  # label='Receiver',
-                        color='tab:orange', linewidth=0, markersize=0.5)
-    line03 = ax[0].plot(df_signal_recv['time'], df_signal_recv['signal_avg'], label='Receiver',
-                        marker=',', color='tab:orange', linestyle='dashed')
+    # line02 = ax[0].plot(df_signal_recv['time'], df_signal_recv['signal'], marker='x',  # label='Receiver',
+    #                     color='tab:orange', linewidth=0, markersize=0.5)
+    # line03 = ax[0].plot(df_signal_recv['time'], df_signal_recv['signal_avg'], label='Receiver',
+    #                     marker=',', color='tab:orange', linestyle='dashed')
 
     if os.path.isfile(send_events_file):
         for i, j in recv_disconnect:
