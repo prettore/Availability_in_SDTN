@@ -5,7 +5,9 @@ import argparse
 import subprocess
 import json
 import csv
+from collections import deque
 from datetime import datetime
+from typing import Optional
 
 import pandas as pd
 from time import sleep
@@ -41,9 +43,9 @@ def main(args: argparse.Namespace):
     with open(statistics_dir + args.interface.split('-')[0] + '_start-params.json', 'w') as file:
         json.dump(parameters, file, indent=4)
 
-    controller = FlexibleSdnOlsrControllerNetState(args.interface, args.apssid, args.apbssid, args.apip, args.pingto,
+    controller = FlexibleSdnOlsrControllerNetState(args.interface, args.ip, args.apssid, args.apbssid, args.apip, args.pingto,
                                                    args.starttime, qdisc_rates, args.state_file,
-                                                   args.disconnect_state, args.reconnect_state, args.statisticsdir)
+                                                   args.disconnect_threshold, args.reconnect_threshold, args.statisticsdir)
     controller.run_controller()
 
 
@@ -52,10 +54,11 @@ class FlexibleSdnOlsrControllerNetState:
                'x_pred': float, 'y_pred': float, 'state_pred': float,
                'dtime': float}
 
-    def __init__(self, interface: str, ap_ssid: str, ap_bssid: str, ap_ip: str, pingto: str, start_time: float,
-                 qdisc: dict, state_file: str, disconnect_state: int, reconnect_state: int, statistics_dir: str):
+    def __init__(self, interface: str, ip: str, ap_ssid: str, ap_bssid: str, ap_ip: str, pingto: str, start_time: float,
+                 qdisc: dict, state_file: str, disconnect_threshold: float, reconnect_threshold: float, statistics_dir: str):
         self.out_path = statistics_dir
         self.interface = interface
+        self.ip = ip
         self.station = interface.split('-')[0]
         self.connected_to_ap = None
         self.pingto = pingto
@@ -68,12 +71,14 @@ class FlexibleSdnOlsrControllerNetState:
         self.olsrd_pid = 0
         self.state_file = f"{state_file}"
         self.state_change_stamp = 0
-        self.disconnect_state = disconnect_state
-        self.reconnect_state = reconnect_state
-        self.current_state = pd.read_csv(self.state_file, dtype=self.columns)
+        self.disconnect_threshold = disconnect_threshold
+        self.reconnect_threshold = reconnect_threshold
+        self.window_size = 10
+        self.sliding_window = deque(maxlen=self.window_size)
+        self.current_state = pd.read_csv(self.state_file, dtype=self.columns).tail(1).reset_index().loc[0].to_dict()
 
         log.info("*** {}: Interface: {}".format(interface.split('-')[0], interface))
-        if self.current_state.loc[0, 'state'] > 0:
+        if self.current_state['state'] > 1:
             self.initial_connect_to_ap()
             self.connected_to_ap = True
         else:
@@ -83,31 +88,41 @@ class FlexibleSdnOlsrControllerNetState:
     def run_controller(self):
         while True:
             sleep(0.1)
-            if self.has_state_changed():
-                df_position_states = pd.read_csv(self.state_file, dtype=self.columns)
-                new_state = df_position_states.tail(1).reset_index().loc[0].to_dict()
-                print(f"*** New state: {new_state}")
-                if self.connected_to_ap and new_state['state_pred'] <= self.disconnect_state:
+            new_state = self.has_state_changed()
+            if new_state is not None:
+                self.sliding_window.append(new_state['state_pred'])
+                if self.connected_to_ap:
+                    net_status = "AP"
+                else:
+                    net_status = "MANET"
+                print(f"*** New state: {new_state} - {net_status}")
+                if self.connected_to_ap and (sum(self.sliding_window) / len(self.sliding_window)) <= self.disconnect_threshold:
                     print("*** Starting OLSRd")
                     self.log_event('disconnect', 1)
                     self.switch_to_olsr()
                     self.connected_to_ap = False
                     self.log_event('disconnect', 2)
                     print("*** Reconnected to AP.")
-                if not self.connected_to_ap and new_state['state_pred'] >= self.reconnect_state:
+                if not self.connected_to_ap and (sum(self.sliding_window) / len(self.sliding_window)) > self.reconnect_threshold:
                     print("*** Reconnecting to AP")
                     self.log_event('reconnect', 1)
                     self.reconnect_to_access_point()
                     self.connected_to_ap = True
                     self.log_event('reconnect', 2)
 
-    def has_state_changed(self):
+    def has_state_changed(self) -> Optional[dict]:
         state_change_stamp = os.stat(self.state_file).st_mtime_ns
         if state_change_stamp != self.state_change_stamp:
-            return True
-        return False
+            new_state = pd.read_csv(self.state_file, dtype=self.columns).tail(1).reset_index().loc[0].to_dict()
+            if new_state != self.current_state:
+                return new_state
+        return None
 
     def initial_connect_to_ap(self):
+        log.info(f"*** {self.interface}: Initially connecting to AP {self.ap_ssid} ...")
+        stdout, stderr = cmd_iw_dev(self.interface, "connect", self.ap_ssid)
+        stdout, stderr = subprocess.Popen(["ifconfig", self.interface, self.ip, "netmask", "255.255.255.0"], stdout=PIPE,
+                                          stderr=PIPE).communicate()
         stdout, stderr = cmd_iw_dev(self.interface, "link")
         print("*** Checking connection to AP...")
         while b'Connected to ' + self.ap_bssid.encode() not in stdout:
@@ -115,6 +130,7 @@ class FlexibleSdnOlsrControllerNetState:
             print(stdout)
             sleep(0.5)
         print("*** Connected to AP")
+        log.info(f"*** {self.interface}: Initial connection to AP successfull")
         stdout, stderr = Popen(["ping", "-c1", self.ap_ip], stdout=PIPE, stderr=PIPE).communicate()
         if self.pingto:
             Popen(["ping", "-c1", self.pingto]).communicate()
@@ -133,13 +149,21 @@ class FlexibleSdnOlsrControllerNetState:
             self.qdisc.update({'throttled': True})
         # Rettore
         if self.olsrd_pid > 0:# and not self.no_olsr:
-            log.info("*** {}: OLSR runnning: Killing olsrd process (PID: {})".format(self.interface, self.olsrd_pid))
+            log.info(f"*** {self.interface}: OLSR runnning: Killing olsrd process (PID: {self.olsrd_pid})")
             self.stop_olsrd()
-        stdout, stderr = cmd_iw_dev(self.interface, "connect", self.ap_ssid)
-        stdout, stderr = cmd_iw_dev(self.interface, "link")
-        while b'Connected to ' + self.ap_bssid.encode() not in stdout:
-            stdout, stderr = cmd_iw_dev(self.interface, "link")
-        log.info("*** {}: Connected interface to {}".format(self.interface, self.ap_ssid))
+        log.info(f"*** {self.interface}: Connecting to AP {self.ap_ssid} ...")
+        connection_successfull = False
+        while not connection_successfull:
+            stdout, stderr = cmd_iw_dev(self.interface, "connect", self.ap_ssid)
+            for i in range(10):
+                sleep(0.1)
+                stdout, stderr = subprocess.Popen(["ifconfig", self.interface, self.ip, "netmask", "255.255.255.0"],
+                                                  stdout=PIPE, stderr=PIPE).communicate()
+                stdout, stderr = cmd_iw_dev(self.interface, "link")
+                if b'Connected to ' + self.ap_bssid.encode() not in stdout:
+                    connection_successfull = True
+                    break
+        log.info(f"*** {self.interface}: Connected interface to {self.ap_ssid}")
         if self.qdisc['reconnect'] > 0:
             update_qdisc(self.interface, self.qdisc['standard'], self.qdisc['std_unit'])
             self.qdisc.update({'throttled': False})
@@ -149,11 +173,11 @@ class FlexibleSdnOlsrControllerNetState:
         Stops OLSR and configures the wifi interface for a reconnection to the AP.
         """
         os.kill(self.olsrd_pid, signal.SIGTERM)
-        log.info("*** {}: Killed given olsrd process (PID: {})".format(self.interface, self.olsrd_pid))
+        log.info(f"*** {self.interface}: Killed given olsrd process (PID: {self.olsrd_pid})")
         stdout, stderr = cmd_iw_dev(self.interface, "ibss", "leave")
-        log.info("*** {}: IBSS leave completed".format(self.interface))
+        log.info(f"*** {self.interface}: IBSS leave completed")
         stdout, stderr = cmd_iw_dev(self.interface, "set", "type", "managed")
-        log.info("*** {}: Set type to managed".format(self.interface))
+        log.info(f"*** {self.interface}: Set type to managed")
         self.olsrd_pid = 0
 
     def switch_to_olsr(self):
@@ -164,7 +188,9 @@ class FlexibleSdnOlsrControllerNetState:
         if self.qdisc['disconnect'] > 0 and not self.qdisc['throttled']:
             update_qdisc(self.interface, self.qdisc['disconnect'], self.qdisc['throttle_unit'])
             self.qdisc.update({'throttled': True})
+        log.info(f"*** {self.interface}: Preparing OLSR connection ...")
         self.prepare_olsrd(self.interface)
+        log.info(f"*** {self.interface}: Connecting to MANET ...")
         self.start_olsrd()
         if self.qdisc['disconnect'] > 0:
             update_qdisc(self.interface, self.qdisc['standard'], self.qdisc['std_unit'])
@@ -176,12 +202,12 @@ class FlexibleSdnOlsrControllerNetState:
         """
         ibss = {'ssid': 'adhocNet', 'freq': '2432', 'ht_cap': 'HT40+', 'bssid': '02:CA:FF:EE:BA:01'}
         stdout, stderr = cmd_iw_dev(interface, "set", "type", "ibss")
-        log.info("*** {}: Set type to ibss".format(interface))
-        stdout, stderr = cmd_ip_link_set(interface, "up")
-        log.info("*** {}: Set ip link up".format(interface))
-        stdout, stderr = cmd_iw_dev(interface, "ibss", "join", ibss['ssid'], ibss['freq'], ibss['ht_cap'],
+        log.info(f"*** {self.interface}: Set type to ibss")
+        stdout, stderr = cmd_ip_link_set(self.interface, "up")
+        log.info(f"*** {self.interface}: Set ip link up")
+        stdout, stderr = cmd_iw_dev(self.interface, "ibss", "join", ibss['ssid'], ibss['freq'], ibss['ht_cap'],
                                     ibss['bssid'])
-        log.info("*** {}: Join ibss adhocNet".format(interface))
+        log.info(f"*** {self.interface}: Join ibss adhocNet")
 
     def start_olsrd(self):
         """
@@ -194,15 +220,15 @@ class FlexibleSdnOlsrControllerNetState:
         stdout, stderr = cmd_ip_link_show(self.interface)
         while b'state DOWN' in stdout:
             stdout, stderr = cmd_ip_link_show(self.interface)
-        log.info("*** {}: Starting OLSR".format(self.interface))
+        log.info(f"*** {self.interface}: Starting OLSR")
         stdout, stderr = Popen(["olsrd", "-f", configfile, "-d", "0"], stdout=PIPE, stderr=PIPE).communicate()
         stdout, stderr = Popen("pgrep -a olsrd | grep " + self.interface, shell=True, stdout=PIPE, stderr=PIPE).communicate()
         if stdout:
             self.olsrd_pid = int(stdout.split()[0])
-            log.info("*** {}: Started olsrd in the background (PID: )".format(self.interface, self.olsrd_pid))
-            print("*** OLSRd running (PID: {})".format(self.olsrd_pid))
+            log.info(f"*** {self.interface}: Started olsrd in the background (PID: {self.olsrd_pid})")
+            print(f"*** OLSRd running (PID: {self.olsrd_pid})")
         else:
-            log.info("*** {}: Starting olsrd failed".format(self.interface))
+            log.info(f"*** {self.interface}: Starting olsrd failed")
             print("*** Starting OLSRd failed!")
 
     def log_event(self, event: str, value: int):
@@ -268,12 +294,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("-t", "--starttime", help="Timestamp of the start of the experiment as synchronizing reference for measurements", type=float, required=True)
     parser.add_argument("-f", "--state-file", help="Trace file CP->Node to update the qdisc rule",
                         type=str, required=True)
-    parser.add_argument("-d", "--disconnect_state", type=int, required=True, default=0,
+    parser.add_argument("-w", "--window-size", type=int, required=True, default=10,
+                        help="Size of the sliding window to average out the predicted state outliers (default: 10)")
+    parser.add_argument("-d", "--disconnect-threshold", type=float, required=True, default=0,
                         help="When this state is predicted while connected to AP, then switch to OLSR connection")
-    parser.add_argument("-r", "--reconnect-state", type=int, required=True, default=2,
+    parser.add_argument("-r", "--reconnect-threshold", type=float, required=True, default=2,
                         help="When this state is predicted while connected to OLSR then switch to AP connection")
     parser.add_argument("--no-realtime", dest="realtime", action="store_false",
                         help="The replay will be faster than realtime by factor 2")
+    parser.add_argument("--ip", type=str, required=True)
     args = parser.parse_args()
     return args
 

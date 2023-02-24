@@ -17,24 +17,20 @@ from datetime import datetime
 
 
 def get_event(file_):
-
-    global event
-
+    event = ''
     if os.path.isfile(file_):
         df_event = pd.read_csv(file_)
-
-        df_event_tail = df_event.tail(5)
-
-        disconnection = df_event_tail['disconnect'].sum()
-        reconnection = df_event_tail['reconnect'].sum()
-
-        if disconnection > 0:
-            event = 'disconnect'
-        elif reconnection > 0:
-            event = 'reconnect'
-    else:
-        event = ''
-
+        for i in range(1, min(5, len(df_event)+1)):
+            try:
+                row = df_event.iloc[-i]
+            except IndexError:
+                break
+            if row['disconnect'] > 0 and row['reconnect'] == 0:
+                event = 'disconnect'
+                break
+            elif row['disconnect'] == 0 and row['reconnect'] > 0:
+                event = 'reconnect'
+                break
     return event
 
 
@@ -54,9 +50,11 @@ def get_trace(node, file_, time_factor: float = 1.0):
                 t_1 = float(trace.loc[line, "time"])
                 if line == 1:
                     state.append(int(float(trace.loc[line-1, "state"])))
-                    state_interval.append((t_1 - t) * 1/time_factor)
+                    state_interval.append((t_1 - t))
+                    # state_interval.append((t_1 - t) * 1/time_factor)
                 state.append(int(float(trace.loc[line, "state"])))
-                state_interval.append((t_1 - t) * 1/time_factor)
+                state_interval.append((t_1 - t))
+                # state_interval.append((t_1 - t) * 1/time_factor)
 
     return state, state_interval
 
@@ -235,6 +233,7 @@ if __name__ == '__main__':
                         required=False)
 
     args = parser.parse_args()
+    sleep(2)
 
     if args.interface and args.rate and args.latency and args.dest and args.src and args.qlen:
         setting_initial_rules(args.interface, args.rate, args.latency, args.dest, args.src, args.qlen)

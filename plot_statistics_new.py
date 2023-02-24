@@ -1,6 +1,5 @@
 import argparse
 import os
-from datetime import datetime
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -32,11 +31,6 @@ def main(data_path, show, noOlsr, file_name, short):
     # converting bitrate to Kbit rate
     df_time_series['bitrate'] = df_time_series['bitrate'].apply(lambda x: x / 1000)
 
-    # starting from time 0
-    df_time_series['time'] = df_time_series['time'].apply(lambda x: x - df_time_series['time'].iloc[0])
-
-    df_sender_buffer['buffer_timestamp'] = range(0, len(df_sender_buffer), 1)
-
     df_packet_loss_peaks = df_time_series[
         (df_time_series.packet_loss > 0) & (df_time_series.packet_loss.shift(-1) == 0)].append(
         df_time_series.tail(1)[df_time_series.tail(1).packet_loss > 0])
@@ -54,11 +48,27 @@ def main(data_path, show, noOlsr, file_name, short):
 
     # df_signal_send = df_signal_send[signal_columns]
     # df_signal_recv = df_signal_recv[signal_columns]
+    pos_state_columns = {'time': float, 'x': float, 'y': float, 'state': int, 'x_pred': float, 'y_pred': float,
+                         'state_pred': int, 'dtime': float}
+    send_pos_state_file = data_path + "sta1_position_state.csv"
+    recv_pos_state_file = data_path + "sta3_position_state.csv"
+    df_pos_state_send = pd.read_csv(send_pos_state_file, dtype=pos_state_columns).drop(0)
+    df_pos_state_recv = pd.read_csv(recv_pos_state_file, dtype=pos_state_columns).drop(0)
+    df_pos_state_send['time'] = df_pos_state_send['time'].apply(lambda x: x / 60)
+    df_pos_state_recv['time'] = df_pos_state_recv['time'].apply(lambda x: x / 60)
 
     df_time_series['time'] = df_time_series['time'].apply(lambda x: x / 60)
     # df_signal_send['time'] = df_signal_send['time'].apply(lambda x: x / 60)
     # df_signal_recv['time'] = df_signal_recv['time'].apply(lambda x: x / 60)
     df_sender_buffer['buffer_timestamp'] = df_sender_buffer['buffer_timestamp'].apply(lambda x: x / 60)
+
+    # starting from time 0
+    min_time = min([min(df_time_series['time']), min(df_sender_buffer['buffer_timestamp']),
+                    min(df_pos_state_send['time']), min(df_pos_state_recv['time'])])
+    df_pos_state_send['time'] = df_pos_state_send['time'].apply(lambda x: x - min_time)
+    df_pos_state_recv['time'] = df_pos_state_recv['time'].apply(lambda x: x - min_time)
+    df_time_series['time'] = df_time_series['time'].apply(lambda x: x - min_time)
+    df_sender_buffer['buffer_timestamp'] = df_sender_buffer['buffer_timestamp'].apply(lambda x: x - min_time)
 
     if os.path.isfile(send_events_file):
 
@@ -70,6 +80,8 @@ def main(data_path, show, noOlsr, file_name, short):
 
         df_events_send['time'] = df_events_send['time'].apply(lambda x: x / 60)
         df_events_recv['time'] = df_events_recv['time'].apply(lambda x: x / 60)
+        df_events_send['time'] = df_events_send['time'].apply(lambda x: x - min_time)
+        df_events_recv['time'] = df_events_recv['time'].apply(lambda x: x - min_time)
 
         send_disconnect_start = []
         send_disconnect_stop = []
@@ -125,6 +137,9 @@ def main(data_path, show, noOlsr, file_name, short):
     #                    color='tab:blue', linewidth=0, markersize=0.5)
     # line01 = ax[0].plot(df_signal_send['time'], df_signal_send['signal_avg'], label='Sender',
     #                     marker=',', color='tab:blue')
+    line0 = ax[0].plot(df_pos_state_send['time'], df_pos_state_send['state'], color='tab:blue', label='Sender')
+    line01 = ax[0].plot(df_pos_state_recv['time'], df_pos_state_recv['state'], color='tab:orange', linestyle='dashed',
+                        label='Receiver')
 
     if os.path.isfile(send_events_file):
         for i, j in send_disconnect:
@@ -216,7 +231,7 @@ def main(data_path, show, noOlsr, file_name, short):
     # ax[0].set_xlabel("Time (seconds)")
     # ax[0].set_xlabel("Time (min)")
     # ax[0].set_ylabel("RSSI of AP (dBm)")
-    ax[0].set_ylabel("CP RSSI\n(dBm)")
+    ax[0].set_ylabel("NetState\n")
     # ax_top = ax[0].twiny()
     # ax[0].legend(loc='upper center')#'upper center')
     ax[0].legend(bbox_to_anchor=(0., 1.02, 1., .102), loc='lower center', columnspacing=0.5, borderaxespad=0.,
@@ -385,6 +400,7 @@ if __name__ == '__main__':
     parser.add_argument("-short", "--short", help="Short plot removes latency and jitter metrics (default: False)",
                         action='store_true', default=True, required=False)
     parser.add_argument("-f", "--fileName", help="File name for the plots", type=str, required=True)
+    # parser.add_argument("-t", "--start-timestamp", type=float, required=True)
 
     args = parser.parse_args()
     path = args.directory

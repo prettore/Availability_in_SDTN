@@ -111,7 +111,7 @@ def qdiscLog(interface_arg):
         pass
 
 
-def bufferLog(interface_arg, buffer_size, file, ex_round):
+def bufferLog(interface_arg, buffer_size, file, ex_round, start_time: float):
     buffer_columns = ['buffer_timestamp', 'data_throughput', 'pr4g_queue_occupancy', 'round']
 
     try:
@@ -143,7 +143,7 @@ def bufferLog(interface_arg, buffer_size, file, ex_round):
             if "htb" == rule['kind']:
                 queue_len = int(rule['qlen'])
 
-                buffer_data_dict['buffer_timestamp'] = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+                buffer_data_dict['buffer_timestamp'] = datetime.now().timestamp() - start_time
                 buffer_data_dict['data_throughput'] = rate_str.replace('bit', '')
                 buffer_data_dict['pr4g_queue_occupancy'] = round(
                     float(rule['qlen']) / float(buffer_size) * 100, 2)
@@ -193,14 +193,16 @@ if __name__ == '__main__':
                         required=False)
     parser.add_argument("-r", "--expRound", help="The experiment round. Used to compute standard error and confidence "
                                                  "interval", type=str, default='0')
-
+    parser.add_argument("-t", "--start-time",
+                        help="Timestamp of the start of the experiment as synchronizing reference for measurements",
+                        type=float, required=True)
     args = parser.parse_args()
     has_packet = True
 
     if args.interface and args.outputFile:
         while has_packet:
             #bufferLog(args.interface, args.queuelen, path + 'data/statistics/' + str(args.outputFile), args.expRound)
-            bufferLog(args.interface, args.queuelen, str(args.outputFile), args.expRound)
+            bufferLog(args.interface, args.queuelen, str(args.outputFile), args.expRound, args.start_time)
             sleep(1)
     elif args.interface:
         while has_packet:

@@ -6,7 +6,7 @@ import pandas as pd
 from datetime import datetime
 
 
-def main(data_path: str, start_time: float):
+def main(data_path: str, start_time: float, time_shift: float = 0.0):
     subprocess.Popen(["ITGDec", "{}/sender.log".format(data_path), "-o", "{}/ditg-packets-send.csv".format(data_path)]).communicate()
     subprocess.Popen(["ITGDec", "{}/receiver.log".format(data_path), "-o", "{}/ditg-packets-recv.csv".format(data_path)]).communicate()
     print("\n\n")
@@ -19,8 +19,8 @@ def main(data_path: str, start_time: float):
     df_packets_send = pd.read_csv(ditg_packets_send, sep=' ', header=None, names=packets_columns, skipinitialspace=True)
     df_packets_recv = pd.read_csv(ditg_packets_recv, sep=' ', header=None, names=packets_columns, skipinitialspace=True)
 
-    df_packets_send = time_columns_to_timestamp(df_packets_send)
-    df_packets_recv = time_columns_to_timestamp(df_packets_recv)
+    df_packets_send = time_columns_to_timestamp(df_packets_send, start_time=start_time, time_shift=time_shift)
+    df_packets_recv = time_columns_to_timestamp(df_packets_recv, start_time=start_time, time_shift=time_shift)
     print("*** Eval: Packets send: {}".format(len(df_packets_send['packet_id'])))
     # print(df_packets_send.head(10))
     print("*** Eval: Packets recv: {}".format(len(df_packets_recv['packet_id'])))
@@ -121,6 +121,7 @@ def main(data_path: str, start_time: float):
     df_summary.to_csv(data_path + 'summary.csv', index=False)
     df_time_series.to_csv(data_path + 'metrics_time_series.csv', index=False)
 
+
 # computing the bit rate
 def computing_bit_rate(df,column_time,column_pct_len,window):
     bit_rate_dict = {}
@@ -163,20 +164,19 @@ def computing_bit_rate(df,column_time,column_pct_len,window):
 
     return bits_received_second
 
-def time_columns_to_timestamp(df: pd.DataFrame, today: datetime = None):
-    if not today:
-        today = datetime.today()
+
+def time_columns_to_timestamp(df: pd.DataFrame, start_time: float, time_shift: float):
     columns = ['packet_id', 'time_tx', 'time_rx', 'packet_length']
     df_new = pd.DataFrame(columns=columns)
     df_new['packet_id'] = df['packet_id']
     df_new['packet_length'] = df['packet_length']
     df_new['time_tx'] = df.apply(
-        lambda r: today.replace(
-            hour=2, minute=0, second=0, microsecond=0).timestamp() + (r['hour_tx'] * 3600 + r['min_tx'] * 60 + r['sec_tx']),
+        lambda r: datetime.fromtimestamp(start_time).replace(
+            hour=0, minute=0, second=0, microsecond=0).timestamp() + (time_shift * 3600) + (r['hour_tx'] * 3600 + r['min_tx'] * 60 + r['sec_tx']),
         axis='columns')
     df_new['time_rx'] = df.apply(
-        lambda r: today.replace(
-            hour=2, minute=0, second=0, microsecond=0).timestamp() + (r['hour_rx'] * 3600 + r['min_rx'] * 60 + r['sec_rx']),
+        lambda r: datetime.fromtimestamp(start_time).replace(
+            hour=0, minute=0, second=0, microsecond=0).timestamp() + (time_shift * 3600) + (r['hour_rx'] * 3600 + r['min_rx'] * 60 + r['sec_rx']),
         axis='columns')
     return df_new
 
@@ -187,5 +187,7 @@ if __name__ == '__main__':
     parser.add_argument("-t", "--starttime",
                         help="Timestamp of the start of the experiment as synchronizing reference for measurements",
                         type=float, required=True)
+    parser.add_argument("-s", "--time-shift", type=float, default=0.0,
+                        help="Time shift between D-ITG and system time (default: 0.0h)")
     args = parser.parse_args()
-    main(args.directory, args.starttime)
+    main(args.directory, args.starttime, args.time_shift)
