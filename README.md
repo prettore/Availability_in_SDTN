@@ -333,6 +333,7 @@ The directory will be named with the date and time of the start of the experimen
 The mobility patterns should be placed in CSV files in a subdirectory of `./data/`.
 The names of the trace files have to start with the name of the subdirectory they are placed in followed by a suffix for each file.
 There have to be the following files:
+
  - `./data/EXAMPLE-SCENARIO/EXAMPLE-SCENARIO_ref-node_pp.csv`
  - `./data/EXAMPLE-SCENARIO/EXAMPLE-SCENARIO_sta1_X-sec_pred-trace_pp.csv`
  - `./data/EXAMPLE-SCENARIO/EXAMPLE-SCENARIO_sta1_X-sec_pred-trace_NtoN.csv`
@@ -348,6 +349,19 @@ However, these have to be preprocessed before they can be used here.
 You can do this using the `preprocess_traces_mobility_prediction.py` script.
 
 ***Note:*** The preprocessing script has to be called with all the trace files at once to work correctly, *NOT* separately for each node!
+
+Usually you will have three files as output from CAMS:
+
+ - `EXAMPLE-SCENARIO_ref-node.csv`
+ - `EXAMPLE-SCENARIO_X-sec_pred-trace.csv`
+ - `EXAMPLE-SCENARIO_convoy-1_X-sec_pred-trace.csv`
+
+As a first step the `*_pred_trace.csv` files should be renamed to `EXAMPLE-SCENARIO_sta1_X-sec_pred-trace.csv` and `EXAMPLE-SCENARIO_sta3_X-sec_pred-trace.csv`.
+Then the preprocessing script can be called with those files like this:
+```shell
+python ./preprocessing_traces_mobility_prediction.py -r EXAMPLE-SCENARIO_ref-node.csv EXAMPLE-SCENARIO_sta1_X-sec_pred-trace.csv EXAMPLE-SCENARIO_sta3_X-sec_pred-trace.csv
+```
+This should produce the files required as input for the experiment.
 
 The scripts `eval_ditg.py` and `eval_statistics.py` are used to evaluate the statistics after running the experiment.
 The output of those are needed to plot the results with `plot_statistics.py`.
