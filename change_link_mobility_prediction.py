@@ -23,7 +23,7 @@ def get_event(file_):
     if os.path.isfile(file_):
         df_event = pd.read_csv(file_)
 
-        df_event_tail = df_event.tail(5)
+        df_event_tail = df_event.tail(2)
 
         disconnection = df_event_tail['disconnect'].sum()
         reconnection = df_event_tail['reconnect'].sum()

@@ -25,15 +25,16 @@ from mn_wifi.replaying import ReplayingMobility
 
 
 # changing the link rate based on node mobility using Qdisc
-def network_change(station1, interface1, extra_arg, trace, trace_manet, buffer_size, exp_round, log_dir, event, manet):
+def network_change(station1, interface1, extra_arg, trace, trace_manet, buffer_size, exp_round, log_dir, event,
+                   start_time: float, manet):
     # adding TC and NetEm rule
     if not manet:  # using olsr
         makeTerm(station1, title='Changing the network - ' + interface1,
-                 cmd="python change_link.py -i " + interface1 + " -qlen " + str(
-                     buffer_size) + " " + extra_arg + " -t '" + trace + "' -t2 '" + trace_manet + "' -e " + log_dir + event)
+                 cmd="python change_link_rssi.py -i " + interface1 + " -qlen " + str(
+                     buffer_size) + " " + extra_arg + " -t '" + trace + "' -t2 '" + trace_manet + "' -e " + log_dir + event + " ; sleep 40")
     else:  # no olsr
         makeTerm(station1, title='Changing the network - ' + interface1,
-                 cmd="python change_link.py -i " + interface1 + " -qlen " + str(
+                 cmd="python change_link_rssi.py -i " + interface1 + " -qlen " + str(
                      buffer_size) + " " + extra_arg + " -t '" + trace + "'")
         # print("python change_link.py -i " + interface1 + " -qlen " + str(
         #             buffer_size) + " " + extra_arg + " -t '" + trace + "'")
@@ -41,8 +42,8 @@ def network_change(station1, interface1, extra_arg, trace, trace_manet, buffer_s
     if log_dir:
         # makeTerm(station1, title='Qdisc', cmd="python packet_queue.py -i "+interface1)
         makeTerm(station1, title='Qdisc',
-                 cmd="python packet_queue.py -i " + interface1 + " -o " + log_dir + station1.name + "_buffer.csv" +
-                     " -r " + str(exp_round) + " -qlen " + str(buffer_size))
+                 cmd=f"python packet_queue.py -i {interface1} -o {log_dir}{station1.name}_buffer.csv"
+                     f" -r {exp_round} -qlen {buffer_size} -t {start_time}")
         # print("python packet_queue.py -i "+interface1+" -o "+log_dir+station1.name + "_buffer.csv" +
         #                                                     " -r " + str(exp_round) + " -qlen " + str(buffer_size))
 
@@ -73,7 +74,7 @@ def user_data_flow(station1, station2, statistics_dir):
         # makeTerm(station1, title='Client',
         #          cmd="ITGSend -Sda 192.168.0.3 -Sdp 9090 -T UDP -a 10.0.0.3 -U 2 30 -z 2500 -s 0.123456 -c 1264 -t "
         #              "10000000 -l {}/sender.log -c 1000".format(statistics_dir))  # uhf
-    if scenario == 2:
+    if scenario == 2 or scenario == 3:
         # long experiment 30 min GM
         makeTerm(station1, title='Client',
                  cmd="ITGSend -Sda 192.168.0.3 -Sdp 9090 -T UDP -a 10.0.0.3 -U 2 20 -z 6000 -s 0.123456 -c 1264 -t 10000000 "
@@ -181,6 +182,15 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
         net.isReplaying = True
         info("*** Creating plot\n")
         net.plotGraph(max_x=3500, max_y=3500)
+    if scenario == 3:
+        trace_file = 'ManhattanGrid_30-sec_pred-trace.csv'
+        trace_manet_file = 'ManhattanGrid_30-sec_pred-trace_NtoN.csv'
+        smooth_motion = False
+        path = os.path.dirname(os.path.abspath(__file__)) + '/data/'
+        get_trace([sta1, sta3, ap1], path + trace_file, smooth_motion, False)
+        net.isReplaying = True
+        info("*** Creating plot\n")
+        net.plotGraph(max_x=5000, max_y=6000)
 
     info("*** Starting network\n")
     net.build()
@@ -238,7 +248,7 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
     # changing the link rate based on node mobility
     network_change(sta1, 'sta1-wlan0', '-latency 2000 -dest 10.0.0.3 -src 10.0.0.1',
                    trace=trace_file, trace_manet=trace_manet_file, buffer_size=bufferSize, exp_round=0,
-                   log_dir=statistics_dir, event="sta1_events.csv", manet=no_olsr)
+                   log_dir=statistics_dir, event="sta1_events.csv", start_time=start_time.timestamp(), manet=no_olsr)
     # network_change(sta3, 'sta3-wlan0', '-latency 2000 -dest 10.0.0.1/8 -src 10.0.0.3/8',
     #               trace=trace_file, trace_manet=trace_manet_file, buffer_size=100, exp_round=0,
     #               log_dir=False, event="sta3_events.csv",manet=no_olsr)
@@ -259,8 +269,6 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
     # makeTerm(sta1, title='Send', cmd="ITGSend -T UDP -C 10 -a 10.0.0.3 -c 1264 -s 0.123456 -t 600000 -l {}/sender.log -c 1000 ; sleep 10".format(statistics_dir))
     user_data_flow(sta1, sta3, statistics_dir)
 
-    print(auto)
-
     if auto:
         info("*** Experiment duration - " + str(experiment_time + 20) + " seconds \n")
         sleep(experiment_time + 20)
@@ -279,12 +287,12 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
         out, err = subprocess.Popen(['pgrep', 'olsrd'], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
         if out:
             subprocess.Popen(['killall', 'olsrd'])
-        subprocess.Popen(["python3", "{}/eval_ditg.py".format(path), "-d", statistics_dir, "-t",
+        subprocess.Popen(["python3", "{}/eval_ditg.py".format(path), "-s", "-5.0", "-d", statistics_dir, "-t",
                           str(start_time.timestamp())]).communicate()
         if no_olsr:
-            plot_cmd = ["python3", "{}/plot_statistics_new.py".format(path), "-d", statistics_dir, '-O', '-f', trace_file]
+            plot_cmd = ["python3", "{}/plot_statistics.py".format(path), "-m", "rssi", "-d", statistics_dir, '-O', '-f', trace_file]
         else:
-            plot_cmd = ["python3", "{}/plot_statistics_new.py".format(path), "-d", statistics_dir, '-f', trace_file]
+            plot_cmd = ["python3", "{}/plot_statistics.py".format(path), "-m", "rssi", "-d", statistics_dir, '-f', trace_file]
         subprocess.Popen(plot_cmd).communicate()
         os.system("chown -R wifi {}".format(path + '/data/statistics/'))
     else:
@@ -296,12 +304,12 @@ def topology(scenario: int, signal_window: int, scan_interval: float, disconnect
         out, err = subprocess.Popen(['pgrep', 'olsrd'], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
         if out:
             subprocess.Popen(['killall', 'olsrd'])
-        subprocess.Popen(["python3", "{}/eval_ditg.py".format(path), "-d", statistics_dir, "-t",
+        subprocess.Popen(["python3", "{}/eval_ditg.py".format(path), "-s", "-5.0", "-d", statistics_dir, "-t",
                           str(start_time.timestamp())]).communicate()
         if no_olsr:
-            plot_cmd = ["python3", "{}/plot_statistics_new.py".format(path), "-d", statistics_dir, '-O', '-f', trace_file]
+            plot_cmd = ["python3", "{}/plot_statistics_new.py".format(path), "-m", "rssi", "-d", statistics_dir, '-O', '-f', trace_file]
         else:
-            plot_cmd = ["python3", "{}/plot_statistics_new.py".format(path), "-d", statistics_dir, '-f', trace_file]
+            plot_cmd = ["python3", "{}/plot_statistics_new.py".format(path), "-m", "rssi", "-d", statistics_dir, '-f', trace_file]
         subprocess.Popen(plot_cmd).communicate()
         os.system("chown -R wifi {}".format(path + '/data/statistics/'))
 
@@ -310,8 +318,8 @@ if __name__ == '__main__':
     setLogLevel('info')
     parser = argparse.ArgumentParser(description="Tactical network experiment!")
     parser.add_argument("-m", "--mobilityScenario",
-                        help="Select a mobility scenario (Integer: 1 or 2) (default: 1)"
-                             " where 1: Pendulum (UHF), 2: GaussMarkov (UHF)",
+                        help="Select a mobility scenario (Integer: 1, 2 or 3) (default: 1)"
+                             " where 1: Pendulum (UHF), 2: GaussMarkov (UHF), 3: ManhattanGrid (UHF)",
                         type=int, required=False, default=1)
     parser.add_argument("-s", "--scanInterval", help="Time interval in seconds (float) for scanning if the wifi CP"
                                                      " is in range while being in adhoc mode (default: 2.0)",

@@ -154,19 +154,30 @@ def main(scenario: str, prediction_interval: int, disconnect_threshold: float, r
 
     info("*** Start replying mobility")
     replay_mobility(sta1, sta3, df_trace_sta1, df_trace_sta3, file_sta1, file_sta3, start_time,
-                    prediction_interval, time_factor)
+                    time_factor)
 
-    info("\n*** Running CLI\n")
-    CLI(net)
-    net.stop()
+    if auto:
+        queue_has_packet = True
+        while queue_has_packet:
+            with open(statistics_dir + 'sta1_packet_queue.txt', 'r') as file:
+                line = file.readline()
+                if line != 'True':
+                    queue_has_packet = False
+                else:
+                    sleep(10)
+    else:
+        info("*** Running CLI\n")
+        CLI(net)
     os.system('sudo pkill xterm')
+    net.stop()
     out, err = subprocess.Popen(['pgrep', 'olsrd'], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
     if out:
         subprocess.Popen(['killall', 'olsrd'])
     subprocess.Popen(["python3", "{}/eval_ditg.py".format(path), "-d", statistics_dir, "-s", "-5.0", "-t",
                       str(start_time.timestamp())]).communicate()
-    plot_cmd = ["python3", "{}/plot_statistics_new.py".format(path), "-d", statistics_dir, '-f', f"{scenario}.csv"]
-    subprocess.Popen(plot_cmd).communicate()
+    plot_cmd = ["python3", "{}/plot_statistics.py".format(path), "-m", "mobility", "-d", statistics_dir, '-f', f"{scenario}.csv"]
+    plotting_proc = subprocess.Popen(plot_cmd)
+    plotting_proc.communicate()
     os.system("chown -R wifi {}".format(path + '/data/statistics/'))
 
 
@@ -245,7 +256,7 @@ def user_data_flow(station1, station2, statistics_dir):
 
 
 def replay_mobility(node_a: Node_wifi, node_b: Node_wifi, trace_a: pd.DataFrame, trace_b: pd.DataFrame, file_a: str,
-                    file_b: str, start_time: datetime, pred_interval: int, time_factor: float = 1.0):
+                    file_b: str, start_time: datetime, time_factor: float = 1.0):
     for row_a, row_b in zip(trace_a.iterrows(), trace_b.iterrows()):
         i, row_a = row_a
         j, row_b = row_b
@@ -276,14 +287,14 @@ def write_or_append_csv_to_file(data: dict, file: str):
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Tactical network experiment!")
-    parser.add_argument("-m", "--mobilityScenario", type=str, required=False, default=1,
+    parser.add_argument("-m", "--mobilityScenario", type=str, required=False, default="ManhattanGrid",
                         help="Name of the scenario (the trace files have to have this as filename)")
-    parser.add_argument("-p", "--predictionInterval", type=int, required=True,
+    parser.add_argument("-p", "--predictionInterval", type=int, required=True, default=30,
                         help="Time in seconds how far into the future the model predicts "
                              "the network state in the given scenario")
     parser.add_argument("-d", "--disconnectThreshold", type=float, default=1.0,
                         help="Predicted network state below which station disconnects (default: 0)")
-    parser.add_argument("-r", "--reconnectThreshold", type=float, default=1.6,
+    parser.add_argument("-r", "--reconnectThreshold", type=float, default=2.0,
                         help="Minimal network state required to reconnect (default: 1)")
     parser.add_argument("-w", "--window-size", type=int, default=10,
                         help="Size of the sliding window to average out the predicted state outliers (default: 10)")

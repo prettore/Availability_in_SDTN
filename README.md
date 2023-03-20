@@ -22,6 +22,14 @@ The central part of the approach towards improving the availability in this scen
 The script enables the nodes to switch their wireless interfaces from managed mode to ad-hoc mode whenever they are disrupted from the infrastructure.
 In ad-hoc mode the nodes use OLSR to establish a communication channel to prevent the data flow from being disrupted.
 
+In this version there are two different approaches implemented for the script that decides when to switch between managed to ad-hoc mode.
+The first version is based on the mobile node(s) monitoring the RSSI of the CP that has to be connected for the managed network mode.
+The RSSI based approach is a stand-alone experiment and can be used directly.
+The second version uses mobility predictions for the mobile nodes to decide ahead of time when a disruption of the CP connection will occur.
+This approach is designed to be used together with [https://github.com/prettore/CAMS](https://github.com/prettore/CAMS), i.e., as input for this experiment the resulting output files from CAMS can be used.
+How to use the two experiments is explained in two separate subsections [here (RSSI)](#rssi-based-approach) and [here (mobility prediction)](#mobility-prediction-based-approach).
+Before using it we recommend reading [the setup instructions](#getting-started) which apply to both experiments.
+
 ## Virtual Presentation
 
 [![N|Solid](https://cdn.iconscout.com/icon/free/png-256/social-334-116368.png)](https://youtu.be/o5MBS2nbPUA)
@@ -39,7 +47,7 @@ You can also find instructions for that in the documentation of Mininet-Wifi.
 If you have not used the scripts of this project before we recommend reading the following sections.
 There, you will find important information about how to set everything up initially.
 
-_**Note:** Additional important information for the usage of this project can be found in the comments of the python scripts, especially in the files `experiment_main.py` and `flexible_sdn.py`.
+_**Note:** Additional important information for the usage of this project can be found in the comments of the python scripts, especially in the files `experiment_*.py` and `flexible_sdn_*.py`.
 We strongly recommend looking into the code of those files before using them._
 
 ### Dependencies
@@ -153,16 +161,17 @@ If you have set everything up then you can continue with the next steps.
 
 In the standard configuration the experiment needs a remote SDN controller to be available under the Address 
 
-To start the experiment with the default values set for the variables you can just execute the included script `experiment_main.py` like this:
+### RSSI based approach
+To start the experiment with the default values set for the variables you can just execute the included script `experiment_rssi.py` like this:
 
 ```shell
-sudo python ./experiment_main.py
+sudo python ./experiment_rssi.py
 ```
 
 To get an explanation of the available options and flags and their default values of the CLI just use:
 
 ```shell
-python ./experiment_main.py --help
+python ./experiment_rssi.py --help
 
 usage: experiment_main.py [-h] [-m MOBILITYSCENARIO] [-s SCANINTERVAL]
                           [-d DISCONNECTTHRESHOLD]
@@ -174,9 +183,9 @@ Tactical network experiment!
 optional arguments:
   -h, --help            show this help message and exit
   -m MOBILITYSCENARIO, --mobilityScenario MOBILITYSCENARIO
-                        Select a mobility scenario (Integer: 1 or 2)
+                        Select a mobility scenario (Integer: 1, 2 or 3)
                         (default: 1) where 1: Pendulum (UHF), 2:
-                        GaussMarkov (UHF)
+                        GaussMarkov (UHF), 3: ManhattanGrid (UHF)
   -s SCANINTERVAL, --scanInterval SCANINTERVAL
                         Time interval in seconds (float) for scanning if
                         the wifi CP is in range while being in adhoc mode
@@ -202,28 +211,28 @@ optional arguments:
                         buffer is empty
 ```
  
-## Structure and Design
-The script `experiment_main.py` initializes the experiment with a Mininet-Wifi topology.
-The script `flexible_sdn.py` is run in the nodes of that topology and contains the actual approach of this project.
+#### Structure
+The script `experiment_rssi.py` initializes the experiment with a Mininet-Wifi topology.
+The script `flexible_sdn_rssi.py` is run in the nodes of that topology and contains the actual approach of this project.
 After running the experiment the main script directly executes evaluation scripts which produce statistic summaries and plots.
 Statistics and plots of each run are saved in a new directory under `./data/statistics/`.
 The directory will be named with the date and time of the start of the experiment.
 
 The mobility patterns can be found in CSV files under `./data/`.
-The mobility patterns that can be used through the CLI of `experiment_main.py` are in the files `Scenario_*.csv`
+The mobility patterns that can be used through the CLI of `experiment_rssi.py` are in the files `Scenario_*.csv`
 
 The scripts `eval_ditg.py` and `eval_statistics.py` are used to evaluate the statistics after running the experiment.
-The output of those are needed to plot the results with `plot_statistics_new.py`.
+The output of those are needed to plot the results with `plot_statistics.py`.
 
 `scanner.py` contains the Multiprocessing class that is used inside the nodes to scan for the AP.
 `cmd_utils.py` contains some wrapper functions for the shell commands of `iw dev`.
 `sta1-wlan0-olsrd.conf` and `sta3-wlan0-olsrd.conf` contain the configurations needed to start OLSRd. 
 
-### Design
-The approach that we implemented in `flexible_sdn.py` is designed as follows:
+#### Design
+The approach that we implemented in `flexible_sdn_rssi.py` is designed as follows:
 
 The basic idea behind our solution is that devices follow SDN policies as long as they are connected to the SDN infrastructure including a controller and a Command Post (CP) connecting the controller with the other nodes and the nodes among each other. 
-If this infrastructure is not available to the nodes because of alink disconnection they switch to using a MANET avoiding disruptions of data flows. 
+If this infrastructure is not available to the nodes because of a link disconnection they switch to using a MANET avoiding disruptions of data flows. 
 Switching betweenSDN and MANET is managed by a control mechanism which can be run in the nodes of a SDTN and thereby control the network interfaces of the respective node.
 
 Our solution is inspired by the concept of using decentralized (D) control as a backup in case of unavailability of centralized (C) infrastructure. 
@@ -280,6 +289,71 @@ iii)  A  Linux  qdisc  is  used  to  control  the  outbound  traffic, reducing p
 iv) Multiple metrics  are  logged,  including  the  signal  strength,  buffer,  and IP  packets  at  the  sender  and  receiver  nodes.  
 The  IP  packets are processed to extract network metrics such as packet loss,end-to-end latency, jitter, data rate, and the buffer occupancy is acquired from the implemented qdisc. 
 We use these metrics to  quantify  the  performance  of  our  handover  mechanism  in the next section.
+
+### Mobility prediction based approach
+
+To start the experiment with the default values set for the variables you can just execute the included script `experiment_mobility_prediction.py` like this:
+
+```shell
+sudo python ./experiment_mobility_prediction.py
+```
+
+To get an explanation of the available options and flags and their default values of the CLI just use:
+```shell
+python ./experiment_mobility_prediction.py --help
+
+usage: experiment_mobility_prediction.py [-h] [-m MOBILITYSCENARIO] -p PREDICTIONINTERVAL [-d DISCONNECTTHRESHOLD] [-r RECONNECTTHRESHOLD] [-w WINDOW_SIZE] [-b BUFFERSIZE] [-a]
+
+Tactical network experiment!
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -m MOBILITYSCENARIO, --mobilityScenario MOBILITYSCENARIO
+                        Name of the scenario (the trace files have to have this as filename)
+  -p PREDICTIONINTERVAL, --predictionInterval PREDICTIONINTERVAL
+                        Time in seconds how far into the future the model predicts the network state in the given scenario
+  -d DISCONNECTTHRESHOLD, --disconnectThreshold DISCONNECTTHRESHOLD
+                        Predicted network state below which station disconnects (default: 0)
+  -r RECONNECTTHRESHOLD, --reconnectThreshold RECONNECTTHRESHOLD
+                        Minimal network state required to reconnect (default: 1)
+  -w WINDOW_SIZE, --window-size WINDOW_SIZE
+                        Size of the sliding window to average out the predicted state outliers (default: 10)
+  -b BUFFERSIZE, --bufferSize BUFFERSIZE
+                        Set the node buffer size (default: 100 packets)
+  -a, --auto            Automatically stop the experiment after the buffer is empty
+```
+
+#### Structure
+The script `experiment_mobility_prediction.py` initializes the experiment with a Mininet-Wifi topology.
+The script `flexible_sdn_mobility_prediction.py` is run in the nodes of that topology and contains the actual approach of this project.
+After running the experiment the main script directly executes evaluation scripts which produce statistic summaries and plots.
+Statistics and plots of each run are saved in a new directory under `./data/statistics/`.
+The directory will be named with the date and time of the start of the experiment.
+
+The mobility patterns should be placed in CSV files in a subdirectory of `./data/`.
+The names of the trace files have to start with the name of the subdirectory they are placed in followed by a suffix for each file.
+There have to be the following files:
+ - `./data/EXAMPLE-SCENARIO/EXAMPLE-SCENARIO_ref-node_pp.csv`
+ - `./data/EXAMPLE-SCENARIO/EXAMPLE-SCENARIO_sta1_X-sec_pred-trace_pp.csv`
+ - `./data/EXAMPLE-SCENARIO/EXAMPLE-SCENARIO_sta1_X-sec_pred-trace_NtoN.csv`
+ - `./data/EXAMPLE-SCENARIO/EXAMPLE-SCENARIO_sta3_X-sec_pred-trace_pp.csv`
+ - `./data/EXAMPLE-SCENARIO/EXAMPLE-SCENARIO_sta3_X-sec_pred-trace_NtoN.csv`
+
+**How to get those files:**
+Currently, there are files for a working example scenario in the directory `./data/ManhattanGrid/`.
+You can use these to see how the files should be named and look like.
+Assuming that you used [https://github.com/prettore/CAMS](https://github.com/prettore/CAMS) to produce the mobility prediction traces,
+you can use the resulting files from the `test_results` directory from your CAMS scenario.
+However, these have to be preprocessed before they can be used here.
+You can do this using the `preprocess_traces_mobility_prediction.py` script.
+
+***Note:*** The preprocessing script has to be called with all the trace files at once to work correctly, *NOT* separately for each node!
+
+The scripts `eval_ditg.py` and `eval_statistics.py` are used to evaluate the statistics after running the experiment.
+The output of those are needed to plot the results with `plot_statistics.py`.
+`cmd_utils.py` contains some wrapper functions for the shell commands of `iw dev`.
+`sta1-wlan0-olsrd.conf` and `sta3-wlan0-olsrd.conf` contain the configurations needed to start OLSRd. 
+
 
 How to cite
 ----

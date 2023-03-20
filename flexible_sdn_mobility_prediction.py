@@ -37,15 +37,17 @@ def main(args: argparse.Namespace):
     else:
         qdisc = 'off'
         qdisc_rates = {'disconnect': 0, 'reconnect': 0, 'unit': 'bit'}
-    parameters = {'start_time': args.starttime, 'interface': args.interface,
+    parameters = {'start_time': args.starttime, 'interface': args.interface, 'disconnect_at': args.disconnect_threshold,
+                  'reconnect_at': args.reconnect_threshold, 'sliding_window': args.window_size,
                   'qdisc': {'mode': qdisc, 'rates': qdisc_rates},
                   'AP': {'ssid': args.apssid, 'bssid': args.apbssid, 'ip': args.apip}}
     with open(statistics_dir + args.interface.split('-')[0] + '_start-params.json', 'w') as file:
         json.dump(parameters, file, indent=4)
 
-    controller = FlexibleSdnOlsrControllerNetState(args.interface, args.ip, args.apssid, args.apbssid, args.apip, args.pingto,
-                                                   args.starttime, qdisc_rates, args.state_file,
-                                                   args.disconnect_threshold, args.reconnect_threshold, args.statisticsdir)
+    controller = FlexibleSdnOlsrControllerNetState(args.interface, args.ip, args.apssid, args.apbssid, args.apip,
+                                                   args.pingto, args.starttime, qdisc_rates, args.state_file,
+                                                   args.disconnect_threshold, args.reconnect_threshold,
+                                                   args.window_size, args.statisticsdir)
     controller.run_controller()
 
 
@@ -55,7 +57,8 @@ class FlexibleSdnOlsrControllerNetState:
                'dtime': float}
 
     def __init__(self, interface: str, ip: str, ap_ssid: str, ap_bssid: str, ap_ip: str, pingto: str, start_time: float,
-                 qdisc: dict, state_file: str, disconnect_threshold: float, reconnect_threshold: float, statistics_dir: str):
+                 qdisc: dict, state_file: str, disconnect_threshold: float, reconnect_threshold: float,
+                 window_size: int, statistics_dir: str):
         self.out_path = statistics_dir
         self.interface = interface
         self.ip = ip
@@ -69,12 +72,12 @@ class FlexibleSdnOlsrControllerNetState:
         self.qdisc = qdisc
         self.qdisc.update({'throttled': False})
         self.olsrd_pid = 0
-        self.state_file = f"{state_file}"
-        self.state_change_stamp = 0
         self.disconnect_threshold = disconnect_threshold
         self.reconnect_threshold = reconnect_threshold
-        self.window_size = 10
-        self.sliding_window = deque(maxlen=self.window_size)
+        self.sliding_window = deque(maxlen=window_size)
+        self.state_file = f"{state_file}"
+        self.state_change_stamp = 0
+        self.state_file_size = os.path.getsize(self.state_file)
         self.current_state = pd.read_csv(self.state_file, dtype=self.columns).tail(1).reset_index().loc[0].to_dict()
 
         log.info("*** {}: Interface: {}".format(interface.split('-')[0], interface))
@@ -88,35 +91,42 @@ class FlexibleSdnOlsrControllerNetState:
     def run_controller(self):
         while True:
             sleep(0.1)
-            new_state = self.has_state_changed()
-            if new_state is not None:
-                self.sliding_window.append(new_state['state_pred'])
+            if self.state_has_changed():
+                self.sliding_window.append(self.current_state['state_pred'])
                 if self.connected_to_ap:
                     net_status = "AP"
                 else:
                     net_status = "MANET"
-                print(f"*** New state: {new_state} - {net_status}")
-                if self.connected_to_ap and (sum(self.sliding_window) / len(self.sliding_window)) <= self.disconnect_threshold:
+                print(f"*** New state: {self.current_state} - Prediction window: {self.sliding_window}"
+                      f" - Current status: {net_status}")
+                if self.connected_to_ap and all(x <= self.disconnect_threshold for x in self.sliding_window):
+                    log.info(f"*** {self.interface}: Disconnecting [Prediction window: {self.sliding_window}]")
                     print("*** Starting OLSRd")
                     self.log_event('disconnect', 1)
                     self.switch_to_olsr()
                     self.connected_to_ap = False
                     self.log_event('disconnect', 2)
-                    print("*** Reconnected to AP.")
-                if not self.connected_to_ap and (sum(self.sliding_window) / len(self.sliding_window)) > self.reconnect_threshold:
+                    print("*** Connected to MANET.")
+                if not self.connected_to_ap and all(x >= self.reconnect_threshold for x in self.sliding_window):
+                    log.info(f"*** Reconnecting [Prediction window: {self.sliding_window}]")
                     print("*** Reconnecting to AP")
                     self.log_event('reconnect', 1)
                     self.reconnect_to_access_point()
                     self.connected_to_ap = True
                     self.log_event('reconnect', 2)
+                    print("*** Reconnected to AP")
 
-    def has_state_changed(self) -> Optional[dict]:
+    def state_has_changed(self) -> bool:
         state_change_stamp = os.stat(self.state_file).st_mtime_ns
-        if state_change_stamp != self.state_change_stamp:
+        # size = os.path.getsize(self.state_file)
+        if state_change_stamp != self.state_change_stamp:  # and size > self.state_file_size:
+            self.state_change_stamp = state_change_stamp
+            # self.state_file_size = size
             new_state = pd.read_csv(self.state_file, dtype=self.columns).tail(1).reset_index().loc[0].to_dict()
             if new_state != self.current_state:
-                return new_state
-        return None
+                self.current_state = new_state
+                return True
+        return False
 
     def initial_connect_to_ap(self):
         log.info(f"*** {self.interface}: Initially connecting to AP {self.ap_ssid} ...")

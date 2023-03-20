@@ -135,7 +135,7 @@ class FlexibleSdnOlsrController:
                     num_of_cases = 2
 
                 # Rettore
-                if num_of_cases >=2:
+                if num_of_cases >= 2:
                     #if not self.no_olsr:
                     print("*** Starting background scan")
                     self.scanner.start()
@@ -144,19 +144,19 @@ class FlexibleSdnOlsrController:
 
             scan_signal = self.get_scan_dump_signal()
             #print(scan_signal)
-            if scan_signal and 'signal' in scan_signal:
+            if scan_signal and 'signal' in scan_signal and scan_signal['signal'] is not None:
                 # Rettore
                 #if scan_signal['signal'] is not None:
                 self.scan_signal_deque.append(scan_signal['signal'])
                 scan_signal.update({'signal_avg': sum(self.scan_signal_deque) / len(self.scan_signal_deque)})
+                self.write_signal_to_file(scan_signal)
+                print("{}, {}, {}, {:.2f}, {}".format(scan_signal['SSID'], scan_signal['time'], scan_signal['signal'],
+                                                      scan_signal['signal_avg'], self.scan_signal_deque))
                 #print("An exception occurred during sum(self.scan_signal_deque) / len(self.scan_signal_deque).")
                 log.info(
                     "*** {}: Scan detected {} in range (signal: {} / {})".format(self.scan_interface, self.ap_ssid,
                                                                                  scan_signal['signal'],
                                                                                  self.reconnect_threshold))
-                self.write_signal_to_file(scan_signal)
-                print("{}, {}, {}, {:.2f}".format(scan_signal['SSID'], scan_signal['time'], scan_signal['signal'],
-                                                  scan_signal['signal_avg']))
                 if scan_signal['signal'] >= self.reconnect_threshold:
                     self.log_event('reconnect', 1)
                     self.reconnect_to_access_point()

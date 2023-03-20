@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def main(data_path, show, noOlsr, file_name, short):
+def main(data_path, show, noOlsr, file_name, short, mode: str, plot_centralized: bool):
     summary_file = data_path + 'summary.csv'
     time_series_file = data_path + 'metrics_time_series.csv'
     buffer_file = data_path + 'sta1_buffer.csv'
@@ -31,6 +31,10 @@ def main(data_path, show, noOlsr, file_name, short):
     # converting bitrate to Kbit rate
     df_time_series['bitrate'] = df_time_series['bitrate'].apply(lambda x: x / 1000)
 
+    # starting from time 0
+    # df_time_series['time'] = df_time_series['time'].apply(lambda x: x - df_time_series['time'].iloc[0])
+    # df_sender_buffer['buffer_timestamp'] = range(0, len(df_sender_buffer), 1)
+
     df_packet_loss_peaks = df_time_series[
         (df_time_series.packet_loss > 0) & (df_time_series.packet_loss.shift(-1) == 0)].append(
         df_time_series.tail(1)[df_time_series.tail(1).packet_loss > 0])
@@ -43,30 +47,41 @@ def main(data_path, show, noOlsr, file_name, short):
     signal_columns = ["time", "SSID", "signal", "signal_avg", "rx_bitrate", "tx_bitrate"]
     events_columns = ['time', 'disconnect', 'reconnect', 'scanner_start', 'scanner_stop', 'scan_trigger']
 
-    # df_signal_send = pd.read_csv(send_signal_file, sep=',')
-    # df_signal_recv = pd.read_csv(recv_signal_file, sep=',')
+    if mode == "rssi":
+        df_signal_send = pd.read_csv(send_signal_file, sep=',')
+        df_signal_recv = pd.read_csv(recv_signal_file, sep=',')
 
-    # df_signal_send = df_signal_send[signal_columns]
-    # df_signal_recv = df_signal_recv[signal_columns]
-    pos_state_columns = {'time': float, 'x': float, 'y': float, 'state': int, 'x_pred': float, 'y_pred': float,
-                         'state_pred': int, 'dtime': float}
-    send_pos_state_file = data_path + "sta1_position_state.csv"
-    recv_pos_state_file = data_path + "sta3_position_state.csv"
-    df_pos_state_send = pd.read_csv(send_pos_state_file, dtype=pos_state_columns).drop(0)
-    df_pos_state_recv = pd.read_csv(recv_pos_state_file, dtype=pos_state_columns).drop(0)
-    df_pos_state_send['time'] = df_pos_state_send['time'].apply(lambda x: x / 60)
-    df_pos_state_recv['time'] = df_pos_state_recv['time'].apply(lambda x: x / 60)
+        df_signal_send = df_signal_send[signal_columns]
+        df_signal_recv = df_signal_recv[signal_columns]
+
+        df_signal_send['time'] = df_signal_send['time'].apply(lambda x: x / 60)
+        df_signal_recv['time'] = df_signal_recv['time'].apply(lambda x: x / 60)
+    else:
+        pos_state_columns = {'time': float, 'x': float, 'y': float, 'state': int, 'x_pred': float, 'y_pred': float,
+                             'state_pred': int, 'dtime': float}
+        send_pos_state_file = data_path + "sta1_position_state.csv"
+        recv_pos_state_file = data_path + "sta3_position_state.csv"
+        df_pos_state_send = pd.read_csv(send_pos_state_file, dtype=pos_state_columns).drop(0)
+        df_pos_state_recv = pd.read_csv(recv_pos_state_file, dtype=pos_state_columns).drop(0)
+        df_pos_state_send['time'] = df_pos_state_send['time'].apply(lambda x: x / 60)
+        df_pos_state_recv['time'] = df_pos_state_recv['time'].apply(lambda x: x / 60)
 
     df_time_series['time'] = df_time_series['time'].apply(lambda x: x / 60)
-    # df_signal_send['time'] = df_signal_send['time'].apply(lambda x: x / 60)
-    # df_signal_recv['time'] = df_signal_recv['time'].apply(lambda x: x / 60)
     df_sender_buffer['buffer_timestamp'] = df_sender_buffer['buffer_timestamp'].apply(lambda x: x / 60)
+    end_time = df_time_series['time'].max()
 
     # starting from time 0
-    min_time = min([min(df_time_series['time']), min(df_sender_buffer['buffer_timestamp']),
-                    min(df_pos_state_send['time']), min(df_pos_state_recv['time'])])
-    df_pos_state_send['time'] = df_pos_state_send['time'].apply(lambda x: x - min_time)
-    df_pos_state_recv['time'] = df_pos_state_recv['time'].apply(lambda x: x - min_time)
+    if mode == "rssi":
+        min_time = min([min(df_time_series['time']), min(df_sender_buffer['buffer_timestamp']),
+                        min(df_signal_send['time']), min(df_signal_recv['time'])])
+        df_signal_send['time'] = df_signal_send['time'].apply(lambda x: x - min_time)
+        df_signal_recv['time'] = df_signal_recv['time'].apply(lambda x: x - min_time)
+    else:
+        min_time = min([min(df_time_series['time']), min(df_sender_buffer['buffer_timestamp']),
+                        min(df_pos_state_send['time']), min(df_pos_state_recv['time'])])
+        df_pos_state_send['time'] = df_pos_state_send['time'].apply(lambda x: x - min_time)
+        df_pos_state_recv['time'] = df_pos_state_recv['time'].apply(lambda x: x - min_time)
+
     df_time_series['time'] = df_time_series['time'].apply(lambda x: x - min_time)
     df_sender_buffer['buffer_timestamp'] = df_sender_buffer['buffer_timestamp'].apply(lambda x: x - min_time)
 
@@ -80,40 +95,52 @@ def main(data_path, show, noOlsr, file_name, short):
 
         df_events_send['time'] = df_events_send['time'].apply(lambda x: x / 60)
         df_events_recv['time'] = df_events_recv['time'].apply(lambda x: x / 60)
-        df_events_send['time'] = df_events_send['time'].apply(lambda x: x - min_time)
-        df_events_recv['time'] = df_events_recv['time'].apply(lambda x: x - min_time)
 
         send_disconnect_start = []
         send_disconnect_stop = []
         send_reconnect_start = []
         send_reconnect_stop = []
+        send_central_start = [0.0]
+        send_central_stop = []
         for i, row in df_events_send.iterrows():
             if df_events_send.loc[i, 'disconnect'] == 1:
                 send_disconnect_start.append(df_events_send.loc[i, 'time'])
+                send_central_stop.append(df_events_send.loc[i, 'time'])
             if df_events_send.loc[i, 'disconnect'] == 2:
                 send_disconnect_stop.append(df_events_send.loc[i, 'time'])
             if df_events_send.loc[i, 'reconnect'] == 1:
                 send_reconnect_start.append(df_events_send.loc[i, 'time'])
             if df_events_send.loc[i, 'reconnect'] == 2:
                 send_reconnect_stop.append(df_events_send.loc[i, 'time'])
+                if len(send_central_start) == len(send_central_stop):
+                    send_central_start.append(df_events_send.loc[i, 'time'])
         send_disconnect = list(zip(send_disconnect_start, send_disconnect_stop))
         send_reconnect = list(zip(send_reconnect_start, send_reconnect_stop))
+        send_central_stop.append(end_time)
+        send_central = list(zip(sorted(send_central_start), sorted(send_central_stop)))
 
         recv_disconnect_start = []
         recv_disconnect_stop = []
         recv_reconnect_start = []
         recv_reconnect_stop = []
+        recv_central_start = [0.0]
+        recv_central_stop = []
         for i, row in df_events_recv.iterrows():
             if df_events_recv.loc[i, 'disconnect'] == 1:
                 recv_disconnect_start.append(df_events_recv.loc[i, 'time'])
+                recv_central_stop.append(df_events_recv.loc[i, 'time'])
             if df_events_recv.loc[i, 'disconnect'] == 2:
                 recv_disconnect_stop.append(df_events_recv.loc[i, 'time'])
             if df_events_recv.loc[i, 'reconnect'] == 1:
                 recv_reconnect_start.append(df_events_recv.loc[i, 'time'])
             if df_events_recv.loc[i, 'reconnect'] == 2:
                 recv_reconnect_stop.append(df_events_recv.loc[i, 'time'])
+                if len(recv_central_start) == len(recv_central_stop):
+                    recv_central_start.append(df_events_recv.loc[i, 'time'])
         recv_disconnect = list(zip(recv_disconnect_start, recv_disconnect_stop))
         recv_reconnect = list(zip(recv_reconnect_start, recv_reconnect_stop))
+        recv_central_stop.append(end_time)
+        recv_central = list(zip(recv_central_start, recv_central_stop))
 
     # applying SMA
     df_time_series['bitrate'] = df_time_series.bitrate.rolling(20).mean()
@@ -123,7 +150,7 @@ def main(data_path, show, noOlsr, file_name, short):
     #short = True
     if short:
         # fig, ax = plt.subplots(4, 1, figsize=(6, 4), sharex=True)
-        fig, ax = plt.subplots(4, 1, sharex='col', figsize=(6, 3), gridspec_kw={'hspace': 0, 'wspace': 0},
+        fig, ax = plt.subplots(4, 1, sharex='col', figsize=(6, 4), gridspec_kw={'hspace': 0, 'wspace': 0},
                                tight_layout=True)
     else:
         # create a group of plot, and remove vertical gap between subplots
@@ -133,105 +160,131 @@ def main(data_path, show, noOlsr, file_name, short):
     # fig, ax = plt.subplots(6, 1, sharex='col', gridspec_kw={'hspace': 0.0, 'wspace': 0}, tight_layout=True)
     # fig.set_size_inches(6, 5)
 
-    # line0 = ax[0].plot(df_signal_send['time'], df_signal_send['signal'], marker='v',  # label='Sender',
-    #                    color='tab:blue', linewidth=0, markersize=0.5)
-    # line01 = ax[0].plot(df_signal_send['time'], df_signal_send['signal_avg'], label='Sender',
-    #                     marker=',', color='tab:blue')
-    line0 = ax[0].plot(df_pos_state_send['time'], df_pos_state_send['state'], color='tab:blue', label='Sender')
-    line01 = ax[0].plot(df_pos_state_recv['time'], df_pos_state_recv['state'], color='tab:orange', linestyle='dashed',
-                        label='Receiver')
+    if mode == "rssi":
+        line0 = ax[0].plot(df_signal_send['time'], df_signal_send['signal'], marker='v',  # label='Sender',
+                           color='tab:blue', linewidth=0, markersize=0.5)
+        line01 = ax[0].plot(df_signal_send['time'], df_signal_send['signal_avg'], label='Sender',
+                            marker=',', color='tab:blue')
+    else:
+        line0 = ax[0].plot(df_pos_state_send['time'], df_pos_state_send['state'], color='tab:blue', label='Sender')
+        line01 = ax[0].plot(df_pos_state_recv['time'], df_pos_state_recv['state'], color='tab:orange',
+                            linestyle='dashed', label='Receiver')
 
     if os.path.isfile(send_events_file):
-        for i, j in send_disconnect:
-            print("*** Send disconnect time: {}, {}".format(i, j))
-            ax[0].axvspan(i, j, ymin=0, ymax=0.5, color='#b8e1ff')
-            ax[0].axvline(x=i, ymax=0.5, color='tab:blue', linestyle=(0, (3, 5, 1, 5)))
-            ax[0].axvline(x=j, ymax=0.5, color='tab:blue', linestyle=(0, (3, 5, 1, 5)))
-            if not noOlsr:
-                # draw_brace_bottom(ax[0], (i, j), "CP"  r"$\rightarrow$" "MN", '#006ab5')
+        if not plot_centralized:
+            for i, j in send_disconnect:
+                print("*** Send disconnect time: {}, {}".format(i, j))
+                ax[0].axvspan(i, j, ymin=0, ymax=0.5, color='#b8e1ff')
+                ax[0].axvline(x=i, ymax=0.5, color='tab:blue', linestyle=(0, (3, 5, 1, 5)))
+                ax[0].axvline(x=j, ymax=0.5, color='tab:blue', linestyle=(0, (3, 5, 1, 5)))
+                if not noOlsr:
+                    # draw_brace_bottom(ax[0], (i, j), "CP"  r"$\rightarrow$" "MN", '#006ab5')
 
-                ax[0].annotate("CP"  r"$\rightarrow$" "MN", fontsize=9, color='#006ab5',
-                               xy=(i, -85), xycoords='data', textcoords='offset points', xytext=(20, 0),
-                               # bbox=dict(boxstyle="round", fc="0.8"),
-                               arrowprops=dict(arrowstyle="->", color='#006ab5'))
-            else:
-                # draw_brace_bottom(ax[0], (i, j), "BS disconnect", '#006ab5')
+                    ax[0].annotate("CP"  r"$\rightarrow$" "MN", fontsize=9, color='#006ab5',
+                                   xy=(i, -85), xycoords='data', textcoords='offset points', xytext=(20, 0),
+                                   # bbox=dict(boxstyle="round", fc="0.8"),
+                                   arrowprops=dict(arrowstyle="->", color='#006ab5'))
+                else:
+                    # draw_brace_bottom(ax[0], (i, j), "BS disconnect", '#006ab5')
 
-                ax[0].annotate("CP discon", fontsize=9, color='#006ab5',
-                               xy=(i, -85), xycoords='data', textcoords='offset points', xytext=(20, 0),
-                               # bbox=dict(boxstyle="round", fc="0.8"),
-                               arrowprops=dict(arrowstyle="->", color='#006ab5'))
+                    ax[0].annotate("CP discon", fontsize=9, color='#006ab5',
+                                   xy=(i, -85), xycoords='data', textcoords='offset points', xytext=(20, 0),
+                                   # bbox=dict(boxstyle="round", fc="0.8"),
+                                   arrowprops=dict(arrowstyle="->", color='#006ab5'))
 
-        for i, j in send_reconnect:
-            print("*** Send reconnect time: {}, {}".format(i, j))
-            ax[0].axvspan(i, j, ymin=0, ymax=0.5, color='#b8e1ff')
-            ax[0].axvline(x=i, ymax=0.5, color='tab:blue', linestyle=(0, (3, 5, 1, 5)))
-            ax[0].axvline(x=j, ymax=0.5, color='tab:blue', linestyle=(0, (3, 5, 1, 5)))
-            if not noOlsr:
-                # draw_brace_bottom(ax[0], (i, j), "MN" r"$\rightarrow$" "CP" , '#006ab5')
+            for i, j in send_reconnect:
+                print("*** Send reconnect time: {}, {}".format(i, j))
+                ax[0].axvspan(i, j, ymin=0, ymax=0.5, color='#b8e1ff')
+                ax[0].axvline(x=i, ymax=0.5, color='tab:blue', linestyle=(0, (3, 5, 1, 5)))
+                ax[0].axvline(x=j, ymax=0.5, color='tab:blue', linestyle=(0, (3, 5, 1, 5)))
+                if not noOlsr:
+                    # draw_brace_bottom(ax[0], (i, j), "MN" r"$\rightarrow$" "CP" , '#006ab5')
 
-                ax[0].annotate("MN" r"$\rightarrow$" "CP", fontsize=9, color='#006ab5',
-                               xy=(i, -85), xycoords='data', textcoords='offset points', xytext=(-70, 0),
-                               # bbox=dict(boxstyle="round", fc="0.8"),
-                               arrowprops=dict(arrowstyle="->", color='#006ab5'))
-            else:
-                # draw_brace_bottom(ax[0], (i, j), "CP reconnect", '#006ab5')
+                    ax[0].annotate("MN" r"$\rightarrow$" "CP", fontsize=9, color='#006ab5',
+                                   xy=(i, -85), xycoords='data', textcoords='offset points', xytext=(-70, 0),
+                                   # bbox=dict(boxstyle="round", fc="0.8"),
+                                   arrowprops=dict(arrowstyle="->", color='#006ab5'))
+                else:
+                    # draw_brace_bottom(ax[0], (i, j), "CP reconnect", '#006ab5')
 
-                ax[0].annotate("CP recon", fontsize=9, color='#006ab5',
-                               xy=(i, -85), xycoords='data', textcoords='offset points', xytext=(-70, 0),
-                               # bbox=dict(boxstyle="round", fc="0.8"),
-                               arrowprops=dict(arrowstyle="->", color='#006ab5'))
+                    ax[0].annotate("CP recon", fontsize=9, color='#006ab5',
+                                   xy=(i, -85), xycoords='data', textcoords='offset points', xytext=(-70, 0),
+                                   # bbox=dict(boxstyle="round", fc="0.8"),
+                                   arrowprops=dict(arrowstyle="->", color='#006ab5'))
+        else:
+            for c, (i, j) in enumerate(send_central):
+                print("*** Send central connect time: {}, {}".format(i*60, j*60))
+                if c == 0:
+                    ax[0].axvspan(i, j, ymin=0, ymax=0.5, color='#b8e1ff', label='Centralized connection')
+                else:
+                    ax[0].axvspan(i, j, ymin=0, ymax=0.5, color='#b8e1ff')
+                ax[0].axvline(x=i, ymax=0.5, color='tab:blue', linestyle=(0, (3, 5, 1, 5)))
+                ax[0].axvline(x=j, ymax=0.5, color='tab:blue', linestyle=(0, (3, 5, 1, 5)))
 
-    # line02 = ax[0].plot(df_signal_recv['time'], df_signal_recv['signal'], marker='x',  # label='Receiver',
-    #                     color='tab:orange', linewidth=0, markersize=0.5)
-    # line03 = ax[0].plot(df_signal_recv['time'], df_signal_recv['signal_avg'], label='Receiver',
-    #                     marker=',', color='tab:orange', linestyle='dashed')
+    if mode == "rssi":
+        line02 = ax[0].plot(df_signal_recv['time'], df_signal_recv['signal'], marker='x',  # label='Receiver',
+                            color='tab:orange', linewidth=0, markersize=0.5)
+        line03 = ax[0].plot(df_signal_recv['time'], df_signal_recv['signal_avg'], label='Receiver',
+                            marker=',', color='tab:orange', linestyle='dashed')
 
     if os.path.isfile(send_events_file):
-        for i, j in recv_disconnect:
-            print("*** Recv disconnect time: {}, {}".format(i, j))
-            ax[0].axvspan(i, j, ymin=0.5, ymax=1, color='#ffcfa6')
-            ax[0].axvline(x=i, ymin=0.5, color='tab:orange', linestyle=(0, (3, 5, 1, 5, 1, 5)))
-            ax[0].axvline(x=j, ymin=0.5, color='tab:orange', linestyle=(0, (3, 5, 1, 5, 1, 5)))
-            ymin, ymax = ax[0].get_ylim()
-            if not noOlsr:
-                # draw_brace_top(ax[0], (i, j), "CP"  r"$\rightarrow$" "MN", '#ff7700')
+        if not plot_centralized:
+            for i, j in recv_disconnect:
+                print("*** Recv disconnect time: {}, {}".format(i, j))
+                ax[0].axvspan(i, j, ymin=0.5, ymax=1, color='#ffcfa6')
+                ax[0].axvline(x=i, ymin=0.5, color='tab:orange', linestyle=(0, (3, 5, 1, 5, 1, 5)))
+                ax[0].axvline(x=j, ymin=0.5, color='tab:orange', linestyle=(0, (3, 5, 1, 5, 1, 5)))
+                ymin, ymax = ax[0].get_ylim()
+                if not noOlsr:
+                    # draw_brace_top(ax[0], (i, j), "CP"  r"$\rightarrow$" "MN", '#ff7700')
 
-                ax[0].annotate("CP"  r"$\rightarrow$" "MN", fontsize=9, color='#ff7700',
-                               xy=(i, -75), xycoords='data', textcoords='offset points', xytext=(20, 0),
-                               # bbox=dict(boxstyle="round", fc="0.8"),
-                               arrowprops=dict(arrowstyle="->", color='#ff7700'))
-            else:
-                # draw_brace_top(ax[0], (i, j), "CP disconnect", '#ff7700')
+                    ax[0].annotate("CP"  r"$\rightarrow$" "MN", fontsize=9, color='#ff7700',
+                                   xy=(i, -75), xycoords='data', textcoords='offset points', xytext=(20, 0),
+                                   # bbox=dict(boxstyle="round", fc="0.8"),
+                                   arrowprops=dict(arrowstyle="->", color='#ff7700'))
+                else:
+                    # draw_brace_top(ax[0], (i, j), "CP disconnect", '#ff7700')
 
-                ax[0].annotate("CP discon", fontsize=9, color='#ff7700',
-                               xy=(i, -75), xycoords='data', textcoords='offset points', xytext=(20, 0),
-                               # bbox=dict(boxstyle="round", fc="0.8"),
-                               arrowprops=dict(arrowstyle="->", color='#ff7700'))
-        for i, j in recv_reconnect:
-            print("*** Recv reconnect time: {}, {}".format(i, j))
-            ax[0].axvspan(i, j, ymin=0.5, ymax=1, color='#ffcfa6')
-            ax[0].axvline(x=i, ymin=0.5, color='tab:orange', linestyle=(0, (3, 5, 1, 5, 1, 5)))
-            ax[0].axvline(x=j, ymin=0.5, color='tab:orange', linestyle=(0, (3, 5, 1, 5, 1, 5)))
-            if not noOlsr:
-                # draw_brace_top(ax[0], (i, j), "MN" r"$\rightarrow$" "CP" , '#ff7700')
+                    ax[0].annotate("CP discon", fontsize=9, color='#ff7700',
+                                   xy=(i, -75), xycoords='data', textcoords='offset points', xytext=(20, 0),
+                                   # bbox=dict(boxstyle="round", fc="0.8"),
+                                   arrowprops=dict(arrowstyle="->", color='#ff7700'))
+            for i, j in recv_reconnect:
+                print("*** Recv reconnect time: {}, {}".format(i, j))
+                ax[0].axvspan(i, j, ymin=0.5, ymax=1, color='#ffcfa6')
+                ax[0].axvline(x=i, ymin=0.5, color='tab:orange', linestyle=(0, (3, 5, 1, 5, 1, 5)))
+                ax[0].axvline(x=j, ymin=0.5, color='tab:orange', linestyle=(0, (3, 5, 1, 5, 1, 5)))
+                if not noOlsr:
+                    # draw_brace_top(ax[0], (i, j), "MN" r"$\rightarrow$" "CP" , '#ff7700')
 
-                ax[0].annotate("MN" r"$\rightarrow$" "CP", fontsize=9, color='#ff7700',
-                               xy=(i, -75), xycoords='data', textcoords='offset points', xytext=(-70, 0),
-                               # bbox=dict(boxstyle="round", fc="0.8"),
-                               arrowprops=dict(arrowstyle="->", color='#ff7700'))
-            else:
-                # draw_brace_top(ax[0], (i, j), "CP reconnect", '#ff7700')
+                    ax[0].annotate("MN" r"$\rightarrow$" "CP", fontsize=9, color='#ff7700',
+                                   xy=(i, -75), xycoords='data', textcoords='offset points', xytext=(-70, 0),
+                                   # bbox=dict(boxstyle="round", fc="0.8"),
+                                   arrowprops=dict(arrowstyle="->", color='#ff7700'))
+                else:
+                    # draw_brace_top(ax[0], (i, j), "CP reconnect", '#ff7700')
 
-                ax[0].annotate("CP recon", fontsize=9, color='#ff7700',
-                               xy=(i, -75), xycoords='data', textcoords='offset points', xytext=(-70, 0),
-                               # bbox=dict(boxstyle="round", fc="0.8"),
-                               arrowprops=dict(arrowstyle="->", color='#ff7700'))
+                    ax[0].annotate("CP recon", fontsize=9, color='#ff7700',
+                                   xy=(i, -75), xycoords='data', textcoords='offset points', xytext=(-70, 0),
+                                   # bbox=dict(boxstyle="round", fc="0.8"),
+                                   arrowprops=dict(arrowstyle="->", color='#ff7700'))
+        else:
+            for c, (i, j) in enumerate(recv_central):
+                print("*** Recv central connect time: {}, {}".format(i*60, j*60))
+                if c == 0:
+                    ax[0].axvspan(i, j, ymin=0.5, ymax=1, color='#ffcfa6', label='Centralized connection')
+                else:
+                    ax[0].axvspan(i, j, ymin=0.5, ymax=1, color='#ffcfa6')
+                ax[0].axvline(x=i, ymin=0.5, color='tab:orange', linestyle=(0, (3, 5, 1, 5, 1, 5)))
+                ax[0].axvline(x=j, ymin=0.5, color='tab:orange', linestyle=(0, (3, 5, 1, 5, 1, 5)))
 
     # ax[0].set_xlabel("Time (seconds)")
     # ax[0].set_xlabel("Time (min)")
     # ax[0].set_ylabel("RSSI of AP (dBm)")
-    ax[0].set_ylabel("NetState\n")
+    if mode == "rssi":
+        ax[0].set_ylabel("CP RSSI\n(dBm)")
+    else:
+        ax[0].set_ylabel("NetState\n")
     # ax_top = ax[0].twiny()
     # ax[0].legend(loc='upper center')#'upper center')
     ax[0].legend(bbox_to_anchor=(0., 1.02, 1., .102), loc='lower center', columnspacing=0.5, borderaxespad=0.,
@@ -400,8 +453,12 @@ if __name__ == '__main__':
     parser.add_argument("-short", "--short", help="Short plot removes latency and jitter metrics (default: False)",
                         action='store_true', default=True, required=False)
     parser.add_argument("-f", "--fileName", help="File name for the plots", type=str, required=True)
-    # parser.add_argument("-t", "--start-timestamp", type=float, required=True)
+    parser.add_argument("-m", "--mode", help="Handover mechanism mode. Either 'rssi' or 'mobility' (default: rssi)",
+                        type=str, default='rssi')
+    parser.add_argument("-c", "--plot-centralized", action="store_true", default=False,
+                        help="Instead of coloring an area of the plot for each handover, color an area for the time"
+                             " when the node is connected to the AP")
 
     args = parser.parse_args()
     path = args.directory
-    main(path, args.show, args.noOlsr, args.fileName, args.short)
+    main(path, args.show, args.noOlsr, args.fileName, args.short, args.mode, args.plot_centralized)
